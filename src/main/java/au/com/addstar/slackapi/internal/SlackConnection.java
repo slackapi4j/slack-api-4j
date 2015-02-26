@@ -11,11 +11,13 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import au.com.addstar.slackapi.exceptions.SlackAuthException;
 import au.com.addstar.slackapi.exceptions.SlackException;
+import au.com.addstar.slackapi.exceptions.SlackRequestLimitException;
 import au.com.addstar.slackapi.exceptions.SlackRestrictedException;
 
 import com.google.gson.JsonElement;
@@ -26,9 +28,15 @@ import com.google.gson.stream.JsonReader;
 public class SlackConnection
 {
 	private String token;
+	private boolean isRateLimited;
+	private long retryEnd;
+	
 	public SlackConnection(String token)
 	{
 		this.token = token;
+		
+		isRateLimited = false;
+		retryEnd = 0;
 	}
 	
 	private String encodeRequest(Map<String, Object> params)
@@ -82,10 +90,26 @@ public class SlackConnection
 		}
 	}
 	
-	public JsonElement callMethod(String method, Map<String, Object> params) throws IOException
+	public JsonElement callMethod(String method, Map<String, Object> params) throws IOException, SlackRequestLimitException
 	{
+		if (isRateLimited)
+		{
+			if (System.currentTimeMillis() < retryEnd)
+				throw new SlackRequestLimitException(retryEnd);
+			
+			isRateLimited = false;
+		}
+		
 		HttpsURLConnection connection = createConnection(method, params);
 		connection.connect();
+		
+		if (connection.getResponseCode() == 429) // Too many requests
+		{
+			int delay = connection.getHeaderFieldInt("Retry-After", 2);
+			isRateLimited = true;
+			retryEnd = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(delay);
+			throw new SlackRequestLimitException(retryEnd);
+		}
 		
 		JsonReader reader = new JsonReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
 		
