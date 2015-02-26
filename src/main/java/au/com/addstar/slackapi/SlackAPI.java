@@ -11,6 +11,7 @@ public class SlackAPI
 	private Gson gson;
 	
 	private ChannelManager channels;
+	private GroupManager groups;
 	
 	public SlackAPI(String token)
 	{
@@ -24,11 +25,17 @@ public class SlackAPI
 		gson = builder.create();
 		
 		channels = new ChannelManager(this);
+		groups = new GroupManager(this);
 	}
 	
 	public ChannelManager getChannelManager()
 	{
 		return channels;
+	}
+	
+	public GroupManager getGroupManager()
+	{
+		return groups;
 	}
 	
 	SlackConnection getSlack()
