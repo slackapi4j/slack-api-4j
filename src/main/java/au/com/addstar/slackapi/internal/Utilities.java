@@ -1,5 +1,8 @@
 package au.com.addstar.slackapi.internal;
 
+import java.util.Collections;
+import java.util.Map;
+
 import com.google.gson.JsonElement;
 
 public class Utilities
@@ -24,4 +27,9 @@ public class Utilities
 		
 		return time;
 	}
+	
+	/**
+	 * So I dont have to force type Collections.emptyMap() for parameters
+	 */
+	public static final Map<String, Object> EMPTY_MAP = Collections.emptyMap();
 }

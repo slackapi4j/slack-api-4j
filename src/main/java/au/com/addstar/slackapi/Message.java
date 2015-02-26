@@ -47,7 +47,9 @@ public class Message
 			message.userId = root.get("user").getAsString();
 			message.text = root.get("text").getAsString();
 			message.timestamp = Utilities.getAsTimestamp(root.get("ts"));
-			message.sourceId = root.get("channel").getAsString();
+			if (root.has("channel")) {
+				message.sourceId = root.get("channel").getAsString();
+			}
 			
 			if (root.has("edited"))
 			{

@@ -14,8 +14,12 @@ import java.util.Map.Entry;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import com.google.gson.GsonBuilder;
+import au.com.addstar.slackapi.exceptions.SlackAuthException;
+import au.com.addstar.slackapi.exceptions.SlackException;
+import au.com.addstar.slackapi.exceptions.SlackRestrictedException;
+
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 
@@ -27,19 +31,19 @@ public class SlackConnection
 		this.token = token;
 	}
 	
-	private String encodeRequest(Map<String, String> params)
+	private String encodeRequest(Map<String, Object> params)
 	{
 		try
 		{
 			StringBuilder data = new StringBuilder();
 			data.append("token=");
 			data.append(URLEncoder.encode(token, "UTF-8"));
-			for (Entry<String, String> param : params.entrySet())
+			for (Entry<String, Object> param : params.entrySet())
 			{
 				data.append('&');
 				data.append(URLEncoder.encode(param.getKey(), "UTF-8"));
 				data.append('=');
-				data.append(URLEncoder.encode(param.getValue(), "UTF-8"));
+				data.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
 			}
 			
 			return data.toString();
@@ -51,7 +55,7 @@ public class SlackConnection
 		}
 	}
 	
-	private HttpsURLConnection createConnection(String method, Map<String, String> params) throws IOException, MalformedURLException
+	private HttpsURLConnection createConnection(String method, Map<String, Object> params) throws IOException, MalformedURLException
 	{
 		try
 		{
@@ -78,26 +82,51 @@ public class SlackConnection
 		}
 	}
 	
-	public JsonElement callMethod(String method, Map<String, String> params)
+	public JsonElement callMethod(String method, Map<String, Object> params) throws IOException
 	{
-		try
+		HttpsURLConnection connection = createConnection(method, params);
+		connection.connect();
+		
+		JsonReader reader = new JsonReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+		
+		JsonParser parser = new JsonParser();
+		JsonElement result = parser.parse(reader);
+		
+		reader.close();
+		
+		return result;
+	}
+	
+	public JsonObject callMethodHandled(String method, Map<String, Object> params) throws SlackException, IOException
+	{
+		JsonObject base = callMethod(method, params).getAsJsonObject();
+		boolean ok = base.get("ok").getAsBoolean();
+		
+		if (!ok)
 		{
-			HttpsURLConnection connection = createConnection(method, params);
-			connection.connect();
+			String code = base.get("error").getAsString();
+			switch (code)
+			{
+			case "not_authed":
+			case "invalid_auth":
+			case "account_inactive":
+				throw new SlackAuthException(code);
 			
-			JsonReader reader = new JsonReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+			case "restricted_action":
+			case "user_is_bot":
+			case "user_is_restricted":
+				throw new SlackRestrictedException(code);
 			
-			JsonParser parser = new JsonParser();
-			JsonElement result = parser.parse(reader);
-			
-			reader.close();
-			
-			return result;
+			default:
+				throw new SlackException(code);
+			}
 		}
-		catch (IOException e)
-		{
-			// TODO: Handle this
-			return null;
-		}
+		else
+			return base;
+	}
+	
+	public JsonObject callMethodHandled(String method) throws SlackException, IOException
+	{
+		return callMethodHandled(method, Utilities.EMPTY_MAP);
 	}
 }

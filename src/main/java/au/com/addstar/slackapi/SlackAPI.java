@@ -25,4 +25,19 @@ public class SlackAPI
 		
 		channels = new ChannelManager(this);
 	}
+	
+	public ChannelManager getChannelManager()
+	{
+		return channels;
+	}
+	
+	SlackConnection getSlack()
+	{
+		return connection;
+	}
+	
+	Gson getGson()
+	{
+		return gson;
+	}
 }

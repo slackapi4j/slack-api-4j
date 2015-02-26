@@ -86,7 +86,7 @@ public class Channel
 			channel.purposeUpdateUserId = purpose.get("creator").getAsString();
 			
 			channel.isClientMember = root.get("is_member").getAsBoolean();
-			if (channel.isClientMember)
+			if (channel.isClientMember && root.has("last_read"))
 			{
 				channel.lastRead = Utilities.getAsTimestamp(root.get("last_read"));
 				channel.latest = context.deserialize(root.get("latest"), Message.class);
