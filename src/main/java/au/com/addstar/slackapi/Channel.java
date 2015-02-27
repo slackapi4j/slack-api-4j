@@ -2,6 +2,7 @@ package au.com.addstar.slackapi;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import lombok.EqualsAndHashCode;
@@ -69,21 +70,32 @@ public class Channel
 			channel.isArchived = root.get("is_archived").getAsBoolean();
 			channel.isGeneral = root.get("is_general").getAsBoolean();
 			
-			JsonArray members = root.get("members").getAsJsonArray();
-			List<String> memberList = new ArrayList<String>(members.size());
-			for (JsonElement member : members)
-				memberList.add(member.getAsString());
-			channel.memberIds = memberList;
+			if (root.has("members"))
+			{
+				JsonArray members = root.get("members").getAsJsonArray();
+				List<String> memberList = new ArrayList<String>(members.size());
+				for (JsonElement member : members)
+					memberList.add(member.getAsString());
+				channel.memberIds = memberList;
+			}
+			else
+				channel.memberIds = Collections.emptyList();
 			
-			JsonObject topic = root.get("topic").getAsJsonObject();
-			channel.topic = topic.get("value").getAsString();
-			channel.topicUpdateDate = Utilities.getAsTimestamp(topic.get("last_set"));
-			channel.topicUpdateUserId = topic.get("creator").getAsString();
+			if (root.has("topic"))
+			{
+				JsonObject topic = root.get("topic").getAsJsonObject();
+				channel.topic = topic.get("value").getAsString();
+				channel.topicUpdateDate = Utilities.getAsTimestamp(topic.get("last_set"));
+				channel.topicUpdateUserId = topic.get("creator").getAsString();
+			}
 			
-			JsonObject purpose = root.get("purpose").getAsJsonObject();
-			channel.purpose = purpose.get("value").getAsString();
-			channel.purposeUpdateDate = Utilities.getAsTimestamp(purpose.get("last_set"));
-			channel.purposeUpdateUserId = purpose.get("creator").getAsString();
+			if (root.has("purpose"))
+			{
+				JsonObject purpose = root.get("purpose").getAsJsonObject();
+				channel.purpose = purpose.get("value").getAsString();
+				channel.purposeUpdateDate = Utilities.getAsTimestamp(purpose.get("last_set"));
+				channel.purposeUpdateUserId = purpose.get("creator").getAsString();
+			}
 			
 			channel.isClientMember = root.get("is_member").getAsBoolean();
 			if (channel.isClientMember && root.has("last_read"))

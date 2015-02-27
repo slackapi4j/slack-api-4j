@@ -7,7 +7,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import au.com.addstar.slackapi.exceptions.SlackException;
-import au.com.addstar.slackapi.internal.RTMEvent;
 import au.com.addstar.slackapi.internal.SlackConnection;
 import au.com.addstar.slackapi.internal.SlackConstants;
 
@@ -27,8 +26,7 @@ public class SlackAPI
 		builder.registerTypeAdapter(User.class, User.getGsonAdapter());
 		builder.registerTypeAdapter(Group.class, Group.getGsonAdapter());
 		builder.registerTypeAdapter(Message.class, Message.getGsonAdapter());
-		builder.registerTypeAdapter(RTMEvent.class, RTMEvent.getGsonAdapter());
-		
+				
 		gson = builder.create();
 		
 		channels = new ChannelManager(this);

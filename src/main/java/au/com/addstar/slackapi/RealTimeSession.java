@@ -19,7 +19,7 @@ import au.com.addstar.slackapi.Message.MessageType;
 import au.com.addstar.slackapi.events.MessageEvent;
 import au.com.addstar.slackapi.events.RealTimeEvent;
 import au.com.addstar.slackapi.exceptions.SlackRTException;
-import au.com.addstar.slackapi.internal.RTMEvent;
+import au.com.addstar.slackapi.internal.Utilities;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -48,16 +48,20 @@ public class RealTimeSession implements Closeable
 	private Map<String, Group> groupIdMap;
 	
 	private WebSocketClient client;
+	private Session session;
 	private int nextMessageId = 1;
 	private boolean needJoinConfirm;
 	
 	private List<RealTimeListener> listeners;
+	
+	private Map<Integer, Message> pendingMessages;
 	
 	RealTimeSession(JsonObject object, SlackAPI main) throws IOException
 	{
 		gson = main.getGson();
 		
 		listeners = Lists.newArrayList();
+		pendingMessages = Maps.newHashMap();
 		
 		load(object);
 		
@@ -249,6 +253,36 @@ public class RealTimeSession implements Closeable
 		return groupIdMap.get(id);
 	}
 	
+	private int appendId(JsonObject object)
+	{
+		int id = nextMessageId++;
+		object.addProperty("id", id);
+		return id;
+	}
+	
+	public void sendMessage(String text, Channel channel)
+	{
+		sendMessage(new Message(text, channel));
+	}
+	
+	public void sendMessage(String text, Group group)
+	{
+		sendMessage(new Message(text, group));
+	}
+	
+	private void sendMessage(Message message)
+	{
+		JsonObject object = gson.toJsonTree(message).getAsJsonObject();
+		int id = appendId(object);
+		pendingMessages.put(id, message);
+		send(object);
+	}
+	
+	private void send(JsonObject object)
+	{
+		session.getRemote().sendStringByFuture(gson.toJson(object));
+	}
+	
 	public boolean isOpen()
 	{
 		return client != null && client.isRunning();
@@ -278,19 +312,49 @@ public class RealTimeSession implements Closeable
 		return null;
 	}
 	
-	private void onEvent(RTMEvent event)
+	private void onReply(JsonObject reply)
 	{
+		int replyId = reply.get("reply_to").getAsInt();
+		// TODO: Handle other types of replies
+		Message message = pendingMessages.remove(replyId);
+		
+		if (reply.get("ok").getAsBoolean())
+		{
+			
+			User user;
+			if (message.getSubtype() == MessageType.Edit)
+				user = getUserById(message.getEditUserId());
+			else
+				user = getUserById(message.getUserId());
+			
+			postEvent(new MessageEvent(user, message, message.getSubtype()));
+		}
+		else
+		{
+			SlackRTException exception = makeException(reply);
+			if (exception != null)
+				postError(exception);
+			// Not sure what to do it no error
+		}
+	}
+	
+	private void onEvent(JsonObject event)
+	{
+		String type = Utilities.getAsString(event.get("type"));
+		if (type == null)
+			return;
+		
 		// Handle login first
 		if (needJoinConfirm)
 		{
-			if (event.getType().equals("hello"))
+			if (type.equals("hello"))
 			{
 				needJoinConfirm = false;
 				postLogin();
 			}
 			else
 			{
-				postError(makeException(event.getData()));
+				postError(makeException(event));
 				close();
 				return;
 			}
@@ -299,11 +363,15 @@ public class RealTimeSession implements Closeable
 		}
 		
 		RealTimeEvent newEvent = null;
-		switch (event.getType())
+		switch (type)
 		{
 		case "message":
 		{
-			Message message = gson.fromJson(event.getData(), Message.class);
+			// A message from a previous session
+			if (event.has("reply_to"))
+				return;
+			
+			Message message = gson.fromJson(event, Message.class);
 			User user;
 			if (message.getSubtype() == MessageType.Edit)
 				user = getUserById(message.getEditUserId());
@@ -348,7 +416,7 @@ public class RealTimeSession implements Closeable
 		case "team_join":
 			break;
 		case "error":
-			postError(makeException(event.getData()));
+			postError(makeException(event));
 			break;
 		}
 		
@@ -372,7 +440,7 @@ public class RealTimeSession implements Closeable
 		@Override
 		public void onWebSocketConnect( Session session )
 		{
-			System.out.println("Opened RTM");
+			RealTimeSession.this.session = session;
 		}
 
 		@Override
@@ -385,8 +453,11 @@ public class RealTimeSession implements Closeable
 		@Override
 		public void onWebSocketText( String message )
 		{
-			RTMEvent event = gson.fromJson(message, RTMEvent.class);
-			onEvent(event);
+			JsonObject event = gson.fromJson(message, JsonElement.class).getAsJsonObject();
+			if (event.has("ok"))
+				onReply(event);
+			else
+				onEvent(event);
 		}
 	}
 }

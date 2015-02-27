@@ -9,6 +9,8 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -28,6 +30,18 @@ public class Message
 	private String editUserId;
 	private long editTimestamp;
 	
+	public Message(String text, Channel channel)
+	{
+		this.sourceId = channel.getId();
+		this.text = text;
+	}
+	
+	public Message(String text, Group group)
+	{
+		this.sourceId = group.getId();
+		this.text = text;
+	}
+	
 	static Object getGsonAdapter()
 	{
 		return new MessageJsonAdapter();
@@ -39,7 +53,7 @@ public class Message
 		return String.format("%s: '%s' from %s", subtype, text, userId);
 	}
 	
-	private static class MessageJsonAdapter implements JsonDeserializer<Message>
+	private static class MessageJsonAdapter implements JsonDeserializer<Message>, JsonSerializer<Message>
 	{
 		@Override
 		public Message deserialize( JsonElement element, Type typeOfT, JsonDeserializationContext context ) throws JsonParseException
@@ -68,6 +82,17 @@ public class Message
 			message.subtype = MessageType.fromId(Utilities.getAsString(root.get("subtype")));
 			
 			return message;
+		}
+
+		@Override
+		public JsonElement serialize( Message src, Type typeOfSrc, JsonSerializationContext context )
+		{
+			JsonObject object = new JsonObject();
+			object.addProperty("type", "message");
+			object.addProperty("channel", src.sourceId);
+			object.addProperty("text", src.text);
+			
+			return object;
 		}
 	}
 	
