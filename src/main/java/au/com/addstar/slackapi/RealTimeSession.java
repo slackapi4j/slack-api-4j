@@ -95,6 +95,17 @@ public class RealTimeSession implements Closeable
 		}
 	}
 	
+	private void postClose()
+	{
+		synchronized(listeners)
+		{
+			for (RealTimeListener listener : listeners)
+			{
+				listener.onClose();
+			}
+		}
+	}
+	
 	private void postError(SlackRTException ex)
 	{
 		synchronized(listeners)
@@ -434,7 +445,7 @@ public class RealTimeSession implements Closeable
 		@Override
 		public void onWebSocketClose( int statusCode, String reason )
 		{
-			System.out.println("Got closed :" + statusCode + " " + reason);
+			postClose();
 		}
 
 		@Override
@@ -446,7 +457,6 @@ public class RealTimeSession implements Closeable
 		@Override
 		public void onWebSocketError( Throwable cause )
 		{
-			System.out.println("RTM Ex");
 			cause.printStackTrace();
 		}
 

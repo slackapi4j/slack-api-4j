@@ -8,4 +8,5 @@ public interface RealTimeListener
 	public void onLoginComplete();
 	public void onEvent(RealTimeEvent event);
 	public void onError(SlackRTException cause);
+	public void onClose();
 }

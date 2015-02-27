@@ -31,6 +31,26 @@ public class ChannelManager
 		throw new UnsupportedOperationException("Not yet implemented");
 	}
 	
+	public boolean joinChannel(Channel channel) throws SlackException, IOException
+	{
+		Map<String, Object> params = ImmutableMap.<String, Object>builder()
+			.put("channel", channel.getName())
+			.build();
+		
+		JsonObject result = connection.callMethodHandled(SlackConstants.CHANNEL_INFO, params);
+		return !(result.has("already_in_channel") && result.get("already_in_channel").getAsBoolean());
+	}
+	
+	public boolean leaveChannel(Channel channel) throws SlackException, IOException
+	{
+		Map<String, Object> params = ImmutableMap.<String, Object>builder()
+			.put("channel", channel.getId())
+			.build();
+		
+		JsonObject result = connection.callMethodHandled(SlackConstants.CHANNEL_INFO, params);
+		return !(result.has("not_in_channel") && result.get("not_in_channel").getAsBoolean());
+	}
+	
 	public Channel getChannel(String id) throws SlackException, IOException
 	{
 		Map<String, Object> params = ImmutableMap.<String, Object>builder()
