@@ -23,7 +23,7 @@ public class Message
 	private String text;
 	private String sourceId;
 	private long timestamp;
-	private String subtype;
+	private MessageType subtype;
 	
 	private String editUserId;
 	private long editTimestamp;
@@ -31,6 +31,12 @@ public class Message
 	static Object getGsonAdapter()
 	{
 		return new MessageJsonAdapter();
+	}
+	
+	@Override
+	public String toString()
+	{
+		return String.format("%s: '%s' from %s", subtype, text, userId);
 	}
 	
 	private static class MessageJsonAdapter implements JsonDeserializer<Message>
@@ -44,12 +50,13 @@ public class Message
 			JsonObject root = (JsonObject)element;
 			
 			Message message = new Message();
-			message.userId = root.get("user").getAsString();
+			if (root.has("user"))
+				message.userId = root.get("user").getAsString();
+			
 			message.text = root.get("text").getAsString();
 			message.timestamp = Utilities.getAsTimestamp(root.get("ts"));
-			if (root.has("channel")) {
+			if (root.has("channel"))
 				message.sourceId = root.get("channel").getAsString();
-			}
 			
 			if (root.has("edited"))
 			{
@@ -58,12 +65,60 @@ public class Message
 				message.editTimestamp = Utilities.getAsTimestamp(edited.get("ts"));
 			}
 			
-			if (root.has("subtype"))
-				message.subtype = root.get("subtype").getAsString();
-			else
-				message.subtype = "";
+			message.subtype = MessageType.fromId(Utilities.getAsString(root.get("subtype")));
 			
 			return message;
+		}
+	}
+	
+	public enum MessageType
+	{
+		Normal(""),
+		FromBot("bot_message"),
+		FromMeCommand("me_message"),
+		
+		Edit("message_changed"),
+		Delete("message_deleted"),
+		
+		ChannelJoin("channel_join"),
+		ChannelLeave("channel_leave"),
+		ChannelTopic("channel_topic"),
+		ChannelPurpose("channel_purpose"),
+		ChannelName("channel_name"),
+		ChannelArchive("channel_archive"),
+		ChannelUnarchive("channel_unarchive"),
+		
+		GroupJoin("group_join"),
+		GroupLeave("group_leave"),
+		GroupTopic("group_topic"),
+		GroupPurpose("group_purpose"),
+		GroupName("group_name"),
+		GroupArchive("group_archive"),
+		GroupUnarchive("group_unarchive"),
+		
+		FileShare("file_share"),
+		FileComment("file_comment"),
+		FileMention("file_mention");
+		
+		private final String id;
+		
+		private MessageType(String id)
+		{
+			this.id = id;
+		}
+		
+		static MessageType fromId(String id)
+		{
+			if (id == null)
+				return Normal;
+			
+			for (MessageType type : values())
+			{
+				if (type.id.equals(id))
+					return type;
+			}
+			
+			return Normal;
 		}
 	}
 }

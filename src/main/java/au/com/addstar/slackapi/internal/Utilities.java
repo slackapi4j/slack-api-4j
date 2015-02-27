@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 
 public class Utilities
 {
@@ -26,6 +27,14 @@ public class Utilities
 			time = Long.parseLong(raw) * 1000;
 		
 		return time;
+	}
+	
+	public static String getAsString(JsonElement element)
+	{
+		if (element == null || element instanceof JsonNull)
+			return null;
+		
+		return element.getAsString();
 	}
 	
 	/**
