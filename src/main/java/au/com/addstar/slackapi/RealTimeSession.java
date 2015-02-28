@@ -331,14 +331,7 @@ public class RealTimeSession implements Closeable
 		
 		if (reply.get("ok").getAsBoolean())
 		{
-			
-			User user;
-			if (message.getSubtype() == MessageType.Edit)
-				user = getUserById(message.getEditUserId());
-			else
-				user = getUserById(message.getUserId());
-			
-			postEvent(new MessageEvent(user, message, message.getSubtype()));
+			postEvent(new MessageEvent(self, message, message.getSubtype()));
 		}
 		else
 		{

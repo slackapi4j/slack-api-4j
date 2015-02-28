@@ -34,12 +34,14 @@ public class Message
 	{
 		this.sourceId = channel.getId();
 		this.text = text;
+		this.subtype = MessageType.Sent;
 	}
 	
 	public Message(String text, Group group)
 	{
 		this.sourceId = group.getId();
 		this.text = text;
+		this.subtype = MessageType.Sent;
 	}
 	
 	static Object getGsonAdapter()
@@ -99,6 +101,7 @@ public class Message
 	public enum MessageType
 	{
 		Normal(""),
+		Sent(""),
 		FromBot("bot_message"),
 		FromMeCommand("me_message"),
 		
