@@ -1,9 +1,12 @@
 package au.com.addstar.slackapi;
 
 import java.lang.reflect.Type;
+import java.util.List;
 
 import au.com.addstar.slackapi.internal.Utilities;
 
+import com.google.common.collect.Lists;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -15,6 +18,7 @@ import com.google.gson.JsonSerializer;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @NoArgsConstructor
 @Getter
@@ -22,6 +26,7 @@ import lombok.NoArgsConstructor;
 public class Message
 {
 	private String userId;
+	@Setter
 	private String text;
 	private String sourceId;
 	private long timestamp;
@@ -29,6 +34,9 @@ public class Message
 	
 	private String editUserId;
 	private long editTimestamp;
+	
+	@Setter
+	private List<Attachment> attachments;
 	
 	public Message(String text, Channel channel)
 	{
@@ -83,6 +91,14 @@ public class Message
 			
 			message.subtype = MessageType.fromId(Utilities.getAsString(root.get("subtype")));
 			
+			if (root.has("attachments"))
+			{
+				message.attachments = Lists.newArrayList();
+				JsonArray attachments = root.getAsJsonArray("attachments");
+				for (JsonElement rawAttachment : attachments)
+					message.attachments.add(context.<Attachment>deserialize(rawAttachment, Attachment.class));
+			}
+			
 			return message;
 		}
 
@@ -93,6 +109,16 @@ public class Message
 			object.addProperty("type", "message");
 			object.addProperty("channel", src.sourceId);
 			object.addProperty("text", src.text);
+			
+			if (src.attachments != null)
+			{
+				JsonArray attachments = new JsonArray();
+				for (Attachment attachment : src.attachments)
+					attachments.add(context.serialize(attachment));
+				object.add("attachments", attachments);
+			}
+			
+			System.out.println("Sending message: " + object);
 			
 			return object;
 		}

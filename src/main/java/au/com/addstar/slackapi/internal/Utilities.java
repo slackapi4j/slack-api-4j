@@ -37,6 +37,14 @@ public class Utilities
 		return element.getAsString();
 	}
 	
+	public static boolean getAsBoolean(JsonElement element, boolean def) 
+	{
+		if (element == null || element instanceof JsonNull)
+			return def;
+		
+		return element.getAsBoolean();
+	}
+	
 	/**
 	 * So I dont have to force type Collections.emptyMap() for parameters
 	 */
