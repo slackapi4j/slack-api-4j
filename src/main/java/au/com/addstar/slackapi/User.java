@@ -19,7 +19,7 @@ import com.google.gson.JsonParseException;
 @EqualsAndHashCode
 public class User
 {
-	private String id;
+	private ObjectID id;
 	private String name;
 	private boolean isDeleted;
 	private String color;
@@ -60,7 +60,7 @@ public class User
 			JsonObject root = (JsonObject)element;
 			
 			User user = new User();
-			user.id = root.get("id").getAsString();
+			user.id = new ObjectID(root.get("id").getAsString());
 			user.name = root.get("name").getAsString();
 			user.isDeleted = root.get("deleted").getAsBoolean();
 			user.color = root.get("color").getAsString();

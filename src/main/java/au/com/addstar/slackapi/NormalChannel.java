@@ -20,19 +20,19 @@ import com.google.gson.JsonObject;
 public class NormalChannel extends BaseChannel
 {
 	private String name;
-	private String creationUserId;
+	private ObjectID creationUserId;
 	private boolean isArchived;
 	private boolean isGeneral;
 	
-	private List<String> memberIds;
+	private List<ObjectID> memberIds;
 	private boolean isClientMember;
 	
 	private String topic;
-	private String topicUpdateUserId;
+	private ObjectID topicUpdateUserId;
 	private long topicUpdateDate;
 	
 	private String purpose;
-	private String purposeUpdateUserId;
+	private ObjectID purposeUpdateUserId;
 	private long purposeUpdateDate;
 	
 	// Member only values
@@ -48,16 +48,16 @@ public class NormalChannel extends BaseChannel
 		super.load(root, context);
 		
 		name = root.get("name").getAsString();
-		creationUserId = root.get("creator").getAsString();
+		creationUserId = new ObjectID(root.get("creator").getAsString());
 		isArchived = Utilities.getAsBoolean(root.get("is_archived"), false);
 		isGeneral = Utilities.getAsBoolean(root.get("is_general"), false);
 		
 		if (root.has("members"))
 		{
 			JsonArray members = root.get("members").getAsJsonArray();
-			List<String> memberList = new ArrayList<String>(members.size());
+			List<ObjectID> memberList = new ArrayList<ObjectID>(members.size());
 			for (JsonElement member : members)
-				memberList.add(member.getAsString());
+				memberList.add(new ObjectID(member.getAsString()));
 			memberIds = memberList;
 		}
 		else
@@ -68,7 +68,7 @@ public class NormalChannel extends BaseChannel
 			JsonObject topic = root.get("topic").getAsJsonObject();
 			this.topic = topic.get("value").getAsString();
 			topicUpdateDate = Utilities.getAsTimestamp(topic.get("last_set"));
-			topicUpdateUserId = topic.get("creator").getAsString();
+			topicUpdateUserId = new ObjectID(topic.get("creator").getAsString());
 		}
 		
 		if (root.has("purpose"))
@@ -76,7 +76,7 @@ public class NormalChannel extends BaseChannel
 			JsonObject purpose = root.get("purpose").getAsJsonObject();
 			this.purpose = purpose.get("value").getAsString();
 			purposeUpdateDate = Utilities.getAsTimestamp(purpose.get("last_set"));
-			purposeUpdateUserId = purpose.get("creator").getAsString();
+			purposeUpdateUserId = new ObjectID(purpose.get("creator").getAsString());
 		}
 		
 		if (root.has("is_member"))

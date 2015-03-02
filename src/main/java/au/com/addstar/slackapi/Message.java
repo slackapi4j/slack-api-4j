@@ -25,14 +25,14 @@ import lombok.Setter;
 @EqualsAndHashCode
 public class Message
 {
-	private String userId;
+	private ObjectID userId;
 	@Setter
 	private String text;
-	private String sourceId;
+	private ObjectID sourceId;
 	private long timestamp;
 	private MessageType subtype;
 	
-	private String editUserId;
+	private ObjectID editUserId;
 	private long editTimestamp;
 	
 	@Setter
@@ -68,17 +68,17 @@ public class Message
 			
 			Message message = new Message();
 			if (root.has("user"))
-				message.userId = root.get("user").getAsString();
+				message.userId = new ObjectID(root.get("user").getAsString());
 			
 			message.text = root.get("text").getAsString();
 			message.timestamp = Utilities.getAsTimestamp(root.get("ts"));
 			if (root.has("channel"))
-				message.sourceId = root.get("channel").getAsString();
+				message.sourceId = new ObjectID(root.get("channel").getAsString());
 			
 			if (root.has("edited"))
 			{
 				JsonObject edited = root.getAsJsonObject("edited");
-				message.editUserId = edited.get("user").getAsString();
+				message.editUserId = new ObjectID(edited.get("user").getAsString());
 				message.editTimestamp = Utilities.getAsTimestamp(edited.get("ts"));
 			}
 			
@@ -100,7 +100,7 @@ public class Message
 		{
 			JsonObject object = new JsonObject();
 			object.addProperty("type", "message");
-			object.addProperty("channel", src.sourceId);
+			object.addProperty("channel", src.sourceId.toString());
 			object.addProperty("text", src.text);
 			
 			if (src.attachments != null)
@@ -110,8 +110,6 @@ public class Message
 					attachments.add(context.serialize(attachment));
 				object.add("attachments", attachments);
 			}
-			
-			System.out.println("Sending message: " + object);
 			
 			return object;
 		}

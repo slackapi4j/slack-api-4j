@@ -41,8 +41,8 @@ public class RealTimeSession implements Closeable
 	private Map<String, User> userMap;
 	private Map<String, BaseChannel> channelMap;
 	
-	private Map<String, User> userIdMap;
-	private Map<String, BaseChannel> channelIdMap;
+	private Map<ObjectID, User> userIdMap;
+	private Map<ObjectID, BaseChannel> channelIdMap;
 	
 	private WebSocketClient client;
 	private Session session;
@@ -217,7 +217,7 @@ public class RealTimeSession implements Closeable
 		return userMap.get(name.toLowerCase());
 	}
 	
-	public User getUserById(String id)
+	public User getUserById(ObjectID id)
 	{
 		return userIdMap.get(id);
 	}
@@ -240,7 +240,7 @@ public class RealTimeSession implements Closeable
 		return (NormalChannel)channelMap.get(name.toLowerCase());
 	}
 	
-	public BaseChannel getChannelById(String id)
+	public BaseChannel getChannelById(ObjectID id)
 	{
 		return channelIdMap.get(id);
 	}

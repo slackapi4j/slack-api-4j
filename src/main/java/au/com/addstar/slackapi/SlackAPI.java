@@ -61,13 +61,8 @@ public class SlackAPI
 	
 	public Message sendMessage(String message, BaseChannel channel, MessageOptions options) throws SlackException, IOException
 	{
-		return sendMessage(message, channel.getId(), options);
-	}
-	
-	private Message sendMessage(String message, String id, MessageOptions options) throws SlackException, IOException
-	{
 		Map<String, Object> params = Maps.newHashMap();
-		params.put("channel", id);
+		params.put("channel", channel.getId().toString());
 		params.put("text", message);
 		if (options.getUsername() != null)
 			params.put("username", options.getUsername());

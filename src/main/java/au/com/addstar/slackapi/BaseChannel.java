@@ -15,12 +15,12 @@ import com.google.gson.JsonParseException;
 @EqualsAndHashCode
 public abstract class BaseChannel
 {
-	private String id;
+	private ObjectID id;
 	private long creationDate;
 	
 	protected void load(JsonObject object, JsonDeserializationContext context)
 	{
-		id = object.get("id").getAsString();
+		id = new ObjectID(object.get("id").getAsString());
 		creationDate = Utilities.getAsTimestamp(object.get("created"));
 	}
 	

@@ -13,7 +13,7 @@ import com.google.gson.JsonObject;
 @EqualsAndHashCode(callSuper=true)
 public class DirectChannel extends BaseChannel
 {
-	private String userId;
+	private ObjectID userId;
 	private boolean isUserDeleted;
 	
 	// Optional params
@@ -27,7 +27,7 @@ public class DirectChannel extends BaseChannel
 	{
 		super.load(object, context);
 		
-		userId = object.get("user").getAsString();
+		userId = new ObjectID(object.get("user").getAsString());
 		isUserDeleted = Utilities.getAsBoolean(object.get("is_user_deleted"), false);
 		
 		isOpen = Utilities.getAsBoolean(object.get("is_open"), true);
