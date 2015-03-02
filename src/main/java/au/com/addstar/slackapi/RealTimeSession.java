@@ -131,9 +131,9 @@ public class RealTimeSession implements Closeable
 		JsonArray channels = object.getAsJsonArray("channels");
 		JsonArray groups = object.getAsJsonArray("groups");
 		JsonArray users = object.getAsJsonArray("users");
-		JsonArray ims = object.getAsJsonArray("users");
+		JsonArray ims = object.getAsJsonArray("ims");
 		
-		String selfId = self.get("id").getAsString();
+		ObjectID selfId = new ObjectID(self.get("id").getAsString());
 		
 		// Load users
 		this.users = Sets.newHashSetWithExpectedSize(users.size());

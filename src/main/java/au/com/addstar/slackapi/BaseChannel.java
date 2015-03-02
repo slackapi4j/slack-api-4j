@@ -1,6 +1,7 @@
 package au.com.addstar.slackapi;
 
 import java.lang.reflect.Type;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import au.com.addstar.slackapi.internal.Utilities;
@@ -21,6 +22,9 @@ public abstract class BaseChannel
 	protected void load(JsonObject object, JsonDeserializationContext context)
 	{
 		id = new ObjectID(object.get("id").getAsString());
+		if (!object.has("created"))
+			throw new IllegalStateException("This is not a valid channel");
+		
 		creationDate = Utilities.getAsTimestamp(object.get("created"));
 	}
 	

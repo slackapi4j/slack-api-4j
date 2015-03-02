@@ -13,6 +13,13 @@ public class ObjectID
 	
 	public ObjectID(String full)
 	{
+		if (full.isEmpty())
+		{
+			id = "";
+			type = ObjectType.Unknown;
+			return;
+		}
+
 		char classifier = Character.toUpperCase(full.charAt(0));
 		this.type = ObjectType.Unknown;
 		
