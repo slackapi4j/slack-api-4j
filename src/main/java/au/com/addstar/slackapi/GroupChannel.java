@@ -6,6 +6,6 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access=AccessLevel.PACKAGE)
 @Getter
-public class Group extends Channel
+public class GroupChannel extends NormalChannel
 {
 }

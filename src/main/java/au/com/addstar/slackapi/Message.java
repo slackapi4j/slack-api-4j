@@ -38,7 +38,7 @@ public class Message
 	@Setter
 	private List<Attachment> attachments;
 	
-	public Message(String text, Channel channel)
+	public Message(String text, BaseChannel channel)
 	{
 		this.sourceId = channel.getId();
 		this.text = text;

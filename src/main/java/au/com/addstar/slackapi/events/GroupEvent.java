@@ -1,6 +1,6 @@
 package au.com.addstar.slackapi.events;
 
-import au.com.addstar.slackapi.Group;
+import au.com.addstar.slackapi.GroupChannel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public class GroupEvent extends RealTimeEvent
 {
-	private final Group channel;
+	private final GroupChannel channel;
 	private final EventType type;
 	
 	public enum EventType

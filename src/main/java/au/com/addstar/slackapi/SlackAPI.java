@@ -25,8 +25,9 @@ public class SlackAPI
 	{
 		connection = new SlackConnection(token);
 		GsonBuilder builder = new GsonBuilder();
-		builder.registerTypeAdapter(Channel.class, Channel.getGsonAdapter());
-		builder.registerTypeAdapter(Group.class, Channel.getGsonAdapter());
+		builder.registerTypeAdapter(NormalChannel.class, NormalChannel.getGsonAdapter());
+		builder.registerTypeAdapter(GroupChannel.class, NormalChannel.getGsonAdapter());
+		builder.registerTypeAdapter(DirectChannel.class, NormalChannel.getGsonAdapter());
 		builder.registerTypeAdapter(User.class, User.getGsonAdapter());
 		builder.registerTypeAdapter(Message.class, Message.getGsonAdapter());
 		Attachment.addGsonAdapters(builder);
@@ -53,12 +54,12 @@ public class SlackAPI
 		return new RealTimeSession(root, this);
 	}
 	
-	public void sendMessage(String message, Channel channel) throws SlackException, IOException
+	public void sendMessage(String message, BaseChannel channel) throws SlackException, IOException
 	{
 		sendMessage(message, channel, MessageOptions.DEFAULT);
 	}
 	
-	public Message sendMessage(String message, Channel channel, MessageOptions options) throws SlackException, IOException
+	public Message sendMessage(String message, BaseChannel channel, MessageOptions options) throws SlackException, IOException
 	{
 		return sendMessage(message, channel.getId(), options);
 	}

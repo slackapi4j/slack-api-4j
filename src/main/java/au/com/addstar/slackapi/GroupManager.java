@@ -26,12 +26,12 @@ public class GroupManager
 		connection = main.getSlack();
 	}
 	
-	public List<Group> getGroups() throws SlackException, IOException
+	public List<GroupChannel> getGroups() throws SlackException, IOException
 	{
 		return getGroups(true);
 	}
 	
-	public List<Group> getGroups(boolean includeArchived) throws SlackException, IOException
+	public List<GroupChannel> getGroups(boolean includeArchived) throws SlackException, IOException
 	{
 		JsonObject raw;
 		if (includeArchived)
@@ -45,10 +45,10 @@ public class GroupManager
 		}
 		
 		JsonArray rawList = raw.getAsJsonArray("groups");
-		ImmutableList.Builder<Group> groups = ImmutableList.builder();
+		ImmutableList.Builder<GroupChannel> groups = ImmutableList.builder();
 		
 		for (JsonElement rawGroup : rawList)
-			groups.add(gson.fromJson(rawGroup, Group.class));
+			groups.add(gson.fromJson(rawGroup, GroupChannel.class));
 		
 		return groups.build();
 	}

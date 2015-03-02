@@ -36,13 +36,13 @@ public class RealTimeSession implements Closeable
 	@Getter
 	private User self;
 	private Set<User> users;
-	private Set<Channel> channels;
+	private Set<BaseChannel> channels;
 	
 	private Map<String, User> userMap;
-	private Map<String, Channel> channelMap;
+	private Map<String, BaseChannel> channelMap;
 	
 	private Map<String, User> userIdMap;
-	private Map<String, Channel> channelIdMap;
+	private Map<String, BaseChannel> channelIdMap;
 	
 	private WebSocketClient client;
 	private Session session;
@@ -131,6 +131,7 @@ public class RealTimeSession implements Closeable
 		JsonArray channels = object.getAsJsonArray("channels");
 		JsonArray groups = object.getAsJsonArray("groups");
 		JsonArray users = object.getAsJsonArray("users");
+		JsonArray ims = object.getAsJsonArray("users");
 		
 		String selfId = self.get("id").getAsString();
 		
@@ -153,14 +154,21 @@ public class RealTimeSession implements Closeable
 		channelIdMap = Maps.newHashMapWithExpectedSize(channels.size());
 		for (JsonElement channel : channels)
 		{
-			Channel loaded = gson.fromJson(channel, Channel.class);
+			NormalChannel loaded = gson.fromJson(channel, NormalChannel.class);
 			addChannel(loaded);
 		}
 		
 		// Load groups
 		for (JsonElement group : groups)
 		{
-			Group loaded = gson.fromJson(group, Group.class);
+			GroupChannel loaded = gson.fromJson(group, GroupChannel.class);
+			addChannel(loaded);
+		}
+		
+		// Load DMs
+		for (JsonElement dm : ims)
+		{
+			DirectChannel loaded = gson.fromJson(dm, DirectChannel.class);
 			addChannel(loaded);
 		}
 	}
@@ -214,24 +222,25 @@ public class RealTimeSession implements Closeable
 		return userIdMap.get(id);
 	}
 	
-	private void addChannel(Channel channel)
+	private void addChannel(BaseChannel channel)
 	{
 		channels.add(channel);
-		channelMap.put(channel.getName().toLowerCase(), channel);
+		if (channel instanceof NormalChannel)
+			channelMap.put(((NormalChannel)channel).getName().toLowerCase(), channel);
 		channelIdMap.put(channel.getId(), channel);
 	}
 	
-	public Set<Channel> getChannels()
+	public Set<BaseChannel> getAllChannels()
 	{
 		return Collections.unmodifiableSet(channels);
 	}
 	
-	public Channel getChannel(String name)
+	public NormalChannel getChannel(String name)
 	{
-		return channelMap.get(name.toLowerCase());
+		return (NormalChannel)channelMap.get(name.toLowerCase());
 	}
 	
-	public Channel getChannelById(String id)
+	public BaseChannel getChannelById(String id)
 	{
 		return channelIdMap.get(id);
 	}
@@ -243,7 +252,7 @@ public class RealTimeSession implements Closeable
 		return id;
 	}
 	
-	public void sendMessage(String text, Channel channel)
+	public void sendMessage(String text, BaseChannel channel)
 	{
 		sendMessage(new Message(text, channel));
 	}
