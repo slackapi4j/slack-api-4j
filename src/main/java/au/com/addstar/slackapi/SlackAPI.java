@@ -26,11 +26,11 @@ public class SlackAPI
 		connection = new SlackConnection(token);
 		GsonBuilder builder = new GsonBuilder();
 		builder.registerTypeAdapter(Channel.class, Channel.getGsonAdapter());
+		builder.registerTypeAdapter(Group.class, Channel.getGsonAdapter());
 		builder.registerTypeAdapter(User.class, User.getGsonAdapter());
-		builder.registerTypeAdapter(Group.class, Group.getGsonAdapter());
 		builder.registerTypeAdapter(Message.class, Message.getGsonAdapter());
 		Attachment.addGsonAdapters(builder);
-				
+		
 		gson = builder.create();
 		
 		channels = new ChannelManager(this);
@@ -63,16 +63,6 @@ public class SlackAPI
 		return sendMessage(message, channel.getId(), options);
 	}
 	
-	public void sendMessage(String message, Group group) throws SlackException, IOException
-	{
-		sendMessage(message, group, MessageOptions.DEFAULT);
-	}
-	
-	public Message sendMessage(String message, Group group, MessageOptions options) throws SlackException, IOException
-	{
-		return sendMessage(message, group.getId(), options);
-	}
-	
 	private Message sendMessage(String message, String id, MessageOptions options) throws SlackException, IOException
 	{
 		Map<String, Object> params = Maps.newHashMap();
@@ -88,16 +78,19 @@ public class SlackAPI
 			params.put("icon_emoji", options.getIconEmoji());
 		else if (options.getIconUrl() != null)
 			params.put("icon_url", options.getIconUrl().toExternalForm());
-		switch (options.getMode())
+		if (options.getMode() != null)
 		{
-		case Full:
-			params.put("parse", "full");
-			break;
-		case None:
-			params.put("parse", "none");
-			break;
-		default:
-			break;
+			switch (options.getMode())
+			{
+			case Full:
+				params.put("parse", "full");
+				break;
+			case None:
+				params.put("parse", "none");
+				break;
+			default:
+				break;
+			}
 		}
 		
 		if (options.getAttachments() != null)

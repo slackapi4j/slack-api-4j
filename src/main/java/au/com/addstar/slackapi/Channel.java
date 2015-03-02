@@ -62,13 +62,18 @@ public class Channel
 			
 			JsonObject root = (JsonObject)element;
 			
-			Channel channel = new Channel();
+			Channel channel;
+			if (type.equals(Group.class))
+				channel = new Group();
+			else
+				channel = new Channel();
+			
 			channel.name = root.get("name").getAsString();
 			channel.id = root.get("id").getAsString();
 			channel.creationDate = root.get("created").getAsLong() * 1000;
 			channel.creationUserId = root.get("creator").getAsString();
 			channel.isArchived = root.get("is_archived").getAsBoolean();
-			channel.isGeneral = root.get("is_general").getAsBoolean();
+			channel.isGeneral = Utilities.getAsBoolean(root.get("is_general"), false);
 			
 			if (root.has("members"))
 			{
@@ -97,7 +102,11 @@ public class Channel
 				channel.purposeUpdateUserId = purpose.get("creator").getAsString();
 			}
 			
-			channel.isClientMember = root.get("is_member").getAsBoolean();
+			if (root.has("is_member"))
+				channel.isClientMember = root.get("is_member").getAsBoolean();
+			else
+				channel.isClientMember = root.has("last_read");
+			
 			if (channel.isClientMember && root.has("last_read"))
 			{
 				channel.lastRead = Utilities.getAsTimestamp(root.get("last_read"));

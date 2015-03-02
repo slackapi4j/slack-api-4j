@@ -10,7 +10,14 @@ import lombok.experimental.Builder;
 @Getter
 public class MessageOptions
 {
-	public static final MessageOptions DEFAULT = builder().build();
+	public static final MessageOptions DEFAULT = builder()
+		.unfurlLinks(true)
+		.unfurlMedia(false)
+		.asUser(true)
+		.linkNames(false)
+		.mode(ParseMode.Partial)
+		.format(false)
+		.build();
 	
 	private boolean unfurlLinks = true;
 	private boolean unfurlMedia = false;

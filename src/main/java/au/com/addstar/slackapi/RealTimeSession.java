@@ -37,15 +37,12 @@ public class RealTimeSession implements Closeable
 	private User self;
 	private Set<User> users;
 	private Set<Channel> channels;
-	private Set<Group> groups;
 	
 	private Map<String, User> userMap;
 	private Map<String, Channel> channelMap;
-	private Map<String, Group> groupMap;
 	
 	private Map<String, User> userIdMap;
 	private Map<String, Channel> channelIdMap;
-	private Map<String, Group> groupIdMap;
 	
 	private WebSocketClient client;
 	private Session session;
@@ -161,13 +158,10 @@ public class RealTimeSession implements Closeable
 		}
 		
 		// Load groups
-		this.groups = Sets.newHashSetWithExpectedSize(groups.size());
-		groupMap = Maps.newHashMapWithExpectedSize(groups.size());
-		groupIdMap = Maps.newHashMapWithExpectedSize(groups.size());
 		for (JsonElement group : groups)
 		{
 			Group loaded = gson.fromJson(group, Group.class);
-			addGroup(loaded);
+			addChannel(loaded);
 		}
 	}
 	
@@ -242,28 +236,6 @@ public class RealTimeSession implements Closeable
 		return channelIdMap.get(id);
 	}
 	
-	private void addGroup(Group group)
-	{
-		groups.add(group);
-		groupMap.put(group.getName().toLowerCase(), group);
-		groupIdMap.put(group.getId(), group);
-	}
-	
-	public Set<Group> getGroups()
-	{
-		return Collections.unmodifiableSet(groups);
-	}
-	
-	public Group getGroup(String name)
-	{
-		return groupMap.get(name.toLowerCase());
-	}
-	
-	public Group getGroupById(String id)
-	{
-		return groupIdMap.get(id);
-	}
-	
 	private int appendId(JsonObject object)
 	{
 		int id = nextMessageId++;
@@ -274,11 +246,6 @@ public class RealTimeSession implements Closeable
 	public void sendMessage(String text, Channel channel)
 	{
 		sendMessage(new Message(text, channel));
-	}
-	
-	public void sendMessage(String text, Group group)
-	{
-		sendMessage(new Message(text, group));
 	}
 	
 	private void sendMessage(Message message)

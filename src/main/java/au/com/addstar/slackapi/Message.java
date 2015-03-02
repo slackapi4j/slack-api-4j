@@ -45,13 +45,6 @@ public class Message
 		this.subtype = MessageType.Sent;
 	}
 	
-	public Message(String text, Group group)
-	{
-		this.sourceId = group.getId();
-		this.text = text;
-		this.subtype = MessageType.Sent;
-	}
-	
 	static Object getGsonAdapter()
 	{
 		return new MessageJsonAdapter();
