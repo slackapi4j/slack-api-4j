@@ -70,7 +70,7 @@ public class Message
 			if (root.has("user"))
 				message.userId = new ObjectID(root.get("user").getAsString());
 			
-			message.text = root.get("text").getAsString();
+			message.text = Utilities.getAsString(root.get("text"));
 			message.timestamp = Utilities.getAsTimestamp(root.get("ts"));
 			if (root.has("channel"))
 				message.sourceId = new ObjectID(root.get("channel").getAsString());
