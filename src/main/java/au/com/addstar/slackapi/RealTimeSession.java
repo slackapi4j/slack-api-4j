@@ -2,12 +2,17 @@ package au.com.addstar.slackapi;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.api.Session;
@@ -181,7 +186,10 @@ public class RealTimeSession implements Closeable
 			needJoinConfirm = true;
 			client = new WebSocketClient(new SslContextFactory());
 			client.start();
-			client.connect(new SocketClient(), uri);
+			Future<Session> future = client.connect(new SocketClient(), uri);
+			
+			session = future.get(client.getConnectTimeout() + 1000, TimeUnit.MILLISECONDS);
+			
 			nextMessageId = 1;
 		}
 		catch ( URISyntaxException e )
@@ -192,6 +200,22 @@ public class RealTimeSession implements Closeable
 		catch (IOException e)
 		{
 			throw e;
+		}
+		catch (InterruptedException e)
+		{
+			
+		}
+		catch (ExecutionException e)
+		{
+			if (e.getCause() instanceof IOException)
+				throw (IOException)e.getCause();
+			else
+				throw new IOException(e.getCause());
+		}
+		catch (TimeoutException e)
+		{
+			// Probably wont
+			throw new SocketTimeoutException();
 		}
 		// Sigh, couldnt they pick a more specific one? :/
 		catch ( Exception e )
