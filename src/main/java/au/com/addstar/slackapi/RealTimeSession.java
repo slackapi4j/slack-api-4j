@@ -146,11 +146,19 @@ public class RealTimeSession implements Closeable
 		userIdMap = Maps.newHashMapWithExpectedSize(users.size());
 		for (JsonElement user : users)
 		{
-			User loaded = gson.fromJson(user, User.class);
-			if (loaded.getId().equals(selfId))
-				this.self = loaded;
-			
-			addUser(loaded);
+			try
+			{
+				User loaded = gson.fromJson(user, User.class);
+				if (loaded.getId().equals(selfId))
+					this.self = loaded;
+				
+				addUser(loaded);
+			}
+			catch (Throwable e)
+			{
+				System.err.println("Unable to load user " + user);
+				e.printStackTrace();
+			}
 		}
 		
 		// Load channels

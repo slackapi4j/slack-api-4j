@@ -63,7 +63,15 @@ public class User
 			user.id = new ObjectID(root.get("id").getAsString());
 			user.name = root.get("name").getAsString();
 			user.isDeleted = root.get("deleted").getAsBoolean();
-			user.color = root.get("color").getAsString();
+			if (!user.isDeleted)
+			{
+				user.color = root.get("color").getAsString();
+				user.isAdmin = root.get("is_admin").getAsBoolean();
+				user.isOwner = root.get("is_owner").getAsBoolean();
+				user.isPrimaryOwner = root.get("is_primary_owner").getAsBoolean();
+				user.isRestricted = root.get("is_restricted").getAsBoolean();
+				user.isUltraRestricted = root.get("is_ultra_restricted").getAsBoolean();
+			}
 			
 			if (root.has("profile"))
 			{
@@ -84,11 +92,6 @@ public class User
 				}
 			}
 			
-			user.isAdmin = root.get("is_admin").getAsBoolean();
-			user.isOwner = root.get("is_owner").getAsBoolean();
-			user.isPrimaryOwner = root.get("is_primary_owner").getAsBoolean();
-			user.isRestricted = root.get("is_restricted").getAsBoolean();
-			user.isUltraRestricted = root.get("is_ultra_restricted").getAsBoolean();
 			if (root.has("has_files"))
 				user.hasFiles = root.get("has_files").getAsBoolean();
 			return user;
