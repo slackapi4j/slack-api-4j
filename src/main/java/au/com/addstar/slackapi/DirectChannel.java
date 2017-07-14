@@ -34,7 +34,7 @@ public class DirectChannel extends BaseChannel
 		if (object.has("last_read"))
 		{
 			lastRead = Utilities.getAsTimestamp(object.get("last_read"));
-			unreadCount = object.get("unread_count").getAsInt();
+			unreadCount = Utilities.getAsInt(object.get("unread_count"));
 			latest = context.deserialize(object.get("latest"), Message.class);
 		}
 	}
