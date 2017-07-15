@@ -54,12 +54,12 @@ public class SlackAPI
 		return new RealTimeSession(root, this);
 	}
 	
-	public void sendMessage(String message, BaseChannel channel) throws SlackException, IOException
+	public void sendMessage(String message, BaseChannel channel) throws SlackException, IOException, NullPointerException
 	{
 		sendMessage(message, channel, MessageOptions.DEFAULT);
 	}
 	
-	public Message sendMessage(String message, BaseChannel channel, MessageOptions options) throws SlackException, IOException
+	public Message sendMessage(String message, BaseChannel channel, MessageOptions options) throws SlackException, IOException, NullPointerException
 	{
 		Map<String, Object> params = Maps.newHashMap();
 		params.put("channel", channel.getId().toString());
