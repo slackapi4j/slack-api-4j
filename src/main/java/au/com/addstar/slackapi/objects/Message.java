@@ -1,8 +1,9 @@
-package au.com.addstar.slackapi;
+package au.com.addstar.slackapi.objects;
 
 import java.lang.reflect.Type;
 import java.util.List;
 
+import au.com.addstar.slackapi.Attachment;
 import au.com.addstar.slackapi.internal.Utilities;
 
 import com.google.common.collect.Lists;
@@ -23,7 +24,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @EqualsAndHashCode
-public class Message
+public class Message extends BaseObject
 {
 	private ObjectID userId;
 	@Setter
@@ -38,14 +39,14 @@ public class Message
 	@Setter
 	private List<Attachment> attachments;
 	
-	public Message(String text, BaseChannel channel)
+	public Message(String text, BaseObject channel)
 	{
 		this.sourceId = channel.getId();
 		this.text = text;
 		this.subtype = MessageType.Sent;
 	}
 	
-	static Object getGsonAdapter()
+	public static Object getGsonAdapter()
 	{
 		return new MessageJsonAdapter();
 	}

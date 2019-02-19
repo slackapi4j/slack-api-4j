@@ -8,6 +8,7 @@ import au.com.addstar.slackapi.exceptions.SlackException;
 import au.com.addstar.slackapi.internal.SlackConnection;
 import au.com.addstar.slackapi.internal.SlackConstants;
 
+import au.com.addstar.slackapi.objects.GroupChannel;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;

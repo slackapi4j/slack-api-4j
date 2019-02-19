@@ -1,6 +1,6 @@
 package au.com.addstar.slackapi.events;
 
-import au.com.addstar.slackapi.GroupChannel;
+import au.com.addstar.slackapi.objects.GroupChannel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
