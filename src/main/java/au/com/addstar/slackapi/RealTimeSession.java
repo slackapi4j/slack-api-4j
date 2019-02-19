@@ -14,13 +14,20 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import au.com.addstar.slackapi.objects.BaseObject;
+import au.com.addstar.slackapi.objects.DirectChannel;
+import au.com.addstar.slackapi.objects.GroupChannel;
+import au.com.addstar.slackapi.objects.Message;
+import au.com.addstar.slackapi.objects.NormalChannel;
+import au.com.addstar.slackapi.objects.ObjectID;
+import au.com.addstar.slackapi.objects.User;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketListener;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 
 import lombok.Getter;
-import au.com.addstar.slackapi.Message.MessageType;
+import au.com.addstar.slackapi.objects.Message.MessageType;
 import au.com.addstar.slackapi.events.MessageEvent;
 import au.com.addstar.slackapi.events.RealTimeEvent;
 import au.com.addstar.slackapi.exceptions.SlackRTException;
@@ -41,13 +48,13 @@ public class RealTimeSession implements Closeable
 	@Getter
 	private User self;
 	private Set<User> users;
-	private Set<BaseChannel> channels;
+	private Set<BaseObject> channels;
 	
 	private Map<String, User> userMap;
-	private Map<String, BaseChannel> channelMap;
+	private Map<String, BaseObject> channelMap;
 	
 	private Map<ObjectID, User> userIdMap;
-	private Map<ObjectID, BaseChannel> channelIdMap;
+	private Map<ObjectID, BaseObject> channelIdMap;
 	
 	private WebSocketClient client;
 	private Session session;
@@ -254,7 +261,7 @@ public class RealTimeSession implements Closeable
 		return userIdMap.get(id);
 	}
 	
-	private void addChannel(BaseChannel channel)
+	private void addChannel(BaseObject channel)
 	{
 		channels.add(channel);
 		if (channel instanceof NormalChannel)
@@ -262,7 +269,7 @@ public class RealTimeSession implements Closeable
 		channelIdMap.put(channel.getId(), channel);
 	}
 	
-	public Set<BaseChannel> getAllChannels()
+	public Set<BaseObject> getAllChannels()
 	{
 		return Collections.unmodifiableSet(channels);
 	}
@@ -272,7 +279,7 @@ public class RealTimeSession implements Closeable
 		return (NormalChannel)channelMap.get(name.toLowerCase());
 	}
 	
-	public BaseChannel getChannelById(ObjectID id)
+	public BaseObject getChannelById(ObjectID id)
 	{
 		return channelIdMap.get(id);
 	}
@@ -284,7 +291,7 @@ public class RealTimeSession implements Closeable
 		return id;
 	}
 	
-	public void sendMessage(String text, BaseChannel channel)
+	public void sendMessage(String text, BaseObject channel)
 	{
 		sendMessage(new Message(text, channel));
 	}
