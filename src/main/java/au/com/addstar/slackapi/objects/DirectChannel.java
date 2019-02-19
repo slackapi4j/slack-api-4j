@@ -1,4 +1,4 @@
-package au.com.addstar.slackapi;
+package au.com.addstar.slackapi.objects;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import com.google.gson.JsonObject;
 @NoArgsConstructor
 @Getter
 @EqualsAndHashCode(callSuper=true)
-public class DirectChannel extends BaseChannel
+public class DirectChannel extends TimeStampedBaseObject
 {
 	private ObjectID userId;
 	private boolean isUserDeleted;

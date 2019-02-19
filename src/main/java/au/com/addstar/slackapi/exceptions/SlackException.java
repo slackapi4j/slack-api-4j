@@ -1,6 +1,6 @@
 package au.com.addstar.slackapi.exceptions;
 
-public class SlackException extends Exception
+public class  SlackException extends Exception
 {
 	private static final long serialVersionUID = -6107026452270704333L;
 	

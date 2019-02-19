@@ -1,4 +1,4 @@
-package au.com.addstar.slackapi;
+package au.com.addstar.slackapi.objects;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -45,10 +45,10 @@ public class ObjectID
 	@RequiredArgsConstructor
 	private enum ObjectType
 	{
-		User('U', User.class),
-		NormalChannel('C', NormalChannel.class),
-		GroupChannel('G', GroupChannel.class),
-		DirectChannel('D', DirectChannel.class),
+		User('U', au.com.addstar.slackapi.objects.User.class),
+		NormalChannel('C', au.com.addstar.slackapi.objects.NormalChannel.class),
+		GroupChannel('G', au.com.addstar.slackapi.objects.GroupChannel.class),
+		DirectChannel('D', au.com.addstar.slackapi.objects.DirectChannel.class),
 		Team('T', null),
 		Bot('B', null),
 		Unknown('\0', null);

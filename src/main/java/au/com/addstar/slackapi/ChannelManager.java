@@ -1,9 +1,12 @@
 package au.com.addstar.slackapi;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import au.com.addstar.slackapi.objects.Message;
+import au.com.addstar.slackapi.objects.NormalChannel;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -86,5 +89,25 @@ public class ChannelManager
 			channels.add(gson.fromJson(rawChannel, NormalChannel.class));
 		
 		return channels.build();
+	}
+
+	public boolean purgeChannel (String id)  throws SlackException, IOException{
+		Map<String, Object> params = ImmutableMap.<String, Object>builder()
+				.put("channel",id)
+				.build();
+		JsonObject raw = connection.callMethodHandled(SlackConstants.CHANNEL_HISTORY,params);
+		JsonArray rawList = raw.getAsJsonArray("messages");
+		List<Message> messages = new ArrayList<>();
+		for (JsonElement message : rawList){
+			messages.add(gson.fromJson(message,Message.class));
+		}
+		for (Message message: messages) {
+			Map<String, Object> p = ImmutableMap.<String, Object>builder()
+					.put("channel",id)
+					.put("ts",message.getTimestamp())
+					.build();
+			connection.callMethodHandled(SlackConstants.CHAT_DELETE,p );
+		}
+		return true;
 	}
 }
