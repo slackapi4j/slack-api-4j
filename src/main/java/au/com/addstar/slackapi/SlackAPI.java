@@ -3,6 +3,7 @@ package au.com.addstar.slackapi;
 import java.io.IOException;
 import java.util.Map;
 
+import au.com.addstar.slackapi.objects.*;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -18,16 +19,22 @@ public class SlackAPI
 	private SlackConnection connection;
 	private Gson gson;
 	
-	private ChannelManager channels;
-	private GroupManager groups;
-	
+	private final ChannelManager channels;
+	private final GroupManager groups;
+	private final ConversationsManager conversations;
+
+	public ConversationsManager getConversations() {
+		return conversations;
+	}
+
 	public SlackAPI(String token)
 	{
 		connection = new SlackConnection(token);
 		GsonBuilder builder = new GsonBuilder();
 		builder.registerTypeAdapter(NormalChannel.class, NormalChannel.getGsonAdapter());
-		builder.registerTypeAdapter(GroupChannel.class, NormalChannel.getGsonAdapter());
-		builder.registerTypeAdapter(DirectChannel.class, NormalChannel.getGsonAdapter());
+		builder.registerTypeAdapter(GroupChannel.class, GroupChannel.getGsonAdapter());
+		builder.registerTypeAdapter(DirectChannel.class, DirectChannel.getGsonAdapter());
+		builder.registerTypeAdapter(Conversation.class,Conversation.getGsonAdapter());
 		builder.registerTypeAdapter(User.class, User.getGsonAdapter());
 		builder.registerTypeAdapter(Message.class, Message.getGsonAdapter());
 		Attachment.addGsonAdapters(builder);
@@ -36,6 +43,7 @@ public class SlackAPI
 		
 		channels = new ChannelManager(this);
 		groups = new GroupManager(this);
+		conversations = new ConversationsManager(this);
 	}
 	
 	public ChannelManager getChannelManager()
@@ -54,12 +62,12 @@ public class SlackAPI
 		return new RealTimeSession(root, this);
 	}
 	
-	public void sendMessage(String message, BaseChannel channel) throws SlackException, IOException, NullPointerException
+	public void sendMessage(String message, BaseObject channel) throws SlackException, IOException
 	{
 		sendMessage(message, channel, MessageOptions.DEFAULT);
 	}
 	
-	public Message sendMessage(String message, BaseChannel channel, MessageOptions options) throws SlackException, IOException, NullPointerException
+	public Message sendMessage(String message, BaseObject channel, MessageOptions options) throws SlackException, IOException
 	{
 		Map<String, Object> params = Maps.newHashMap();
 		params.put("channel", channel.getId().toString());
