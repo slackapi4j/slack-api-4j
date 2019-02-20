@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class TimeStampedBaseObject extends BaseObject {
+public class TimeStampedBaseObject extends IdBaseObject {
 
     private long creationDate;
 

@@ -3,6 +3,7 @@ package au.com.addstar.slackapi;
 import java.net.URL;
 import java.util.List;
 
+import au.com.addstar.slackapi.objects.Attachment;
 import lombok.Builder;
 import lombok.Getter;
 

@@ -1,6 +1,5 @@
 package au.com.addstar.slackapi.objects;
 
-import java.lang.reflect.Type;
 import java.net.URL;
 
 import lombok.EqualsAndHashCode;
@@ -9,15 +8,12 @@ import lombok.NoArgsConstructor;
 import au.com.addstar.slackapi.internal.Utilities;
 
 import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 
 @NoArgsConstructor
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class User extends BaseObject
+public class User extends IdBaseObject
 {
 
 

@@ -62,12 +62,12 @@ public class SlackAPI
         return new RealTimeSession(root, this);
     }
     
-    public Message sendMessage(String message, BaseObject channel) throws SlackException, IOException
+    public Message sendMessage(String message, IdBaseObject channel) throws SlackException, IOException
     {
        return sendMessage(message, channel, MessageOptions.DEFAULT);
     }
     
-    public Message sendMessage(String message, BaseObject channel, MessageOptions options) throws SlackException, IOException
+    public Message sendMessage(String message, IdBaseObject channel, MessageOptions options) throws SlackException, IOException
     {
         Map<String, Object> params = Maps.newHashMap();
         params.put("channel", channel.getId().toString());

@@ -1,4 +1,4 @@
-package au.com.addstar.slackapi;
+package au.com.addstar.slackapi.objects;
 
 import java.lang.reflect.Type;
 import java.net.URL;
@@ -62,7 +62,7 @@ public class Attachment
 		fields.add(field);
 	}
 	
-	static void addGsonAdapters(GsonBuilder builder)
+	public static void addGsonAdapters(GsonBuilder builder)
 	{
 		builder.registerTypeAdapter(Attachment.class, new AttachmentJsonAdapter());
 		builder.registerTypeAdapter(AttachmentField.class, new AttachmentFieldJsonAdapter());

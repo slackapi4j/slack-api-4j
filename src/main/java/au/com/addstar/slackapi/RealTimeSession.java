@@ -42,13 +42,13 @@ public class RealTimeSession implements Closeable
     @Getter
     private User self;
     private Set<User> users;
-    private Set<BaseObject> channels;
+    private Set<IdBaseObject> channels;
     
     private Map<String, User> userMap;
-    private Map<String, BaseObject> channelMap;
+    private Map<String, IdBaseObject> channelMap;
     
     private Map<ObjectID, User> userIdMap;
-    private Map<ObjectID, BaseObject> channelIdMap;
+    private Map<ObjectID, IdBaseObject> channelIdMap;
     
     private WebSocketClient client;
     private Session session;
@@ -238,7 +238,7 @@ public class RealTimeSession implements Closeable
         return userIdMap.get(id);
     }
     
-    private void addChannel(BaseObject channel)
+    private void addChannel(IdBaseObject channel)
     {
         channels.add(channel);
         if (channel instanceof Conversation)
@@ -246,17 +246,17 @@ public class RealTimeSession implements Closeable
         channelIdMap.put(channel.getId(), channel);
     }
     
-    public Set<BaseObject> getAllChannels()
+    public Set<IdBaseObject> getAllChannels()
     {
         return Collections.unmodifiableSet(channels);
     }
     
-    public BaseObject getChannel(String name)
+    public IdBaseObject getChannel(String name)
     {
-        return (BaseObject) channelMap.get(name.toLowerCase());
+        return (IdBaseObject) channelMap.get(name.toLowerCase());
     }
     
-    public BaseObject getChannelById(ObjectID id)
+    public IdBaseObject getChannelById(ObjectID id)
     {
         return channelIdMap.get(id);
     }
@@ -268,7 +268,7 @@ public class RealTimeSession implements Closeable
         return id;
     }
     
-    public void sendMessage(String text, BaseObject channel)
+    public void sendMessage(String text, IdBaseObject channel)
     {
         sendMessage(new Message(text, channel));
     }

@@ -3,7 +3,6 @@ package au.com.addstar.slackapi.objects;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import au.com.addstar.slackapi.Attachment;
 import au.com.addstar.slackapi.internal.Utilities;
 
 import com.google.common.collect.Lists;
@@ -24,7 +23,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @EqualsAndHashCode
-public class Message extends BaseObject
+public class Message extends IdBaseObject
 {
 	private ObjectID userId;
 	@Setter
@@ -39,7 +38,7 @@ public class Message extends BaseObject
 	@Setter
 	private List<Attachment> attachments;
 	
-	public Message(String text, BaseObject channel)
+	public Message(String text, IdBaseObject channel)
 	{
 		this.sourceId = channel.getId();
 		this.text = text;
