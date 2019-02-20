@@ -7,7 +7,7 @@ import au.com.addstar.slackapi.internal.Utilities;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
-
+@Deprecated
 @NoArgsConstructor
 @Getter
 @EqualsAndHashCode(callSuper=true)

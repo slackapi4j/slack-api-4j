@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created for use for the Add5tar MC Minecraft server
  * Created by benjamincharlton on 26/08/2018.
  * Conversations replace Channels, IM's and Group IMs
  */
@@ -33,6 +32,7 @@ public class Conversation extends TimeStampedBaseObject {
     private boolean isMember;
     private boolean isPrivate;
     private boolean isMPIM;
+    private boolean isIM;
     private List<ObjectID> members;
 
     private String topic;
@@ -87,6 +87,7 @@ public class Conversation extends TimeStampedBaseObject {
         isPrivate = Utilities.getAsBoolean(root.get("is_private"),false);
         isOrgShared = Utilities.getAsBoolean(root.get("is_org_shared"),false);
         isMPIM = Utilities.getAsBoolean(root.get("is_mpim"),false);
+        isIM = Utilities.getAsBoolean(root.get("is_im"),false);
         if(root.has("name_normalized")){
             normalized_name = root.get("name_normalized").getAsString();
         }

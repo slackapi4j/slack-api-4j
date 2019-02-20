@@ -3,16 +3,13 @@ package au.com.addstar.slackapi;
 
 import au.com.addstar.slackapi.exceptions.SlackException;
 import au.com.addstar.slackapi.internal.SlackConversationType;
-import au.com.addstar.slackapi.objects.BaseObject;
-import au.com.addstar.slackapi.objects.Conversation;
-import com.google.gson.JsonObject;
-import netscape.javascript.JSObject;
+import au.com.addstar.slackapi.objects.*;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -21,11 +18,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Created by benjamincharlton on 19/02/2019.
  */
 public class ConversationsManagerTest {
-
+    private static final String token = System.getenv("SLACK_TOKEN");
 
     @Test
-    public void joinConversation() {
-        SlackAPI api = new SlackAPI("xoxb-3854431244-OorTjHoCcuO6a3bHcZgqrrcT");
+    public void sendMessage() {
+        if(token.isEmpty())return;
+        SlackAPI api = new SlackAPI(token);
         try {
             List<SlackConversationType> types = new ArrayList<>();
             types.add(SlackConversationType.PRIVATE);
@@ -35,8 +33,8 @@ public class ConversationsManagerTest {
             List<Conversation> conversations = api.getConversations().listConversations(types);
             for(Conversation c:conversations){
                 if(c.getName().equals("bot-test")){
-                    assertTrue(api.getConversations().joinConversation(c));
-                    api.sendMessage("Testing Conversation API",c);
+                    Message message = api.sendMessage("Testing Conversation API",c);
+                    assertTrue(message.getSourceId() != null);
                 }
             }
         } catch (SlackException e) {
@@ -44,5 +42,23 @@ public class ConversationsManagerTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    
+    @Test
+    public void createMPIM() throws IOException, SlackException {
+        if(token.isEmpty())return;
+        SlackAPI api = new SlackAPI(token);
+        RealTimeSession session = api.startRTSession();
+        Set<User> users= session.getUsers();
+        List<User> out = new ArrayList<>();
+        for(User user:users) {
+            if(user.getName().equals("narimm") || user.getName().equals("miniworks18")) {
+                out.add(user);
+            }
+        }
+        Conversation conversation = api.getConversations().createMultiPartyMessage(out);
+        //session.sendMessage("Test Message",conversation);
+        api.getConversations().closeMultiPartyMessage(conversation);
+        session.close();
     }
 }

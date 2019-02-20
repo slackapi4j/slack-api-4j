@@ -27,13 +27,15 @@ public final class SlackConstants
 	public static final String CHANNEL_UNARCHIVE = "channels.unarchive";
 
 	public static final String CONVERSATION_ARCHIVE = "conversations.archive";
-	public static final String CONVERSATION_CREATE = "conversations.create";
-	public static final String CONVERSATION_CLOSE = "conversations.create";
+	public static final String CONVERSATION_CLOSE = "conversations.close";
+	public static final String CONVERSATION_OPEN = "conversations.open";
 	public static final String CONVERSATION_HISTORY = "conversations.history";
 	public static final String CONVERSATION_INFO = "conversations.info";
 	public static final String CONVERSATION_INVITE = "conversations.invite";
 	public static final String CONVERSATION_KICK = "conversations.kick";
 	public static final String CONVERSATION_LEAVE = "conversations.leave";
+	@Deprecated
+	public static final String CONVERSATION_JOIN = "conversations.join";
 	public static final String CONVERSATION_LIST = "conversations.list";
 	public static final String CONVERSATION_MARK = "channels.mark";
 	public static final String CONVERSATION_RENAME = "conversations.rename";
@@ -80,6 +82,13 @@ public final class SlackConstants
 	public static final String IM_LIST = "im.list";
 	public static final String IM_MARK = "im.mark";
 	public static final String IM_OPEN = "im.open";
+	
+	public static final String REACTION_ADD = "reaction.add";
+	public static final String REACTION_REMOVE = "reaction.remove";
+	
+	public static final String MPIM_OPEN = "mpim.open";
+	public static final String MPIM_CLOSE = "mpim.close";
+	public static final String MPIM_MARK = "mpim.mark";
 	
 	public static final String OAUTH_ACCESS = "oauth.access";
 	

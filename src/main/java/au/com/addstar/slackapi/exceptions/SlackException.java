@@ -5,7 +5,8 @@ public class  SlackException extends Exception
 	private static final long serialVersionUID = -6107026452270704333L;
 	
 	private String code;
-
+	private String codeMessage;
+ 
 	public SlackException(String code)
 	{
 		super("Slack returned an error code: " + code);

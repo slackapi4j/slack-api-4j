@@ -3,7 +3,6 @@ package au.com.addstar.slackapi.objects;
 import javafx.beans.binding.ObjectExpression;
 
 /**
- * Created for use for the Add5tar MC Minecraft server
  * Created by benjamincharlton on 26/08/2018.
  */
 public class FileObject extends TimeStampedBaseObject {

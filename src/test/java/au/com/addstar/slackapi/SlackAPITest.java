@@ -1,9 +1,7 @@
 package au.com.addstar.slackapi;
 
-import au.com.addstar.slackapi.exceptions.SlackException;
 import au.com.addstar.slackapi.exceptions.SlackRequestLimitException;
 import au.com.addstar.slackapi.internal.SlackConnection;
-import au.com.addstar.slackapi.objects.User;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Test;
@@ -19,27 +17,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Created by benjamincharlton on 19/02/2019.
  */
 public class SlackAPITest {
+    private static final String token = System.getenv("SLACK_TOKEN");
 
     @Test
-    public void startRTSession() {
-    }
-    @Test
-    public void sendMessage() {
-        SlackAPI api = new SlackAPI("xoxb-3854431244-OorTjHoCcuO6a3bHcZgqrrcT");
-        SlackConnection connection = api.getSlack();
-        try {
-            RealTimeSession session = api.startRTSession();
-            for(User user: session.getUsers()){
-            }
-        } catch (SlackException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    @Test
     public void getSlack() {
-        SlackAPI api = new SlackAPI("xoxb-3854431244-OorTjHoCcuO6a3bHcZgqrrcT");
+        if(token.isEmpty())return;
+        SlackAPI api = new SlackAPI(token);
         SlackConnection connection = api.getSlack();
         Map<String,Object> map = new HashMap<>();
         map.put("foo","bar");
