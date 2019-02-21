@@ -3,8 +3,8 @@ package au.com.addstar.slackapi.internal;
 import java.util.Collections;
 import java.util.Map;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
+import au.com.addstar.slackapi.objects.blocks.composition.TextObject;
+import com.google.gson.*;
 
 public class Utilities
 {
@@ -28,6 +28,23 @@ public class Utilities
         }
         
         return time;
+    }
+    public static TextObject getTextObject(final JsonElement element, JsonDeserializationContext context, TextObject.TextType type){
+        TextObject textObject = context.deserialize(element,TextObject.class);
+        if(type == null){
+            return textObject;
+        }else{
+            if(textObject.getType() != type){
+                throw new JsonParseException("Invalid textType: " +textObject.getType().name());
+            }else{
+                return textObject;
+            }
+        }
+    }
+    
+    public static void serializeTextObject(JsonObject root, String name, TextObject object, JsonSerializationContext context){
+        if(object == null)return;
+        root.add(name,context.serialize(object,TextObject.class));
     }
     
     public static String getAsString(final JsonElement element)

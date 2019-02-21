@@ -11,7 +11,8 @@ import java.lang.reflect.Type;
 public abstract class BaseObject {
 
     protected abstract void load(JsonObject root, JsonDeserializationContext context);
-
+    
+    
     public static Object getGsonAdapter()
     {
         return new ChannelJsonAdapter();

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Map;
 
 import au.com.addstar.slackapi.objects.*;
+import au.com.addstar.slackapi.objects.blocks.Block;
+import au.com.addstar.slackapi.objects.blocks.composition.CompositionObject;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -38,6 +40,8 @@ public class SlackAPI
         builder.registerTypeAdapter(User.class, User.getGsonAdapter());
         builder.registerTypeAdapter(Message.class, Message.getGsonAdapter());
         Attachment.addGsonAdapters(builder);
+        Block.addGsonAdapters(builder);
+        CompositionObject.addGsonAdapters(builder);
         
         gson = builder.create();
         

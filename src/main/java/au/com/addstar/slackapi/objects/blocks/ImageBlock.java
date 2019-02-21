@@ -1,9 +1,10 @@
-package au.com.addstar.slackapi.objects.blocks.elements;
+package au.com.addstar.slackapi.objects.blocks;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import au.com.addstar.slackapi.internal.Utilities;
+import au.com.addstar.slackapi.objects.blocks.composition.TextObject;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -14,38 +15,36 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Created for use for the Add5tar MC Minecraft server
- * Created by benjamincharlton on 20/02/2019.
+ * Created for the AddstarMC Project. Created by Narimm on 21/02/2019.
  */
 @NoArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper=true)
-public class ImageElement extends Element {
-    
-    private URL imageURL;
+public class ImageBlock extends Block{
+    private TextObject title;
+    private URL imageUrl;
     private String altText;
     
     @Override
     protected void load(JsonObject root, JsonDeserializationContext context) {
         super.load(root, context);
+        title = Utilities.getTextObject(root.get("title"),context, TextObject.TextType.PLAIN);
         try {
-            this.imageURL = new URL(root.get("imageURL").getAsString());
+            this.imageUrl = new URL(root.get("imageURL").getAsString());
         } catch (MalformedURLException e) {
             throw new JsonParseException("URL could not be decoded");
         }
         altText = Utilities.getAsString(root.get("alt_text"));
+        
     }
     
     @Override
     protected JsonObject save(JsonObject root, JsonSerializationContext context) {
         super.save(root, context);
-        if(this.imageURL != null) {
-            root.addProperty("imageUrl",this.imageURL.toString());
-        }
-        if(altText !=null) {
-            root.addProperty("alt_test",altText);
-        }
+        Utilities.serializeTextObject(root,"title",title,context);
+        root.addProperty("alt_text",altText);
+        root.addProperty("image_url",imageUrl.toString());
         return root;
     }
 }

@@ -1,8 +1,16 @@
 package au.com.addstar.slackapi.objects.blocks;
 
-import au.com.addstar.slackapi.objects.*;
-import com.google.gson.*;
-import lombok.EqualsAndHashCode;
+import au.com.addstar.slackapi.internal.Utilities;
+import au.com.addstar.slackapi.objects.BaseObject;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,40 +23,91 @@ import java.lang.reflect.Type;
 @NoArgsConstructor
 @Getter
 public class Block extends BaseObject {
+    
     private BlockType type;
-
-    public static Object getGSONAdapter(){
-
+    private String block_id;
+    
+    
+    public static void addGsonAdapters(GsonBuilder builder)
+    {
+        builder.registerTypeAdapter(Section.class, Section.getGsonAdapter());
+        builder.registerTypeAdapter(ImageBlock.class,ImageBlock.getGsonAdapter());
+        builder.registerTypeAdapter(Divider.class,Divider.getGsonAdapter());
+        builder.registerTypeAdapter(ActionBlock.class,ActionBlock.getGsonAdapter());
+    
+    
     }
 
-    private static class BlockJSONAdapter implements JsonDeserializer<Block>{
+    public static BlockJSONAdapter getGsonAdapter(){
+        return new BlockJSONAdapter();
+    }
+    
+    private static class BlockJSONAdapter implements JsonDeserializer<Block>, JsonSerializer<Block>{
 
         @Override
         public Block deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
             if (!(json instanceof JsonObject))
                 throw new JsonParseException("Expected JSONObject as channel root");
-            JsonObject root = (JsonObject)json;
-            Block object;
+            final JsonObject root = (JsonObject)json;
+            final Block object;
             if(type.equals(Section.class)) {
                 object = new Section();
-            }else {
+            }  else  if(type.equals(Divider.class)) {
+                object = new Divider();
+            } else  if(type.equals(ImageBlock.class)) {
+                object = new ImageBlock();
+            }  else  if(type.equals(ActionBlock.class)) {
+                object = new ImageBlock();
+            }
+            else {
                 throw new JsonParseException("Cant load unknown channel type");
             }
             object.load(root,context);
             return object;
         }
+    
+        @Override
+        public JsonElement serialize(Block block, Type type, JsonSerializationContext context) {
+            JsonObject root = new JsonObject();
+            block.save(root,context);
+            return root;
+        }
     }
 
     protected void load(JsonObject root, JsonDeserializationContext context) {
-        type = BlockType.valueOf(root.get("type").getAsString());
+        type = BlockType.valueOf(root.get("type").getAsString().toUpperCase());
+        block_id = Utilities.getAsString(root.get("block_id"));
     }
-
+    
+    protected JsonObject save(JsonObject root, JsonSerializationContext context){
+        root.addProperty("type", this.type.toString());
+        if(block_id != null) {
+            root.addProperty("block_id",block_id);
+        }
+        return root;
+    }
+    @AllArgsConstructor
     enum BlockType {
-         SECTION,
-         DIVIDER,
-         IMAGE,
-         ACTIONS,
-         CONTEXT,
+        SECTION("section"),
+        DIVIDER("divider"),
+        IMAGE("image"),
+        ACTIONS("action"),
+        CONTEXT("context");
+        
+        private String name;
+        
+    
+        /**
+         * Returns the name of this enum constant, as contained in the declaration.  This method may be overridden,
+         * though it typically isn't necessary or desirable.  An enum type should override this method when a more
+         * "programmer-friendly" string form exists.
+         *
+         * @return the name of this enum constant
+         */
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 
 

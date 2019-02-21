@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import au.com.addstar.slackapi.internal.Utilities;
+import au.com.addstar.slackapi.objects.blocks.composition.TextObject;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -14,38 +15,35 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Created for use for the Add5tar MC Minecraft server
- * Created by benjamincharlton on 20/02/2019.
+ * Created for the AddstarMC Project. Created by Narimm on 21/02/2019.
  */
 @NoArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper=true)
-public class ImageElement extends Element {
+public class ButtonElement extends Element {
     
-    private URL imageURL;
-    private String altText;
+    private TextObject text;
+    private String action_id;
+    private URL url;
+    private String value;
+    private Object confirm;
     
     @Override
     protected void load(JsonObject root, JsonDeserializationContext context) {
         super.load(root, context);
+        text  =  Utilities.getTextObject(root.get("text"), context, TextObject.TextType.PLAIN);
+        action_id = Utilities.getAsString(root.get("action_id"));
+        value = Utilities.getAsString(root.get("value"));
         try {
-            this.imageURL = new URL(root.get("imageURL").getAsString());
+            this.url = new URL(root.get("url").getAsString());
         } catch (MalformedURLException e) {
             throw new JsonParseException("URL could not be decoded");
         }
-        altText = Utilities.getAsString(root.get("alt_text"));
     }
     
     @Override
     protected JsonObject save(JsonObject root, JsonSerializationContext context) {
-        super.save(root, context);
-        if(this.imageURL != null) {
-            root.addProperty("imageUrl",this.imageURL.toString());
-        }
-        if(altText !=null) {
-            root.addProperty("alt_test",altText);
-        }
-        return root;
+        return super.save(root, context);
     }
 }
