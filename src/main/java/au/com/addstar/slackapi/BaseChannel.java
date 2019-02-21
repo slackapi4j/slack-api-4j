@@ -16,45 +16,48 @@ import com.google.gson.JsonParseException;
 @EqualsAndHashCode
 public abstract class BaseChannel
 {
-	private ObjectID id;
-	private long creationDate;
-	
-	protected void load(JsonObject object, JsonDeserializationContext context)
-	{
-		id = new ObjectID(object.get("id").getAsString());
-		if (!object.has("created"))
-			throw new IllegalStateException("This is not a valid channel");
-		
-		creationDate = Utilities.getAsTimestamp(object.get("created"));
-	}
-	
-	static Object getGsonAdapter()
-	{
-		return new ChannelJsonAdapter();
-	}
-	
-	private static class ChannelJsonAdapter implements JsonDeserializer<BaseChannel>
-	{
-		@Override
-		public BaseChannel deserialize( JsonElement element, Type type, JsonDeserializationContext context ) throws JsonParseException
-		{
-			if (!(element instanceof JsonObject))
-				throw new JsonParseException("Expected JSONObject as channel root");
-			
-			JsonObject root = (JsonObject)element;
-			
-			BaseChannel channel;
-			if (type.equals(GroupChannel.class))
-				channel = new GroupChannel();
-			else if (type.equals(NormalChannel.class))
-				channel = new NormalChannel();
-			else if (type.equals(DirectChannel.class))
-				channel = new DirectChannel();
-			else
-				throw new JsonParseException("Cant load unknown channel type");
-			
-			channel.load(root, context);
-			return channel;
-		}
-	}
+    private ObjectID id;
+    private long creationDate;
+    
+    static Object getGsonAdapter()
+    {
+        return new ChannelJsonAdapter();
+    }
+    
+    protected void load(final JsonObject object, final JsonDeserializationContext context)
+    {
+        this.id = new ObjectID(object.get("id").getAsString());
+        if (!object.has("created")) {
+            throw new IllegalStateException("This is not a valid channel");
+        }
+        
+        this.creationDate = Utilities.getAsTimestamp(object.get("created"));
+    }
+    
+    private static class ChannelJsonAdapter implements JsonDeserializer<BaseChannel>
+    {
+        @Override
+        public BaseChannel deserialize(final JsonElement element, final Type type, final JsonDeserializationContext context ) throws JsonParseException
+        {
+            if (!(element instanceof JsonObject)) {
+                throw new JsonParseException("Expected JSONObject as channel root");
+            }
+            
+            final JsonObject root = (JsonObject)element;
+            
+            final BaseChannel channel;
+            if (type.equals(GroupChannel.class)) {
+                channel = new GroupChannel();
+            } else if (type.equals(NormalChannel.class)) {
+                channel = new NormalChannel();
+            } else if (type.equals(DirectChannel.class)) {
+                channel = new DirectChannel();
+            } else {
+                throw new JsonParseException("Cant load unknown channel type");
+            }
+            
+            channel.load(root, context);
+            return channel;
+        }
+    }
 }

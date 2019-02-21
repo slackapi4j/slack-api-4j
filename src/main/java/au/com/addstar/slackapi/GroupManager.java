@@ -17,39 +17,40 @@ import com.google.gson.JsonObject;
 
 public class GroupManager
 {
-	private Gson gson;
-	private SlackConnection connection;
-	
-	GroupManager(SlackAPI main)
-	{
-		gson = main.getGson();
-		connection = main.getSlack();
-	}
-	
-	public List<GroupChannel> getGroups() throws SlackException, IOException
-	{
-		return getGroups(true);
-	}
-	
-	public List<GroupChannel> getGroups(boolean includeArchived) throws SlackException, IOException
-	{
-		JsonObject raw;
-		if (includeArchived)
-			raw = connection.callMethodHandled(SlackConstants.GROUP_LIST);
-		else
-		{
-			Map<String, Object> params = ImmutableMap.<String, Object>builder()
-				.put("exclude_archived", 1)
-				.build();
-			raw = connection.callMethodHandled(SlackConstants.GROUP_LIST, params);
-		}
-		
-		JsonArray rawList = raw.getAsJsonArray("groups");
-		ImmutableList.Builder<GroupChannel> groups = ImmutableList.builder();
-		
-		for (JsonElement rawGroup : rawList)
-			groups.add(gson.fromJson(rawGroup, GroupChannel.class));
-		
-		return groups.build();
-	}
+    private final Gson gson;
+    private final SlackConnection connection;
+    
+    GroupManager(final SlackAPI main)
+    {
+        this.gson = main.getGson();
+        this.connection = main.getSlack();
+    }
+    
+    public List<GroupChannel> getGroups() throws SlackException, IOException
+    {
+        return this.getGroups(true);
+    }
+    
+    public List<GroupChannel> getGroups(final boolean includeArchived) throws SlackException, IOException
+    {
+        final JsonObject raw;
+        if (includeArchived) {
+            raw = this.connection.callMethodHandled(SlackConstants.GROUP_LIST);
+        } else
+        {
+            final Map<String, Object> params = ImmutableMap.<String, Object>builder()
+                .put("exclude_archived", 1)
+                .build();
+            raw = this.connection.callMethodHandled(SlackConstants.GROUP_LIST, params);
+        }
+        
+        final JsonArray rawList = raw.getAsJsonArray("groups");
+        final ImmutableList.Builder<GroupChannel> groups = ImmutableList.builder();
+        
+        for (final JsonElement rawGroup : rawList) {
+            groups.add(this.gson.fromJson(rawGroup, GroupChannel.class));
+        }
+        
+        return groups.build();
+    }
 }

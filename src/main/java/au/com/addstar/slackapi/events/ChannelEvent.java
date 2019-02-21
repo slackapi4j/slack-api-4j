@@ -8,18 +8,19 @@ import au.com.addstar.slackapi.NormalChannel;
 @Getter
 public class ChannelEvent extends RealTimeEvent
 {
-	private final NormalChannel channel;
-	private final EventType type;
-	
-	public enum EventType
-	{
-		Join,
-		Leave,
-		Create,
-		Delete,
-		Rename,
-		Archive,
-		Unarchive,
-		HistoryChange
-	}
+    private final NormalChannel channel;
+    private final EventType type;
+    
+    @SuppressWarnings("unused")
+    public enum EventType
+    {
+        Join,
+        Leave,
+        Create,
+        Delete,
+        Rename,
+        Archive,
+        Unarchive,
+        HistoryChange
+    }
 }

@@ -8,18 +8,18 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public class GroupEvent extends RealTimeEvent
 {
-	private final GroupChannel channel;
-	private final EventType type;
-	
-	public enum EventType
-	{
-		Join,
-		Leave,
-		Open,
-		Close,
-		Rename,
-		Archive,
-		Unarchive,
-		HistoryChange
-	}
+    private final GroupChannel channel;
+    private final EventType type;
+    
+    public enum EventType
+    {
+        Join,
+        Leave,
+        Open,
+        Close,
+        Rename,
+        Archive,
+        Unarchive,
+        HistoryChange
+    }
 }

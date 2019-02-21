@@ -10,13 +10,13 @@ import au.com.addstar.slackapi.User;
 @Getter
 public class MessageEvent extends RealTimeEvent
 {
-	private final User user;
-	private final Message message;
-	private final MessageType type;
-	
-	@Override
-	public String toString()
-	{
-		return "MessageEvent: " + message;
-	}
+    private final User user;
+    private final Message message;
+    private final MessageType type;
+    
+    @Override
+    public String toString()
+    {
+        return "MessageEvent: " + this.message;
+    }
 }
