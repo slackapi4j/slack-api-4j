@@ -6,15 +6,14 @@ import java.util.Map;
 import au.com.addstar.slackapi.objects.*;
 import au.com.addstar.slackapi.objects.blocks.Block;
 import au.com.addstar.slackapi.objects.blocks.composition.CompositionObject;
+import au.com.addstar.slackapi.objects.blocks.elements.Element;
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 
 import au.com.addstar.slackapi.exceptions.SlackException;
 import au.com.addstar.slackapi.internal.SlackConnection;
 import au.com.addstar.slackapi.internal.SlackConstants;
+import lombok.Data;
 
 public class SlackAPI
 {
@@ -42,7 +41,7 @@ public class SlackAPI
         Attachment.addGsonAdapters(builder);
         Block.addGsonAdapters(builder);
         CompositionObject.addGsonAdapters(builder);
-        
+        Element.addGsonAdapters(builder);
         gson = builder.create();
         
         channels = new ChannelManager(this);
@@ -70,7 +69,23 @@ public class SlackAPI
     {
        return sendMessage(message, channel, MessageOptions.DEFAULT);
     }
-    
+
+    public Message sendMessage(Message message) throws IOException, SlackException {
+        JsonElement obj = gson.toJsonTree(message);
+        JsonObject root = connection.callMethodHandled(SlackConstants.CHAT_POST, obj.getAsJsonObject());
+        return gson.fromJson(root.get("message"), Message.class);
+    }
+
+    /**
+     * @deprecated use {@link #sendMessage(Message)}
+     * @param message The string message
+     * @param channel the channel to send it too
+     * @param options a set of options to apply
+     * @return a Message
+     * @throws SlackException
+     * @throws IOException
+     */
+    @Deprecated
     public Message sendMessage(String message, IdBaseObject channel, MessageOptions options) throws SlackException, IOException
     {
         Map<String, Object> params = Maps.newHashMap();
@@ -113,7 +128,9 @@ public class SlackAPI
         params.put("mrkdwn", options.isFormat());
         
         JsonObject root = connection.callMethodHandled(SlackConstants.CHAT_POST, params);
-        return gson.fromJson(root.get("message"), Message.class);
+        Message out = gson.fromJson(root.get("message"), Message.class);
+        out.setSubtype(Message.MessageType.Sent);
+        return out;
     }
     
     SlackConnection getSlack()

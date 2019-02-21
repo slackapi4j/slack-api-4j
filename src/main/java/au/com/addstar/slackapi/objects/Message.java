@@ -5,6 +5,7 @@ import java.util.List;
 
 import au.com.addstar.slackapi.internal.Utilities;
 
+import au.com.addstar.slackapi.objects.blocks.Block;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
@@ -15,41 +16,53 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@NoArgsConstructor
+@Builder
 @Getter
 @EqualsAndHashCode
+@AllArgsConstructor
 public class Message extends IdBaseObject
 {
+	@Setter
 	private ObjectID userId;
 	@Setter
 	private String text;
 	private ObjectID sourceId;
 	private long timestamp;
+	@Setter
+	private String thread_ts;
+	private String ts;
+	@Setter
 	private MessageType subtype;
-	
 	private ObjectID editUserId;
 	private long editTimestamp;
-	
+	private boolean as_user = true;
 	@Setter
 	private List<Attachment> attachments;
+	@Setter
+	private List<Block> blocks;
+
+	public Message(){
+		this.subtype = MessageType.Normal;
+		as_user = true;
+	}
 	
 	public Message(String text, IdBaseObject channel)
 	{
 		this.sourceId = channel.getId();
 		this.text = text;
 		this.subtype = MessageType.Sent;
+		as_user = true;
 	}
 	
 	public static Object getGsonAdapter()
 	{
 		return new MessageJsonAdapter();
 	}
-	
+	public void addBlock(Block block){
+		blocks.add(block);
+	}
 	@Override
 	public String toString()
 	{
@@ -71,6 +84,9 @@ public class Message extends IdBaseObject
 				message.userId = new ObjectID(root.get("user").getAsString());
 			
 			message.text = Utilities.getAsString(root.get("text"));
+			message.thread_ts = Utilities.getAsString(root.get("thread_ts"));
+			message.ts = Utilities.getAsString(root.get("ts"));
+			message.as_user = Utilities.getAsBoolean(root.get("as_user"),true);
 			message.timestamp = Utilities.getAsTimestamp(root.get("ts"));
 			if (root.has("channel"))
 				message.sourceId = new ObjectID(root.get("channel").getAsString());
@@ -91,7 +107,13 @@ public class Message extends IdBaseObject
 				for (JsonElement rawAttachment : attachments)
 					message.attachments.add(context.<Attachment>deserialize(rawAttachment, Attachment.class));
 			}
-			
+			if (root.has("blocks"))
+			{
+				message.blocks = Lists.newArrayList();
+				JsonArray blocks = root.getAsJsonArray("blocks");
+				for (JsonElement rawBlock : blocks)
+					message.blocks.add(context.<Block>deserialize(rawBlock, Block.class));
+			}
 			return message;
 		}
 
@@ -102,7 +124,9 @@ public class Message extends IdBaseObject
 			object.addProperty("type", "message");
 			object.addProperty("channel", src.sourceId.toString());
 			object.addProperty("text", src.text);
-			
+			object.addProperty("thread_ts",src.thread_ts);
+			object.addProperty("as_user",src.as_user);
+
 			if (src.attachments != null)
 			{
 				JsonArray attachments = new JsonArray();
@@ -110,7 +134,13 @@ public class Message extends IdBaseObject
 					attachments.add(context.serialize(attachment));
 				object.add("attachments", attachments);
 			}
-			
+			if(src.blocks != null){
+				JsonArray blocks = new JsonArray();
+				for(Block block:src.blocks){
+					blocks.add(context.serialize(block));
+				}
+				object.add("blocks",blocks);
+			}
 			return object;
 		}
 	}

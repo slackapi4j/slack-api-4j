@@ -17,7 +17,6 @@ import lombok.Setter;
 /**
  * Created for the AddstarMC Project. Created by Narimm on 21/02/2019.
  */
-@NoArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper=true)
@@ -25,7 +24,11 @@ public class ImageBlock extends Block{
     private TextObject title;
     private URL imageUrl;
     private String altText;
-    
+
+    public ImageBlock() {
+        super.setType(BlockType.IMAGE);
+    }
+
     @Override
     protected void load(JsonObject root, JsonDeserializationContext context) {
         super.load(root, context);

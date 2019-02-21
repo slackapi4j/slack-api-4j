@@ -17,7 +17,6 @@ import lombok.Setter;
  * Created for use for the Add5tar MC Minecraft server
  * Created by benjamincharlton on 20/02/2019.
  */
-@NoArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper=true)
@@ -25,7 +24,11 @@ public class ImageElement extends Element {
     
     private URL imageURL;
     private String altText;
-    
+
+    public ImageElement() {
+        setType(ElementType.IMAGE);
+    }
+
     @Override
     protected void load(JsonObject root, JsonDeserializationContext context) {
         super.load(root, context);

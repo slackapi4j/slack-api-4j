@@ -17,7 +17,6 @@ import lombok.Setter;
 /**
  * Created for the AddstarMC Project. Created by Narimm on 21/02/2019.
  */
-@NoArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper=true)
@@ -28,7 +27,11 @@ public class ButtonElement extends Element {
     private URL url;
     private String value;
     private Object confirm;
-    
+
+    public ButtonElement() {
+        setType(ElementType.BUTTON);
+    }
+
     @Override
     protected void load(JsonObject root, JsonDeserializationContext context) {
         super.load(root, context);

@@ -46,9 +46,9 @@ public class ObjectID
 	private enum ObjectType
 	{
 		User('U', au.com.addstar.slackapi.objects.User.class),
-		NormalChannel('C', au.com.addstar.slackapi.objects.NormalChannel.class),
-		GroupChannel('G', au.com.addstar.slackapi.objects.GroupChannel.class),
-		DirectChannel('D', au.com.addstar.slackapi.objects.DirectChannel.class),
+		Conversation('C', au.com.addstar.slackapi.objects.Conversation.class),
+		GroupConversation('G', au.com.addstar.slackapi.objects.Conversation.class),
+		DirectConversation('D', au.com.addstar.slackapi.objects.Conversation.class),
 		Team('T', null),
 		Bot('B', null),
 		Unknown('\0', null);

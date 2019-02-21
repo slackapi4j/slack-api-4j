@@ -5,24 +5,24 @@ import java.lang.management.PlatformLoggingMXBean;
 import au.com.addstar.slackapi.internal.Utilities;
 import au.com.addstar.slackapi.objects.BaseObject;
 import com.google.gson.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * Created by benjamincharlton on 20/02/2019.
  */
-@NoArgsConstructor
-@Getter
-@Setter
+@Data
+@Builder
 @EqualsAndHashCode(callSuper=true)
+@AllArgsConstructor
 public class TextObject extends CompositionObject  {
 
-    private TextType type;
+    private TextType type = TextType.PLAIN;
     private Boolean emoji;
     private Boolean verbatim;
     private String text;
+
+    public TextObject() {
+    }
 
     @Override
     protected void load(JsonObject root, JsonDeserializationContext context) {
@@ -34,8 +34,8 @@ public class TextObject extends CompositionObject  {
     
     @Override
     protected JsonElement save(JsonObject root, JsonSerializationContext context) {
-        root.addProperty("type",type.name());
-        if(emoji !=null) {
+        root.addProperty("type",type.getValue());
+        if(emoji !=null && type==TextType.PLAIN) {
             root.addProperty("emoji",emoji);
         }
         if(verbatim != null) {
@@ -48,7 +48,7 @@ public class TextObject extends CompositionObject  {
     public enum TextType {
         PLAIN("plain_text"),
         MARKDOWN("mrkdwn");
-
+        @Getter
         private String value;
 
         TextType(String value) {

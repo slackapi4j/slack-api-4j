@@ -19,12 +19,15 @@ import lombok.Setter;
 
 /**
  */
-@NoArgsConstructor
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public class ContextBlock extends Block {
     private List<BaseObject> elements;
-    
+
+    public ContextBlock() {
+        setType(BlockType.CONTEXT);
+    }
+
     private static List<BaseObject> deserializeContextElements(JsonArray array, JsonDeserializationContext context){
         List<BaseObject> o = new ArrayList<>();
         for (JsonElement el:array){

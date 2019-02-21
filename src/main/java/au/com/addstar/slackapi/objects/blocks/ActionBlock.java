@@ -13,13 +13,16 @@ import lombok.Setter;
 /**
  * Created for the AddstarMC Project. Created by Narimm on 21/02/2019.
  */
-@NoArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper=true)
 public class ActionBlock extends Block{
     private List<Element> elements;
-    
+
+    public ActionBlock() {
+        setType(BlockType.ACTIONS);
+    }
+
     @Override
     protected void load(JsonObject root, JsonDeserializationContext context) {
         super.load(root, context);
@@ -28,7 +31,14 @@ public class ActionBlock extends Block{
     }
     
     @Override
-    protected JsonObject save(JsonObject root, JsonSerializationContext context) {
+    protected JsonObject save(JsonObject root, JsonSerializationContext context)
+    {
+        JsonArray array = new JsonArray();
+        for (Element el: elements){
+            JsonElement e  = context.serialize(el);
+            array.add(e);
+        }
+        root.add("elements",array);
         return super.save(root, context);
     }
     

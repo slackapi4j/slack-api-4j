@@ -62,13 +62,27 @@ public class SlackConnection
             throw new AssertionError();
         }
     }
-    
+
+
+    private HttpsURLConnection createConnection(String method, JsonObject base) throws IOException {
+        URL queryUrl = new URL("https", SlackConstants.HOST, "/api/" + method);
+        HttpsURLConnection connection = (HttpsURLConnection)queryUrl.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setRequestProperty("Authorization","Bearer "+ token);
+        connection.setDoInput(true);
+        connection.setDoOutput(true);
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream(), "UTF-8"));
+        writer.write(base.toString());
+        writer.close();
+        return connection;
+    }
+
     private HttpsURLConnection createConnection(String method, Map<String, Object> params) throws IOException, MalformedURLException
     {
         try
         {
             URL queryUrl = new URL("https", SlackConstants.HOST, "/api/" + method);
-            
             HttpsURLConnection connection = (HttpsURLConnection)queryUrl.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -89,7 +103,59 @@ public class SlackConnection
             throw new AssertionError();
         }
     }
-    
+    public JsonElement callMethod(String method, JsonObject object) throws IOException {
+        if (isRateLimited)
+        {
+            if (System.currentTimeMillis() < retryEnd)
+                throw new SlackRequestLimitException(retryEnd);
+
+            isRateLimited = false;
+        }
+        HttpsURLConnection connection = createConnection(method, object);
+        connection.connect();
+        if (connection.getResponseCode() == 429) // Too many requests
+        {
+            int delay = connection.getHeaderFieldInt("Retry-After", 2);
+            isRateLimited = true;
+            retryEnd = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(delay);
+            throw new SlackRequestLimitException(retryEnd);
+        }
+        JsonReader reader = new JsonReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+
+        JsonParser parser = new JsonParser();
+        JsonElement result = parser.parse(reader);
+
+        reader.close();
+
+        return result;
+    }
+    public JsonObject callMethodHandled(String method,JsonObject object) throws IOException, SlackException {
+        JsonObject base = callMethod(method,object).getAsJsonObject();
+        boolean ok = base.get("ok").getAsBoolean();
+        if (!ok)
+        {
+            String code = base.get("error").getAsString();
+            switch (code)
+            {
+                case "not_authed":
+                case "invalid_auth":
+                case "account_inactive":
+                    throw new SlackAuthException(code);
+
+                case "restricted_action":
+                case "user_is_bot":
+                case "user_is_restricted":
+                    throw new SlackRestrictedException(code);
+
+                default:
+                    throw new SlackException(code);
+            }
+        }
+        else
+            return base;
+
+    }
+
     public JsonElement callMethod(String method, Map<String, Object> params) throws IOException, SlackRequestLimitException
     {
         if (isRateLimited)

@@ -13,6 +13,7 @@ import com.google.gson.JsonSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.lang.reflect.Type;
 
@@ -23,7 +24,7 @@ import java.lang.reflect.Type;
 @NoArgsConstructor
 @Getter
 public class Block extends BaseObject {
-    
+    @Setter
     private BlockType type;
     private String block_id;
     
@@ -34,8 +35,9 @@ public class Block extends BaseObject {
         builder.registerTypeAdapter(ImageBlock.class,ImageBlock.getGsonAdapter());
         builder.registerTypeAdapter(Divider.class,Divider.getGsonAdapter());
         builder.registerTypeAdapter(ActionBlock.class,ActionBlock.getGsonAdapter());
-    
-    
+        builder.registerTypeAdapter(ContextBlock.class,ContextBlock.getGsonAdapter());
+
+
     }
 
     public static BlockJSONAdapter getGsonAdapter(){
@@ -58,6 +60,8 @@ public class Block extends BaseObject {
                 object = new ImageBlock();
             }  else  if(type.equals(ActionBlock.class)) {
                 object = new ImageBlock();
+            }  else  if(type.equals(ContextBlock.class)) {
+                object = new ContextBlock();
             }
             else {
                 throw new JsonParseException("Cant load unknown channel type");
@@ -91,7 +95,7 @@ public class Block extends BaseObject {
         SECTION("section"),
         DIVIDER("divider"),
         IMAGE("image"),
-        ACTIONS("action"),
+        ACTIONS("actions"),
         CONTEXT("context");
         
         private String name;

@@ -6,7 +6,6 @@ import au.com.addstar.slackapi.objects.blocks.elements.Element;
 import com.google.gson.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -16,7 +15,6 @@ import java.util.List;
  * Created by benjamincharlton on 20/02/2019.
  */
 
-@NoArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper=true)
@@ -24,7 +22,11 @@ public class Section extends Block {
     private TextObject text;
     private List<TextObject> fields;
     private Element accessory;
-    
+
+    public Section() {
+        super.setType(BlockType.SECTION);
+    }
+
     @Override
     protected JsonObject save(final JsonObject root, final JsonSerializationContext context) {
         super.save(root, context);

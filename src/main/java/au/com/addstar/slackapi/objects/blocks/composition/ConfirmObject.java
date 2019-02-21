@@ -5,17 +5,16 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.checkerframework.checker.units.qual.A;
 
 /**
  * Created for the AddstarMC Project. Created by Narimm on 21/02/2019.
  */
+@AllArgsConstructor
+@Builder
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 @EqualsAndHashCode(callSuper=true)
 public class ConfirmObject extends CompositionObject{
     
@@ -23,6 +22,7 @@ public class ConfirmObject extends CompositionObject{
     private TextObject text;
     private TextObject confirm;
     private TextObject deny;
+
     @Override
     protected JsonElement save(JsonObject root, JsonSerializationContext context) {
         Utilities.serializeTextObject(root,"title",title,context);

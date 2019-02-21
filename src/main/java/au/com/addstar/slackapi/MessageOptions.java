@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.List;
 
 import au.com.addstar.slackapi.objects.Attachment;
+import au.com.addstar.slackapi.objects.blocks.Block;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -29,6 +30,7 @@ public class MessageOptions
     private String username;
     private ParseMode mode = ParseMode.Partial;
     private List<Attachment> attachments;
+    private List<Block> blocks;
     private boolean format = false;
     
     public enum ParseMode

@@ -25,6 +25,7 @@ import lombok.NonNull;
 import lombok.ToString;
 
 @Data
+@Deprecated
 public class Attachment
 {
 	// Header
@@ -72,6 +73,7 @@ public class Attachment
 	@AllArgsConstructor
 	@EqualsAndHashCode
 	@ToString
+	@Deprecated
 	public static class AttachmentField
 	{
 		@NonNull

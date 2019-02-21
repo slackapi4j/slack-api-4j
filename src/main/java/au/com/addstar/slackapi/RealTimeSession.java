@@ -42,13 +42,13 @@ public class RealTimeSession implements Closeable
     @Getter
     private User self;
     private Set<User> users;
-    private Set<IdBaseObject> channels;
+    private Set<Conversation> channels;
     
     private Map<String, User> userMap;
-    private Map<String, IdBaseObject> channelMap;
+    private Map<String, Conversation> channelMap;
     
     private Map<ObjectID, User> userIdMap;
-    private Map<ObjectID, IdBaseObject> channelIdMap;
+    private Map<ObjectID, Conversation> channelIdMap;
     
     private WebSocketClient client;
     private Session session;
@@ -238,25 +238,25 @@ public class RealTimeSession implements Closeable
         return userIdMap.get(id);
     }
     
-    private void addChannel(IdBaseObject channel)
+    private void addChannel(Conversation channel)
     {
         channels.add(channel);
         if (channel instanceof Conversation)
-            channelMap.put(((Conversation)channel).getName().toLowerCase(), channel);
+            channelMap.put(channel.getName().toLowerCase(), channel);
         channelIdMap.put(channel.getId(), channel);
     }
     
-    public Set<IdBaseObject> getAllChannels()
+    public Set<Conversation> getAllChannels()
     {
         return Collections.unmodifiableSet(channels);
     }
     
-    public IdBaseObject getChannel(String name)
+    public Conversation getChannel(String name)
     {
-        return (IdBaseObject) channelMap.get(name.toLowerCase());
+        return channelMap.get(name.toLowerCase());
     }
     
-    public IdBaseObject getChannelById(ObjectID id)
+    public Conversation getChannelById(ObjectID id)
     {
         return channelIdMap.get(id);
     }
@@ -268,12 +268,12 @@ public class RealTimeSession implements Closeable
         return id;
     }
     
-    public void sendMessage(String text, IdBaseObject channel)
+    public void sendMessage(String text, Conversation channel)
     {
         sendMessage(new Message(text, channel));
     }
     
-    private void sendMessage(Message message)
+    public void sendMessage(Message message)
     {
         JsonObject object = gson.toJsonTree(message).getAsJsonObject();
         int id = appendId(object);

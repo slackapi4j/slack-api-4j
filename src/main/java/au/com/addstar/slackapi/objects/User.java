@@ -15,8 +15,6 @@ import com.google.gson.JsonObject;
 @EqualsAndHashCode(callSuper = true)
 public class User extends IdBaseObject
 {
-
-
 	private String name;
 	private boolean isDeleted;
 	private String color;

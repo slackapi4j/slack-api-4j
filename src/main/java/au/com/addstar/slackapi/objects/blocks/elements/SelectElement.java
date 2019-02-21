@@ -18,7 +18,6 @@ import org.checkerframework.checker.nullness.Opt;
 /**
  * Created for the AddstarMC Project. Created by Narimm on 21/02/2019.
  */
-@NoArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper=true)
@@ -29,8 +28,12 @@ public class SelectElement extends Element {
     private List<OptionGroup> optionGroups;
     private Option initialOption;
     private ConfirmObject confirm;
-    
-    
+
+    public SelectElement() {
+        setType(ElementType.STATIC_SELECT);
+    }
+
+
     @Override
     protected void load(JsonObject root, JsonDeserializationContext context) {
         super.load(root, context);

@@ -29,6 +29,7 @@ import lombok.Setter;
 @Setter
 @EqualsAndHashCode(callSuper=true)
 public abstract class Element extends BaseObject {
+
     private ElementType type;
     
     public static void addGsonAdapters(GsonBuilder builder)
