@@ -14,8 +14,6 @@ import au.com.addstar.slackapi.objects.blocks.elements.SelectElement;
 import com.google.gson.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  */
@@ -27,7 +25,13 @@ public class ContextBlock extends Block {
     public ContextBlock() {
         setType(BlockType.CONTEXT);
     }
-
+    
+    public boolean addElement(BaseObject obj){
+        if(obj instanceof TextObject || obj instanceof Element){
+            return elements.add(obj);
+        }
+        return false;
+    }
     private static List<BaseObject> deserializeContextElements(JsonArray array, JsonDeserializationContext context){
         List<BaseObject> o = new ArrayList<>();
         for (JsonElement el:array){
@@ -95,4 +99,5 @@ public class ContextBlock extends Block {
         root.add("elements",array);
         return root;
     }
+    
 }
