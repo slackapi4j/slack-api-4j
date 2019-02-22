@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>au.com.addstar</groupId>
     <artifactId>slack-api</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2-SNAPSHOT</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -10,7 +10,7 @@
         <connection>scm:git:git@github.com:AddstarMC/slack-api.git</connection>
         <developerConnection>scm:git:git@github.com:AddstarMC/slack-api.git</developerConnection>
         <url>https://www.github.com/AddstarMC/slack-api</url>
-        <tag>slack-api-0.0.1</tag>
+        <tag>HEAD</tag>
     </scm>
     <dependencies>
         <dependency>
