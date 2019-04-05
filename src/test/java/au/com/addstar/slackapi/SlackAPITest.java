@@ -14,12 +14,9 @@ import au.com.addstar.slackapi.objects.blocks.elements.Element;
 import au.com.addstar.slackapi.objects.blocks.elements.SelectElement;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.checkerframework.checker.nullness.Opt;
 import org.junit.jupiter.api.Test;
 
-import javax.xml.soap.Text;
 import java.io.IOException;
-import java.lang.management.PlatformLoggingMXBean;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created for use for the Add5tar MC Minecraft server
@@ -90,7 +88,8 @@ public class SlackAPITest {
             test.addBlock(section);
             test.addBlock(new Divider());
             test.addBlock(image);
-            //Message sent = api.sendMessage(test);
+            Message sent = api.sendMessage(test);
+            assertTrue(sent.getTimestamp() >0);
             Message question = Message.builder()
                     .as_user(true)
                     .blocks(new ArrayList<>())
@@ -136,7 +135,8 @@ public class SlackAPITest {
             elements.add(select);
             actions.setElements(elements);
             question.addBlock(actions);
-           // Message out = api.sendMessage(question);
+            sent = api.sendMessage(question);
+            assertTrue(sent.getTimestamp() >0);
         } catch (SlackException e) {
             e.printStackTrace();
         } catch (IOException e) {

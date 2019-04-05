@@ -34,10 +34,10 @@ public class Conversation extends TimeStampedBaseObject {
     private boolean isMPIM;
     private boolean isIM;
     private List<ObjectID> members;
-
     private String topic;
     private ObjectID topicUpdateUserId;
     private long topicUpdateDate;
+    private boolean isUserDeleted;
 
     private String purpose;
     private ObjectID purposeUpdateUserId;
@@ -51,10 +51,20 @@ public class Conversation extends TimeStampedBaseObject {
     @Override
     protected void load(JsonObject root, JsonDeserializationContext context) {
         super.load(root, context);
-        name = root.get("name").getAsString();
-        creationUserId = new ObjectID(root.get("creator").getAsString());
-        isArchived = Utilities.getAsBoolean(root.get("is_archived"), false);
-        isGeneral = Utilities.getAsBoolean(root.get("is_general"), false);
+        isIM = Utilities.getAsBoolean(root.get("is_im"),false);
+        members = new ArrayList<>();
+        if(isIM == true){
+            //this message is on a direct channel and as a result it wont have certain params
+            creationUserId = new ObjectID(root.get("user").getAsString());
+            members.add(creationUserId);
+        }
+        isChannel = Utilities.getAsBoolean(root.get("is_channel"),false);
+        if(isChannel){
+            name = root.get("name").getAsString();
+            creationUserId = new ObjectID(root.get("creator").getAsString());
+            isArchived = Utilities.getAsBoolean(root.get("is_archived"), false);
+            isGeneral = Utilities.getAsBoolean(root.get("is_general"), false);
+        }
         if (root.has("members"))
         {
             JsonArray memberArray = root.get("members").getAsJsonArray();
@@ -63,8 +73,6 @@ public class Conversation extends TimeStampedBaseObject {
                 memberList.add(new ObjectID(member.getAsString()));
             members = memberList;
         }
-        else
-            members = Collections.emptyList();
         if (root.has("topic"))
         {
             JsonObject topic = root.get("topic").getAsJsonObject();
@@ -80,14 +88,12 @@ public class Conversation extends TimeStampedBaseObject {
             purposeUpdateDate = Utilities.getAsTimestamp(purpose.get("last_set"));
             purposeUpdateUserId = new ObjectID(purpose.get("creator").getAsString());
         }
-        isChannel = Utilities.getAsBoolean(root.get("is_channel"),false);
         isMember = Utilities.getAsBoolean(root.get("is_member"),false);
         isShared = Utilities.getAsBoolean(root.get("is_shared"),false);
         isPrivate = Utilities.getAsBoolean(root.get("is_private"),false);
         isPrivate = Utilities.getAsBoolean(root.get("is_private"),false);
         isOrgShared = Utilities.getAsBoolean(root.get("is_org_shared"),false);
         isMPIM = Utilities.getAsBoolean(root.get("is_mpim"),false);
-        isIM = Utilities.getAsBoolean(root.get("is_im"),false);
         if(root.has("name_normalized")){
             normalized_name = root.get("name_normalized").getAsString();
         }

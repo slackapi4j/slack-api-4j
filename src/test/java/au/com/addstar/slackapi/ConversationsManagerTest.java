@@ -52,12 +52,12 @@ public class ConversationsManagerTest {
         Set<User> users= session.getUsers();
         List<User> out = new ArrayList<>();
         for(User user:users) {
-            if(user.getName().equals("narimm") || user.getName().equals("miniworks18")) {
+            if(user.getName().equals("narimm")) {
                 out.add(user);
             }
         }
         Conversation conversation = api.getConversations().createMultiPartyMessage(out);
-        //session.sendMessage("Test Message",conversation);
+        session.sendMessage("Test Message",conversation);
         api.getConversations().closeMultiPartyMessage(conversation);
         session.close();
     }
