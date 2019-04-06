@@ -32,7 +32,7 @@ public class ConversationsManagerTest {
             types.add(SlackConversationType.MPIM);
             List<Conversation> conversations = api.getConversations().listConversations(types);
             for(Conversation c:conversations){
-                if(c.getName().equals("bot-test")){
+                if(c.getName().equals("test")){
                     Message message = api.sendMessage("Testing Conversation API",c);
                     assertTrue(message.getSourceId() != null);
                 }

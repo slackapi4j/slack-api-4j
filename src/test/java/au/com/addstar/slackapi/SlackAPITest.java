@@ -57,7 +57,7 @@ public class SlackAPITest {
         SlackAPI api = new SlackAPI(token);
         try {
             RealTimeSession session = api.startRTSession();
-            Conversation c = session.getChannel("bot-test");
+            Conversation c = session.getChannel("test");
             User u = session.getSelf();
             session.close();
             Message message = new Message("Plain Message Test",c);
