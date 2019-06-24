@@ -2,7 +2,7 @@ package au.com.addstar.slackapi.events;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import au.com.addstar.slackapi.NormalChannel;
+import au.com.addstar.slackapi.objects.NormalChannel;
 
 @RequiredArgsConstructor
 @Getter

@@ -8,6 +8,7 @@ import au.com.addstar.slackapi.exceptions.SlackException;
 import au.com.addstar.slackapi.internal.SlackConnection;
 import au.com.addstar.slackapi.internal.SlackConstants;
 
+import au.com.addstar.slackapi.objects.GroupChannel;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -15,42 +16,47 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+/**
+ * This is used to manager group channels
+ * @deprecated Use {@link ConversationsManager)
+ */
+
+@Deprecated
 public class GroupManager
 {
-    private final Gson gson;
-    private final SlackConnection connection;
-    
-    GroupManager(final SlackAPI main)
+    private Gson gson;
+    private SlackConnection connection;
+
+    GroupManager(SlackAPI main)
     {
-        this.gson = main.getGson();
-        this.connection = main.getSlack();
+        gson = main.getGson();
+        connection = main.getSlack();
     }
-    
+
     public List<GroupChannel> getGroups() throws SlackException, IOException
     {
-        return this.getGroups(true);
+        return getGroups(true);
     }
-    
-    public List<GroupChannel> getGroups(final boolean includeArchived) throws SlackException, IOException
+
+    public List<GroupChannel> getGroups(boolean includeArchived) throws SlackException, IOException
     {
-        final JsonObject raw;
-        if (includeArchived) {
-            raw = this.connection.callMethodHandled(SlackConstants.GROUP_LIST);
-        } else
+        JsonObject raw;
+        if (includeArchived)
+            raw = connection.callMethodHandled(SlackConstants.GROUP_LIST);
+        else
         {
-            final Map<String, Object> params = ImmutableMap.<String, Object>builder()
+            Map<String, Object> params = ImmutableMap.<String, Object>builder()
                 .put("exclude_archived", 1)
                 .build();
-            raw = this.connection.callMethodHandled(SlackConstants.GROUP_LIST, params);
+            raw = connection.callMethodHandled(SlackConstants.GROUP_LIST, params);
         }
-        
-        final JsonArray rawList = raw.getAsJsonArray("groups");
-        final ImmutableList.Builder<GroupChannel> groups = ImmutableList.builder();
-        
-        for (final JsonElement rawGroup : rawList) {
-            groups.add(this.gson.fromJson(rawGroup, GroupChannel.class));
-        }
-        
+
+        JsonArray rawList = raw.getAsJsonArray("groups");
+        ImmutableList.Builder<GroupChannel> groups = ImmutableList.builder();
+
+        for (JsonElement rawGroup : rawList)
+            groups.add(gson.fromJson(rawGroup, GroupChannel.class));
+
         return groups.build();
     }
 }

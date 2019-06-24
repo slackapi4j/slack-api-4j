@@ -2,9 +2,9 @@ package au.com.addstar.slackapi.events;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import au.com.addstar.slackapi.Message;
-import au.com.addstar.slackapi.Message.MessageType;
-import au.com.addstar.slackapi.User;
+import au.com.addstar.slackapi.objects.Message;
+import au.com.addstar.slackapi.objects.Message.MessageType;
+import au.com.addstar.slackapi.objects.User;
 
 @RequiredArgsConstructor
 @Getter

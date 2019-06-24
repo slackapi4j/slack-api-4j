@@ -1,4 +1,4 @@
-package au.com.addstar.slackapi;
+package au.com.addstar.slackapi.objects;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -9,22 +9,21 @@ import lombok.RequiredArgsConstructor;
 public class ObjectID
 {
     private ObjectType type;
-    @SuppressWarnings({"FieldMayBeFinal", "CanBeFinal"})
     private String id;
-    
-    public ObjectID(final String full)
+
+    public ObjectID(String full)
     {
         if (full.isEmpty())
         {
-            this.id = "";
-            this.type = ObjectType.Unknown;
+            id = "";
+            type = ObjectType.Unknown;
             return;
         }
 
-        final char classifier = Character.toUpperCase(full.charAt(0));
+        char classifier = Character.toUpperCase(full.charAt(0));
         this.type = ObjectType.Unknown;
-        
-        for (final ObjectType type : ObjectType.values())
+
+        for (ObjectType type : ObjectType.values())
         {
             if (type.getClassifier() == classifier)
             {
@@ -32,28 +31,28 @@ public class ObjectID
                 break;
             }
         }
-        
-        this.id = full.substring(1);
+
+        id = full.substring(1);
     }
-    
+
     @Override
     public String toString()
     {
-        return String.format("%s%s", this.type.getClassifier(), this.id);
+        return String.format("%s%s", type.getClassifier(), id);
     }
-    
+
     @Getter
     @RequiredArgsConstructor
     private enum ObjectType
     {
-        User('U', User.class),
-        NormalChannel('C', NormalChannel.class),
-        GroupChannel('G', GroupChannel.class),
-        DirectChannel('D', DirectChannel.class),
+        User('U', au.com.addstar.slackapi.objects.User.class),
+        Conversation('C', au.com.addstar.slackapi.objects.Conversation.class),
+        GroupConversation('G', au.com.addstar.slackapi.objects.Conversation.class),
+        DirectConversation('D', au.com.addstar.slackapi.objects.Conversation.class),
         Team('T', null),
         Bot('B', null),
         Unknown('\0', null);
-        
+
         private final char classifier;
         private final Class<?> typeClass;
     }

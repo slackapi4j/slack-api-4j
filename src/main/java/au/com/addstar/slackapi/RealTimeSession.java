@@ -14,13 +14,14 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import au.com.addstar.slackapi.objects.*;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketListener;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 
 import lombok.Getter;
-import au.com.addstar.slackapi.Message.MessageType;
+import au.com.addstar.slackapi.objects.Message.MessageType;
 import au.com.addstar.slackapi.events.MessageEvent;
 import au.com.addstar.slackapi.events.RealTimeEvent;
 import au.com.addstar.slackapi.exceptions.SlackRTException;
@@ -37,330 +38,343 @@ import com.google.gson.JsonObject;
 @SuppressWarnings("WeakerAccess")
 public class RealTimeSession implements Closeable
 {
-    private final Gson gson;
-    private final List<RealTimeListener> listeners;
-    private final Map<Integer, Message> pendingMessages;
+    private Gson gson;
+
     @Getter
     private User self;
     private Set<User> users;
-    private Set<BaseChannel> channels;
+    private Set<Conversation> channels;
+
     private Map<String, User> userMap;
-    private Map<String, BaseChannel> channelMap;
+    private Map<String, Conversation> channelMap;
+
     private Map<ObjectID, User> userIdMap;
-    private Map<ObjectID, BaseChannel> channelIdMap;
+    private Map<ObjectID, Conversation> channelIdMap;
+
     private WebSocketClient client;
     private Session session;
     private int nextMessageId = 1;
     private boolean needJoinConfirm;
-    
-    RealTimeSession(final JsonObject object, final SlackAPI main) throws IOException
+
+    private List<RealTimeListener> listeners;
+
+    private Map<Integer, Message> pendingMessages;
+
+    RealTimeSession(JsonObject object, SlackAPI main) throws IOException
     {
-        this.gson = main.getGson();
-        
-        this.listeners = Lists.newArrayList();
-        this.pendingMessages = Maps.newHashMap();
-        
-        this.load(object);
-        
-        this.initWebSocket(object.get("url").getAsString());
+        gson = main.getGson();
+
+        listeners = Lists.newArrayList();
+        pendingMessages = Maps.newHashMap();
+
+        load(object);
+
+        initWebSocket(object.get("url").getAsString());
     }
-    
-    private void load(final JsonObject object)
+
+    public void addListener(RealTimeListener listener)
     {
-        final JsonObject self = object.getAsJsonObject("self");
-        final JsonArray channels = object.getAsJsonArray("channels");
-        final JsonArray groups = object.getAsJsonArray("groups");
-        final JsonArray users = object.getAsJsonArray("users");
-        final JsonArray ims = object.getAsJsonArray("ims");
-        
-        final ObjectID selfId = new ObjectID(self.get("id").getAsString());
-        
-        // Load users
-        this.users = Sets.newHashSetWithExpectedSize(users.size());
-        this.userMap = Maps.newHashMapWithExpectedSize(users.size());
-        this.userIdMap = Maps.newHashMapWithExpectedSize(users.size());
-        for (final JsonElement user : users)
+        synchronized(listeners)
         {
-            try
+            listeners.add(listener);
+        }
+    }
+
+    public void removeListener(RealTimeListener listener)
+    {
+        synchronized(listeners)
+        {
+            listeners.remove(listener);
+        }
+    }
+
+    private void postLogin()
+    {
+        synchronized(listeners)
+        {
+            for (RealTimeListener listener : listeners)
             {
-                final User loaded = this.gson.fromJson(user, User.class);
-                if (loaded.getId().equals(selfId)) {
-                    this.self = loaded;
-                }
-                
-                this.addUser(loaded);
-            }
-            catch (final Throwable e)
-            {
-                System.err.println("Unable to load user " + user);
-                e.printStackTrace();
+                listener.onLoginComplete();
             }
         }
-        
-        // Load channels
-        this.channels = Sets.newHashSetWithExpectedSize(channels.size());
-        this.channelMap = Maps.newHashMapWithExpectedSize(channels.size());
-        this.channelIdMap = Maps.newHashMapWithExpectedSize(channels.size());
-        for (final JsonElement channel : channels)
-        {
-            final NormalChannel loaded = this.gson.fromJson(channel, NormalChannel.class);
-            this.addChannel(loaded);
-        }
-        
-        // Load groups
-        for (final JsonElement group : groups)
-        {
-            final GroupChannel loaded = this.gson.fromJson(group, GroupChannel.class);
-            this.addChannel(loaded);
-        }
-        
-        // Load DMs
-        for (final JsonElement dm : ims)
-        {
-            final DirectChannel loaded = this.gson.fromJson(dm, DirectChannel.class);
-            this.addChannel(loaded);
-        }
     }
-    
-    private void initWebSocket(final String url) throws IOException
-    {
-        try
-        {
-            final URI uri = new URI(url);
-            this.needJoinConfirm = true;
-            this.client = new WebSocketClient(new SslContextFactory());
-            this.client.start();
-            final Future<Session> future = this.client.connect(new SocketClient(), uri);
-            
-            this.session = future.get(this.client.getConnectTimeout() + 1000, TimeUnit.MILLISECONDS);
-            
-            this.nextMessageId = 1;
-        }
-        catch ( final URISyntaxException e )
-        {
-            // Should never happen
-        }
-        catch (final IOException e)
-        {
-            throw e;
-        }
-        catch (final InterruptedException ignored)
-        {
-        
-        }
-        catch (final ExecutionException e)
-        {
-            if (e.getCause() instanceof IOException) {
-                throw (IOException)e.getCause();
-            } else {
-                throw new IOException(e.getCause());
-            }
-        }
-        catch (final TimeoutException e)
-        {
-            // Probably wont
-            throw new SocketTimeoutException();
-        }
-        // Sigh, couldn't they pick a more specific one? :/
-        catch ( final Exception e )
-        {
-            throw new IOException(e);
-        }
-    }
-    
-    private void addUser(final User user)
-    {
-        this.users.add(user);
-        this.userMap.put(user.getName().toLowerCase(), user);
-        this.userIdMap.put(user.getId(), user);
-    }
-    
-    private void addChannel(final BaseChannel channel)
-    {
-        this.channels.add(channel);
-        if (channel instanceof NormalChannel) {
-            this.channelMap.put(((NormalChannel)channel).getName().toLowerCase(), channel);
-        }
-        this.channelIdMap.put(channel.getId(), channel);
-    }
-    
-    public void addListener(final RealTimeListener listener)
-    {
-        synchronized(this.listeners)
-        {
-            this.listeners.add(listener);
-        }
-    }
-    
-    public void removeListener(final RealTimeListener listener)
-    {
-        synchronized(this.listeners)
-        {
-            this.listeners.remove(listener);
-        }
-    }
-    
+
     private void postClose()
     {
-        synchronized(this.listeners)
+        synchronized(listeners)
         {
-            for (final RealTimeListener listener : this.listeners)
+            for (RealTimeListener listener : listeners)
             {
                 listener.onClose();
             }
         }
     }
-    
-    public Set<User> getUsers()
+
+    private void postError(SlackRTException ex)
     {
-        return Collections.unmodifiableSet(this.users);
-    }
-    
-    public User getUser(final String name)
-    {
-        return this.userMap.get(name.toLowerCase());
-    }
-    
-    public Set<BaseChannel> getAllChannels()
-    {
-        return Collections.unmodifiableSet(this.channels);
-    }
-    
-    public NormalChannel getChannel(final String name)
-    {
-        return (NormalChannel) this.channelMap.get(name.toLowerCase());
-    }
-    
-    public BaseChannel getChannelById(final ObjectID id)
-    {
-        return this.channelIdMap.get(id);
-    }
-    
-    public void sendMessage(final String text, final BaseChannel channel)
-    {
-        this.sendMessage(new Message(text, channel));
-    }
-    
-    private void sendMessage(final Message message)
-    {
-        final JsonObject object = this.gson.toJsonTree(message).getAsJsonObject();
-        final int id = this.appendId(object);
-        this.pendingMessages.put(id, message);
-        this.send(object);
-    }
-    
-    private int appendId(final JsonObject object)
-    {
-        final int id = this.nextMessageId++;
-        object.addProperty("id", id);
-        return id;
-    }
-    
-    private void send(final JsonObject object)
-    {
-        this.session.getRemote().sendStringByFuture(this.gson.toJson(object));
-    }
-    
-    public boolean isOpen()
-    {
-        return this.client != null && this.client.isRunning();
-    }
-    
-    private void onReply(final JsonObject reply)
-    {
-        final int replyId = reply.get("reply_to").getAsInt();
-        // TODO: Handle other types of replies
-        final Message message = this.pendingMessages.remove(replyId);
-        
-        if (reply.get("ok").getAsBoolean())
+        synchronized(listeners)
         {
-            this.postEvent(new MessageEvent(this.self, message, message.getSubtype()));
-        }
-        else
-        {
-            final SlackRTException exception = this.makeException(reply);
-            if (exception != null) {
-                this.postError(exception);
+            for (RealTimeListener listener : listeners)
+            {
+                listener.onError(ex);;
             }
-            // Not sure what to do it no error
         }
     }
-    
-    private void postEvent(final RealTimeEvent event)
+
+    private void postEvent(RealTimeEvent event)
     {
-        synchronized(this.listeners)
+        synchronized(listeners)
         {
-            for (final RealTimeListener listener : this.listeners)
+            for (RealTimeListener listener : listeners)
             {
                 listener.onEvent(event);
             }
         }
     }
-    
-    private SlackRTException makeException(final JsonObject object)
+
+    private void load(JsonObject object)
+    {
+        JsonObject self = object.getAsJsonObject("self");
+        JsonArray channels = object.getAsJsonArray("channels");
+        JsonArray users = object.getAsJsonArray("users");
+        ObjectID selfId = new ObjectID(self.get("id").getAsString());
+
+        // Load users
+        this.users = Sets.newHashSetWithExpectedSize(users.size());
+        userMap = Maps.newHashMapWithExpectedSize(users.size());
+        userIdMap = Maps.newHashMapWithExpectedSize(users.size());
+        for (JsonElement user : users)
+        {
+            try
+            {
+                User loaded = gson.fromJson(user, User.class);
+                if (loaded.getId().equals(selfId))
+                    this.self = loaded;
+
+                addUser(loaded);
+            }
+            catch (Throwable e)
+            {
+                System.err.println("Unable to load user " + user);
+                e.printStackTrace();
+            }
+        }
+        // Load Conversations
+        // Load channels
+        this.channels = Sets.newHashSetWithExpectedSize(channels.size());
+        channelMap = Maps.newHashMapWithExpectedSize(channels.size());
+        channelIdMap = Maps.newHashMapWithExpectedSize(channels.size());
+        for (JsonElement channel : channels)
+        {
+            Conversation loaded = gson.fromJson(channel, Conversation.class);
+            addChannel(loaded);
+        }
+    }
+
+    private void initWebSocket(String url) throws IOException
+    {
+        try
+        {
+            URI uri = new URI(url);
+            needJoinConfirm = true;
+            client = new WebSocketClient(new SslContextFactory());
+            client.start();
+            Future<Session> future = client.connect(new SocketClient(), uri);
+
+            session = future.get(client.getConnectTimeout() + 1000, TimeUnit.MILLISECONDS);
+
+            nextMessageId = 1;
+        }
+        catch ( URISyntaxException e )
+        {
+            // Should never happen
+            return;
+        }
+        catch (IOException e)
+        {
+            throw e;
+        }
+        catch (InterruptedException e)
+        {
+
+        }
+        catch (ExecutionException e)
+        {
+            if (e.getCause() instanceof IOException)
+                throw (IOException)e.getCause();
+            else
+                throw new IOException(e.getCause());
+        }
+        catch (TimeoutException e)
+        {
+            // Probably wont
+            throw new SocketTimeoutException();
+        }
+        // Sigh, couldnt they pick a more specific one? :/
+        catch ( Exception e )
+        {
+            throw new IOException(e);
+        }
+    }
+
+    private void addUser(User user)
+    {
+        users.add(user);
+        userMap.put(user.getName().toLowerCase(), user);
+        userIdMap.put(user.getId(), user);
+    }
+
+    public Set<User> getUsers()
+    {
+        return Collections.unmodifiableSet(users);
+    }
+
+    public User getUser(String name)
+    {
+        return userMap.get(name.toLowerCase());
+    }
+
+    public User getUserById(ObjectID id)
+    {
+        return userIdMap.get(id);
+    }
+
+    private void addChannel(Conversation channel)
+    {
+        channels.add(channel);
+        if (channel instanceof Conversation)
+            channelMap.put(channel.getName().toLowerCase(), channel);
+        channelIdMap.put(channel.getId(), channel);
+    }
+
+    public Set<Conversation> getAllChannels()
+    {
+        return Collections.unmodifiableSet(channels);
+    }
+
+    public Conversation getChannel(String name)
+    {
+        return channelMap.get(name.toLowerCase());
+    }
+
+    public Conversation getChannelById(ObjectID id)
+    {
+        return channelIdMap.get(id);
+    }
+
+    private int appendId(JsonObject object)
+    {
+        int id = nextMessageId++;
+        object.addProperty("id", id);
+        return id;
+    }
+
+    public void sendMessage(String text, Conversation channel)
+    {
+        sendMessage(new Message(text, channel));
+    }
+
+    public void sendMessage(Message message)
+    {
+        JsonObject object = gson.toJsonTree(message).getAsJsonObject();
+        int id = appendId(object);
+        pendingMessages.put(id, message);
+        send(object);
+    }
+
+    private void send(JsonObject object)
+    {
+        session.getRemote().sendStringByFuture(gson.toJson(object));
+    }
+
+    public boolean isOpen()
+    {
+        return client != null && client.isRunning();
+    }
+
+    @Override
+    public void close()
+    {
+        try
+        {
+            client.stop();
+            client = null;
+        }
+        catch ( Exception e )
+        {
+            // Its shutting down, I dont care
+        }
+    }
+
+    private SlackRTException makeException(JsonObject object)
     {
         if (object.has("error"))
         {
-            final JsonObject error = object.getAsJsonObject("error");
+            JsonObject error = object.getAsJsonObject("error");
             return new SlackRTException(error.get("code").getAsInt(), error.get("msg").getAsString());
         }
         return null;
     }
-    
-    private void postError(final SlackRTException ex)
+
+    private void onReply(JsonObject reply)
     {
-        synchronized(this.listeners)
+        int replyId = reply.get("reply_to").getAsInt();
+        // TODO: Handle other types of replies
+        Message message = pendingMessages.remove(replyId);
+
+        if (reply.get("ok").getAsBoolean())
         {
-            for (final RealTimeListener listener : this.listeners)
-            {
-                listener.onError(ex);
-            }
+            postEvent(new MessageEvent(self, message, message.getSubtype()));
+        }
+        else
+        {
+            SlackRTException exception = makeException(reply);
+            if (exception != null)
+                postError(exception);
+            // Not sure what to do it no error
         }
     }
-    
-    private void onEvent(final JsonObject event)
+
+    private void onEvent(JsonObject event)
     {
-        final String type = Utilities.getAsString(event.get("type"));
-        if (type == null) {
+        String type = Utilities.getAsString(event.get("type"));
+        if (type == null)
             return;
-        }
-        
+
         // Handle login first
-        if (this.needJoinConfirm)
+        if (needJoinConfirm)
         {
-            if ("hello".equals(type))
+            if (type.equals("hello"))
             {
-                this.needJoinConfirm = false;
-                this.postLogin();
+                needJoinConfirm = false;
+                postLogin();
             }
             else
             {
-                this.postError(this.makeException(event));
-                this.close();
+                postError(makeException(event));
+                close();
                 return;
             }
-            
+
             return;
         }
-        
+
         RealTimeEvent newEvent = null;
         switch (type)
         {
         case "message":
         {
             // A message from a previous session
-            if (event.has("reply_to")) {
+            if (event.has("reply_to"))
                 return;
-            }
-            
-            final Message message = this.gson.fromJson(event, Message.class);
-            final User user;
-            if (message.getSubtype() == MessageType.Edit) {
-                user = this.getUserById(message.getEditUserId());
-            } else {
-                user = this.getUserById(message.getUserId());
-            }
-            
+
+            Message message = gson.fromJson(event, Message.class);
+            User user;
+            if (message.getSubtype() == MessageType.Edit)
+                user = getUserById(message.getEditUserId());
+            else
+                user = getUserById(message.getUserId());
+
             newEvent = new MessageEvent(user, message, message.getSubtype());
             break;
         }
@@ -399,80 +413,47 @@ public class RealTimeSession implements Closeable
         case "team_join":
             break;
         case "error":
-            this.postError(this.makeException(event));
+            postError(makeException(event));
             break;
         }
-        
-        if (newEvent != null) {
-            this.postEvent(newEvent);
-        }
+
+        if (newEvent != null)
+            postEvent(newEvent);
     }
-    
-    private void postLogin()
-    {
-        synchronized(this.listeners)
-        {
-            for (final RealTimeListener listener : this.listeners)
-            {
-                listener.onLoginComplete();
-            }
-        }
-    }
-    
-    @Override
-    public void close()
-    {
-        try
-        {
-            this.client.stop();
-            this.client = null;
-        }
-        catch ( final Exception e )
-        {
-            // Its shutting down, I dont care
-        }
-    }
-    
-    public User getUserById(final ObjectID id)
-    {
-        return this.userIdMap.get(id);
-    }
-    
+
     private class SocketClient implements WebSocketListener
     {
-        @SuppressWarnings("EmptyMethod")
         @Override
-        public void onWebSocketBinary(final byte[] payload, final int offset, final int len )
+        public void onWebSocketBinary( byte[] payload, int offset, int len )
         {
         }
 
         @Override
-        public void onWebSocketClose(final int statusCode, final String reason )
+        public void onWebSocketClose( int statusCode, String reason )
         {
-            RealTimeSession.this.postClose();
+            postClose();
         }
 
         @Override
-        public void onWebSocketConnect(final Session session )
+        public void onWebSocketConnect( Session session )
         {
             RealTimeSession.this.session = session;
         }
 
         @Override
-        public void onWebSocketError(final Throwable cause )
+        public void onWebSocketError( Throwable cause )
         {
             cause.printStackTrace();
         }
 
         @Override
-        public void onWebSocketText(final String message )
+        public void onWebSocketText( String message )
         {
-            final JsonObject event = RealTimeSession.this.gson.fromJson(message, JsonElement.class).getAsJsonObject();
-            if (event.has("ok")) {
-                RealTimeSession.this.onReply(event);
-            } else {
-                RealTimeSession.this.onEvent(event);
-            }
+            JsonObject event = gson.fromJson(message, JsonElement.class).getAsJsonObject();
+            if (event.has("ok"))
+                onReply(event);
+            else
+                onEvent(event);
         }
     }
 }

@@ -3,80 +3,124 @@ package au.com.addstar.slackapi;
 import java.io.IOException;
 import java.util.Map;
 
+import au.com.addstar.slackapi.objects.*;
+import au.com.addstar.slackapi.objects.blocks.Block;
+import au.com.addstar.slackapi.objects.blocks.composition.CompositionObject;
+import au.com.addstar.slackapi.objects.blocks.elements.Element;
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 
 import au.com.addstar.slackapi.exceptions.SlackException;
 import au.com.addstar.slackapi.internal.SlackConnection;
 import au.com.addstar.slackapi.internal.SlackConstants;
+import lombok.Data;
 
 @SuppressWarnings("WeakerAccess")
 public class SlackAPI
 {
-    private final SlackConnection connection;
-    private final Gson gson;
-    
+    private SlackConnection connection;
+    private Gson gson;
+
     private final ChannelManager channels;
     private final GroupManager groups;
-    
-    public SlackAPI(final String token)
+    private final ConversationsManager conversations;
+
+    public ConversationsManager getConversations() {
+        return conversations;
+    }
+
+    public SlackAPI(String token)
     {
-        this.connection = new SlackConnection(token);
-        final GsonBuilder builder = new GsonBuilder();
+        connection = new SlackConnection(token);
+        GsonBuilder builder = new GsonBuilder();
         builder.registerTypeAdapter(NormalChannel.class, NormalChannel.getGsonAdapter());
-        builder.registerTypeAdapter(GroupChannel.class, NormalChannel.getGsonAdapter());
-        builder.registerTypeAdapter(DirectChannel.class, NormalChannel.getGsonAdapter());
+        builder.registerTypeAdapter(GroupChannel.class, GroupChannel.getGsonAdapter());
+        builder.registerTypeAdapter(DirectChannel.class, DirectChannel.getGsonAdapter());
+        builder.registerTypeAdapter(Conversation.class,Conversation.getGsonAdapter());
         builder.registerTypeAdapter(User.class, User.getGsonAdapter());
         builder.registerTypeAdapter(Message.class, Message.getGsonAdapter());
         Attachment.addGsonAdapters(builder);
-        
-        this.gson = builder.create();
-        
-        this.channels = new ChannelManager(this);
-        this.groups = new GroupManager(this);
+        Block.addGsonAdapters(builder);
+        CompositionObject.addGsonAdapters(builder);
+        Element.addGsonAdapters(builder);
+        gson = builder.create();
+
+        channels = new ChannelManager(this);
+        groups = new GroupManager(this);
+        conversations = new ConversationsManager(this);
     }
-    
+
     public ChannelManager getChannelManager()
     {
-        return this.channels;
+        return channels;
     }
-    
+
     public GroupManager getGroupManager()
     {
-        return this.groups;
+        return groups;
     }
-    
+
     public RealTimeSession startRTSession() throws SlackException, IOException
     {
-        final JsonObject root = this.connection.callMethodHandled(SlackConstants.RTM_START);
+        JsonObject root = connection.callMethodHandled(SlackConstants.RTM_START);
         return new RealTimeSession(root, this);
     }
-    
-    public void sendMessage(final String message, final BaseChannel channel) throws SlackException, IOException, NullPointerException
+
+    public Message sendMessage(String message, IdBaseObject channel) throws SlackException, IOException
     {
-        this.sendMessage(message, channel, MessageOptions.DEFAULT);
+       return sendMessage(message, channel, MessageOptions.DEFAULT);
     }
-    
-    public Message sendMessage(final String message, final BaseChannel channel, final MessageOptions options) throws SlackException, IOException, NullPointerException
+
+    /**
+     * Sends a message
+     * @param message
+     * @return
+     * @throws IOException
+     * @throws SlackException
+     */
+    public Message sendMessage(Message message) throws IOException, SlackException {
+        JsonElement obj = gson.toJsonTree(message);
+        JsonObject root = connection.callMethodHandled(SlackConstants.CHAT_POST, obj.getAsJsonObject());
+        return gson.fromJson(root.get("message"), Message.class);
+    }
+
+    /**
+     * Sends an ephemeral message.
+     * @param message
+     * @return
+     * @throws IOException
+     * @throws SlackException
+     */
+    public Message sendEphemeral(Message message) throws IOException, SlackException {
+        JsonElement obj = gson.toJsonTree(message);
+        JsonObject root = connection.callMethodHandled(SlackConstants.CHAT_POSTEMPHEMERAL, obj.getAsJsonObject());
+        return gson.fromJson(root.get("message"), Message.class);
+    }
+    /**
+     * @deprecated use {@link #sendMessage(Message)}
+     * @param message The string message
+     * @param channel the channel to send it too
+     * @param options a set of options to apply
+     * @return a Message
+     * @throws SlackException
+     * @throws IOException
+     */
+    @Deprecated
+    public Message sendMessage(String message, IdBaseObject channel, MessageOptions options) throws SlackException, IOException
     {
-        final Map<String, Object> params = Maps.newHashMap();
+        Map<String, Object> params = Maps.newHashMap();
         params.put("channel", channel.getId().toString());
         params.put("text", message);
-        if (options.getUsername() != null) {
+        if (options.getUsername() != null)
             params.put("username", options.getUsername());
-        }
         params.put("as_user", options.isAsUser());
         params.put("link_names", options.isLinkNames() ? 1 : 0);
         params.put("unfurl_links", options.isUnfurlLinks());
         params.put("unfurl_media", options.isUnfurlMedia());
-        if (options.getIconEmoji() != null) {
+        if (options.getIconEmoji() != null)
             params.put("icon_emoji", options.getIconEmoji());
-        } else if (options.getIconUrl() != null) {
+        else if (options.getIconUrl() != null)
             params.put("icon_url", options.getIconUrl().toExternalForm());
-        }
         if (options.getMode() != null)
         {
             switch (options.getMode())
@@ -91,30 +135,31 @@ public class SlackAPI
                 break;
             }
         }
-        
+
         if (options.getAttachments() != null)
         {
-            final JsonArray attachments = new JsonArray();
-            for (final Attachment attachment : options.getAttachments()) {
-                attachments.add(this.gson.toJsonTree(attachment));
-            }
-            
+            JsonArray attachments = new JsonArray();
+            for (Attachment attachment : options.getAttachments())
+                attachments.add(gson.toJsonTree(attachment));
+
             params.put("attachments", attachments);
         }
-        
+
         params.put("mrkdwn", options.isFormat());
-        
-        final JsonObject root = this.connection.callMethodHandled(SlackConstants.CHAT_POST, params);
-        return this.gson.fromJson(root.get("message"), Message.class);
+
+        JsonObject root = connection.callMethodHandled(SlackConstants.CHAT_POST, params);
+        Message out = gson.fromJson(root.get("message"), Message.class);
+        out.setSubtype(Message.MessageType.Sent);
+        return out;
     }
-    
+
     SlackConnection getSlack()
     {
-        return this.connection;
+        return connection;
     }
-    
+
     Gson getGson()
     {
-        return this.gson;
+        return gson;
     }
 }
