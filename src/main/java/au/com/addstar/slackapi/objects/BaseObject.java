@@ -5,6 +5,8 @@ import com.google.gson.*;
 import java.lang.reflect.Type;
 
 /**
+ * The Basic object - that support serialization and deserialization via GSON
+ *
  * Created for use for the Add5tar MC Minecraft server
  * Created by benjamincharlton on 20/02/2019.
  */

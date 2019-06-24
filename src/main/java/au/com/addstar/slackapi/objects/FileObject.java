@@ -1,7 +1,5 @@
 package au.com.addstar.slackapi.objects;
 
-import javafx.beans.binding.ObjectExpression;
-
 /**
  * Created by benjamincharlton on 26/08/2018.
  */

@@ -8,9 +8,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
+ * An object that is timestamped on creation as well as unique
+ *
  * Created for use for the Add5tar MC Minecraft server
  * Created by benjamincharlton on 26/08/2018.
- * This object is created at a point in time..it will have a createdTimeStamp
  */
 
 @NoArgsConstructor

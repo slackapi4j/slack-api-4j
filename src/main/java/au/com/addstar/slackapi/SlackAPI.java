@@ -70,12 +70,31 @@ public class SlackAPI
        return sendMessage(message, channel, MessageOptions.DEFAULT);
     }
 
+    /**
+     * Sends a message
+     * @param message
+     * @return
+     * @throws IOException
+     * @throws SlackException
+     */
     public Message sendMessage(Message message) throws IOException, SlackException {
         JsonElement obj = gson.toJsonTree(message);
         JsonObject root = connection.callMethodHandled(SlackConstants.CHAT_POST, obj.getAsJsonObject());
         return gson.fromJson(root.get("message"), Message.class);
     }
 
+    /**
+     * Sends an ephemeral message.
+     * @param message
+     * @return
+     * @throws IOException
+     * @throws SlackException
+     */
+    public Message sendEphemeral(Message message) throws IOException, SlackException {
+        JsonElement obj = gson.toJsonTree(message);
+        JsonObject root = connection.callMethodHandled(SlackConstants.CHAT_POSTEMPHEMERAL, obj.getAsJsonObject());
+        return gson.fromJson(root.get("message"), Message.class);
+    }
     /**
      * @deprecated use {@link #sendMessage(Message)}
      * @param message The string message
