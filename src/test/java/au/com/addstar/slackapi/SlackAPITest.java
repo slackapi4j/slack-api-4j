@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -66,9 +67,16 @@ public class SlackAPITest {
             Message message = new Message("Plain Message Test",c);
             message.setUserId(u.getId());
            // Message response = api.sendMessage(message);
+            List<User> users = api.getUsers();
+            User user = users.stream().filter(new Predicate<User>() {
+                @Override
+                public boolean test(User user) {
+                    return user.getRealName().equals("Narimm");
+                }
+            }).findFirst().get();
             Message test = Message.builder().
                     sourceId(c.getId())
-                    .userId(u.getId())
+                    .userId(user.getId())
                     .as_user(true)
                     .blocks(new ArrayList<>())
                     .subtype(Message.MessageType.Normal)
@@ -91,7 +99,7 @@ public class SlackAPITest {
             test.addBlock(section);
             test.addBlock(new Divider());
             test.addBlock(image);
-            Message sent = api.sendMessage(test);
+            Message sent = api.sendEphemeral(test);
             assertTrue(sent.getTimestamp() >0);
             Message question = Message.builder()
                     .as_user(true)

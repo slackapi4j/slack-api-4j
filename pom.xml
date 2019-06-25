@@ -23,7 +23,7 @@
         <snapshotRepository>
             <id>maven.addstar.com.au</id>
             <name>maven.addstar.com.au-snapshots</name>
-            <url>https://maven.addstar.com.au/artifactory/ext-snapshot-local</url>
+            <url>https://maven.addstar.com.au/artifactory/ext-snapshots-local</url>
         </snapshotRepository>
     </distributionManagement>
     <dependencies>

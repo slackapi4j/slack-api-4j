@@ -169,7 +169,7 @@ public class Message extends IdBaseObject
             object.addProperty("text", src.text);
             object.addProperty("thread_ts",src.thread_ts);
             object.addProperty("as_user",src.as_user);
-
+            object.addProperty("user",src.userId.getId());
             if (src.attachments != null)
             {
                 JsonArray attachments = new JsonArray();

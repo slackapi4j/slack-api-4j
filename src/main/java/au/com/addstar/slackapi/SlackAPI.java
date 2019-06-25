@@ -1,6 +1,8 @@
 package au.com.addstar.slackapi;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import au.com.addstar.slackapi.objects.*;
@@ -13,7 +15,9 @@ import com.google.gson.*;
 import au.com.addstar.slackapi.exceptions.SlackException;
 import au.com.addstar.slackapi.internal.SlackConnection;
 import au.com.addstar.slackapi.internal.SlackConstants;
+import com.google.gson.reflect.TypeToken;
 import lombok.Data;
+import org.eclipse.jetty.util.IO;
 
 @SuppressWarnings("WeakerAccess")
 public class SlackAPI
@@ -152,7 +156,12 @@ public class SlackAPI
         out.setSubtype(Message.MessageType.Sent);
         return out;
     }
-
+    List<User> getUsers() throws IOException {
+        JsonObject root = connection.call(SlackConstants.USER_LIST);
+        TypeToken<List<User>> token = new TypeToken<List<User>>(){};
+        List<User> user = gson.fromJson(root.get("members"), token.getType());
+        return user;
+    }
     SlackConnection getSlack()
     {
         return connection;

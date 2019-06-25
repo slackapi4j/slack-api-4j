@@ -25,6 +25,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
+import org.eclipse.jetty.util.IO;
 
 @SuppressWarnings("WeakerAccess")
 public class SlackConnection
@@ -65,12 +66,21 @@ public class SlackConnection
         }
     }
 
+    private HttpsURLConnection createGetConnection(String method) throws IOException {
+        URL queryUrl = new URL("https", SlackConstants.HOST, "/api/" + method);
+        HttpsURLConnection connection = (HttpsURLConnection)queryUrl.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Authorization","Bearer "+ token);
+        connection.setDoInput(true);
+        connection.setDoOutput(true);
+        return connection;
+    }
 
     private HttpsURLConnection createConnection(String method, JsonObject base) throws IOException {
         URL queryUrl = new URL("https", SlackConstants.HOST, "/api/" + method);
         HttpsURLConnection connection = (HttpsURLConnection)queryUrl.openConnection();
         connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
         connection.setRequestProperty("Authorization","Bearer "+ token);
         connection.setDoInput(true);
         connection.setDoOutput(true);
@@ -87,7 +97,7 @@ public class SlackConnection
             URL queryUrl = new URL("https", SlackConstants.HOST, "/api/" + method);
             HttpsURLConnection connection = (HttpsURLConnection)queryUrl.openConnection();
             connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
             connection.setDoInput(true);
             connection.setDoOutput(true);
 
@@ -105,6 +115,32 @@ public class SlackConnection
             throw new AssertionError();
         }
     }
+    public JsonObject call(String method) throws IOException {
+        if (isRateLimited)
+        {
+            if (System.currentTimeMillis() < retryEnd)
+                throw new SlackRequestLimitException(retryEnd);
+
+            isRateLimited = false;
+        }
+        HttpsURLConnection connection = createGetConnection(method);
+        connection.connect();
+        if (connection.getResponseCode() == 429) // Too many requests
+        {
+            int delay = connection.getHeaderFieldInt("Retry-After", 2);
+            isRateLimited = true;
+            retryEnd = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(delay);
+            throw new SlackRequestLimitException(retryEnd);
+        }
+        JsonReader reader = new JsonReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+
+        JsonParser parser = new JsonParser();
+        JsonElement result = parser.parse(reader);
+
+        reader.close();
+        return result.getAsJsonObject();
+    }
+
     public JsonElement callMethod(String method, JsonObject object) throws IOException {
         if (isRateLimited)
         {
