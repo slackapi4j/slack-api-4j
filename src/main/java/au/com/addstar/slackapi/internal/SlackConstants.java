@@ -2,107 +2,136 @@ package au.com.addstar.slackapi.internal;
 
 import java.io.Serializable;
 
-public final class SlackConstants
-{
-	public static final String HOST = "api.slack.com";
-	
-	public static final String API_TEST = "api.test";
-	public static final String AUTH_TEST = "auth.test";
-	
-	public static final String CHANNEL_ARCHIVE = "channels.archive";
-	public static final String CHANNEL_CREATE = "channels.create";
-	public static final String CHANNEL_HISTORY = "channels.history";
-	public static final String CHANNEL_INFO = "channels.info";
-	public static final String CHANNEL_INVITE = "channels.invite";
-	public static final String CHANNEL_JOIN = "channels.join";
-	public static final String CHANNEL_KICK = "channels.kick";
-	public static final String CHANNEL_LEAVE = "channels.leave";
-	@Deprecated
-	public static final String CHANNEL_LIST = "channels.list";
-	public static final String CHANNEL_MARK = "channels.mark";
-	public static final String CHANNEL_RENAME = "channels.rename";
-	public static final String CHANNEL_REPLIES = "channel.replies";
-	public static final String CHANNEL_SET_PURPOSE = "channels.setPurpose";
-	public static final String CHANNEL_SET_TOPIC = "channels.setTopic";
-	public static final String CHANNEL_UNARCHIVE = "channels.unarchive";
+public enum SlackConstants {
+    HOST("api.slack.com"),
+    API_TEST("api.test"),
+    AUTH_TEST("auth.test"),
+    CHANNEL_ARCHIVE("channels.archive"),
+    CHANNEL_CREATE("channel.create"),
+    CHANNEL_HISTORY("CHANNEL_HISTORY"),
+    CHANNEL_INFO("channels.info"),
+    CHANNEL_INVITE("channels.invite"),
+    CHANNEL_JOIN("channels.join"),
+    CHANNEL_KICK("channels.kick"),
+    CHANNEL_LEAVE("channels.leave"),
 
-	public static final String CONVERSATION_ARCHIVE = "conversations.archive";
-	public static final String CONVERSATION_CLOSE = "conversations.close";
-	public static final String CONVERSATION_OPEN = "conversations.open";
-	public static final String CONVERSATION_HISTORY = "conversations.history";
-	public static final String CONVERSATION_INFO = "conversations.info";
-	public static final String CONVERSATION_INVITE = "conversations.invite";
-	public static final String CONVERSATION_KICK = "conversations.kick";
-	public static final String CONVERSATION_LEAVE = "conversations.leave";
-	@Deprecated
-	public static final String CONVERSATION_JOIN = "conversations.join";
-	public static final String CONVERSATION_LIST = "conversations.list";
-	public static final String CONVERSATION_MARK = "channels.mark";
-	public static final String CONVERSATION_RENAME = "conversations.rename";
-	public static final String CONVERSATION_REPLIES = "conversations.replies";
-	public static final String CONVERSATION_SET_PURPOSE = "conversations.setPurpose";
-	public static final String CONVERSATION_SET_TOPIC = "conversations.setTopic";
-	public static final String CONVERSATION_UNARCHIVE = "conversations.unarchive";
+    CHANNEL_LIST("channels.list", false),
+    CHANNEL_MARK("channels.mark"),
+    CHANNEL_RENAME("channels.rename"),
+    CHANNEL_REPLIES("channel.replies"),
+    CHANNEL_SET_PURPOSE("channels.setPurpose"),
+    CHANNEL_SET_TOPIC("channels.setTopic"),
+    CHANNEL_UNARCHIVE("channels.unarchive"),
 
-	public static final String CHAT_DELETE = "chat.delete";
-	public static final String CHAT_GETPERMALINK = "chat.getPermalink";
-	public static final String CHAT_MEMESSAGE = "chat.meMessage";
-	public static final String CHAT_POSTEMPHEMERAL = "chat.postEphemeral";
-	public static final String CHAT_POST = "chat.postMessage";
-	public static final String CHAT_UNFURL = "chat.unfurl";
-	public static final String CHAT_UPDATE = "chat.update";
+    CONVERSATION_ARCHIVE("conversations.archive"),
+    CONVERSATION_CLOSE("conversations.close"),
+    CONVERSATION_OPEN("conversations.open"),
+    CONVERSATION_HISTORY("conversations.history"),
+    CONVERSATION_INFO("conversations.info"),
+    CONVERSATION_INVITE("conversations.invite"),
+    CONVERSATION_KICK("conversations.kick"),
+    CONVERSATION_LEAVE("conversations.leave"),
+    CONVERSATION_JOIN("conversations.join"),
+    CONVERSATION_LIST("conversations.list", false),
+    CONVERSATION_MARK("channels.mark"),
+    CONVERSATION_RENAME("conversations.rename"),
+    CONVERSATION_REPLIES("conversations.replies"),
+    CONVERSATION_SET_PURPOSE("conversations.setPurpose"),
+    CONVERSATION_SET_TOPIC("conversations.setTopic"),
+    CONVERSATION_UNARCHIVE("conversations.unarchive"),
+    CONVERSATION_MEMBERS("conversations.members", false),
 
-	public static final String EMOJI_LIST = "emoji.list";
+    CHAT_DELETE("chat.delete"),
+    CHAT_GETPERMALINK("chat.getPermalink"),
+    CHAT_MEMESSAGE("chat.meMessage"),
+    CHAT_POSTEMPHEMERAL("chat.postEphemeral"),
+    CHAT_POST("chat.postMessage"),
+    CHAT_UNFURL("chat.unfurl"),
+    CHAT_UPDATE("chat.update"),
 
-	public static final String FILE_DELETE = "files.delete";
-	public static final String FILE_INFO = "files.info";
-	public static final String FILE_LIST = "files.list";
-	public static final String FILE_UPLOAD = "files.upload";
+    EMOJI_LIST("emoji.list"),
 
-	public static final String GROUP_ARCHIVE = "groups.archive";
-	public static final String GROUP_CLOSE = "groups.close";
-	public static final String GROUP_CREATE = "groups.create";
-	public static final String GROUP_CREATE_CHILD = "groups.createChild";
-	public static final String GROUP_HISTORY = "groups.history";
-	public static final String GROUP_INVITE = "groups.invite";
-	public static final String GROUP_KICK = "groups.kick";
-	public static final String GROUP_LEAVE = "groups.leave";
-	@Deprecated
-	public static final String GROUP_LIST = "groups.list";
-	public static final String GROUP_MARK = "groups.mark";
-	public static final String GROUP_OPEN = "groups.open";
-	public static final String GROUP_RENAME = "groups.rename";
-	public static final String GROUP_SET_PURPOSE = "groups.setPurpose";
-	public static final String GROUP_SET_TOPIC = "groups.setTopic";
-	public static final String GROUP_UNARCHIVE = "groups.unarchive";
+    FILE_DELETE("files.delete"),
+    FILE_INFO("files.info"),
+    FILE_LIST("files.list"),
+    FILE_UPLOAD("files.upload"),
 
-	public static final String IM_CLOSE = "im.close";
-	public static final String IM_HISTORY = "im.history";
-	@Deprecated
-	public static final String IM_LIST = "im.list";
-	public static final String IM_MARK = "im.mark";
-	public static final String IM_OPEN = "im.open";
+    GROUP_ARCHIVE("groups.archive"),
+    GROUP_CLOSE("groups.close"),
+    GROUP_CREATE("groups.create"),
+    GROUP_CREATE_CHILD("groups.createChild"),
+    GROUP_HISTORY("groups.history"),
+    GROUP_INVITE("groups.invite"),
+    GROUP_KICK("groups.kick"),
+    GROUP_LEAVE("groups.leave"),
 
-	public static final String REACTION_ADD = "reaction.add";
-	public static final String REACTION_REMOVE = "reaction.remove";
+    GROUP_LIST("groups.list"),
+    GROUP_MARK("groups.mark"),
+    GROUP_OPEN("groups.open"),
+    GROUP_RENAME("groups.rename"),
+    GROUP_SET_PURPOSE("groups.setPurpose"),
+    GROUP_SET_TOPIC("groups.setTopic"),
+    GROUP_UNARCHIVE("groups.unarchive"),
 
-	public static final String MPIM_OPEN = "mpim.open";
-	public static final String MPIM_CLOSE = "mpim.close";
-	public static final String MPIM_MARK = "mpim.mark";
-	
-	public static final String OAUTH_ACCESS = "oauth.access";
-	
-	public static final String RTM_START = "rtm.start";
-	
-	public static final String SEARCH_ALL = "search.all";
-	public static final String SEARCH_FILES = "search.files";
-	public static final String SEARCH_MESSAGES = "search.messages";
-	
-	public static final String STARS_LIST = "stars.list";
-	
-	public static final String USER_GET_PRESENCE = "users.getPresence";
-	public static final String USER_INFO = "users.info";
-	public static final String USER_LIST = "users.list";
-	public static final String USER_SET_ACTIVE = "users.setActive";
-	public static final String USER_SET_PRESENCE = "users.setPresence";
+    IM_CLOSE("im.close"),
+    IM_HISTORY("im.history"),
+
+    IM_LIST("im.list"),
+    IM_MARK("im.mark"),
+    IM_OPEN("im.open"),
+
+    REACTION_ADD("reaction.add"),
+    REACTION_REMOVE("reaction.remove"),
+
+    MPIM_OPEN("mpim.open"),
+    MPIM_CLOSE("mpim.close"),
+    MPIM_MARK("mpim.mark"),
+
+    OAUTH_ACCESS("oauth.access"),
+
+    RTM_START("rtm.start"),
+
+    SEARCH_ALL("search.all"),
+    SEARCH_FILES("search.files"),
+    SEARCH_MESSAGES("search.messages"),
+
+    STARS_LIST("stars.list"),
+
+    USER_GET_PRESENCE("users.getPresence"),
+    USER_INFO("users.info"),
+    USER_LIST("users.list", false),
+    USER_SET_ACTIVE("users.setActive"),
+    USER_SET_PRESENCE("users.setPresence");
+
+    private final String value;
+    private boolean post = true;
+
+    SlackConstants(final String value) {
+        this.value = value;
+    }
+
+    SlackConstants(final String value, final boolean post) {
+        this.value = value;
+        this.post = post;
+    }
+
+    /**
+     * @return true if this method prefers a post v a get
+     */
+    public boolean isPost() {
+        return this.post;
+    }
+
+    /**
+     * Returns the name of this enum constant, as contained in the
+     * declaration.  This method may be overridden, though it typically
+     * isn't necessary or desirable.  An enum type should override this
+     * method when a more "programmer-friendly" string form exists.
+     *
+     * @return the name of this enum constant
+     */
+    @Override
+    public String toString() {
+        return this.value;
+    }
 }

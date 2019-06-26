@@ -121,7 +121,19 @@ public class ConversationsManager {
         }
         return true;
     }
-    
+
+    public List<ObjectID> getMembers(Conversation conversation) throws SlackException, IOException {
+        final Map<String, Object> params = ImmutableMap.<String, Object>builder()
+                .put("channel", conversation.getId())
+                .build();
+        final JsonObject raw = this.connection.callMethodHandled(SlackConstants.CONVERSATION_MEMBERS, params);
+        final JsonArray rawList = raw.getAsJsonArray("members");
+        final List<ObjectID> users = new ArrayList<>();
+        for (final JsonElement user : rawList) {
+            users.add(new ObjectID(user.getAsString()));
+        }
+        return users;
+    }
     /**
      * Returns a conversation thats is a MultiParty DM
      * @param users the users to add.
@@ -129,12 +141,14 @@ public class ConversationsManager {
      * @throws IOException
      * @throws SlackException
      */
-    public Conversation createMultiPartyMessage(List<User> users) throws IOException, SlackException {
+    public Conversation createDMConversation(final List<User> users) throws IOException, SlackException {
+        if (users.size() == 0) {
+            throw new IOException("No users to recieve");
+        }
         StringBuilder userlist = new StringBuilder();
-        for(User u:users){
+        for (final User u : users) {
             userlist.append(u.getId()).append(',');
         }
-        
         final String userString = userlist.toString().substring(0,userlist.length()-1);
         final ImmutableMap.Builder<String,Object> builder = ImmutableMap.builder();
         builder.put("users",userString);

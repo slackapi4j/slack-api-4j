@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -16,40 +15,37 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import au.com.addstar.slackapi.exceptions.SlackAuthException;
-import au.com.addstar.slackapi.exceptions.SlackException;
-import au.com.addstar.slackapi.exceptions.SlackRequestLimitException;
-import au.com.addstar.slackapi.exceptions.SlackRestrictedException;
+import au.com.addstar.slackapi.SlackAPI;
+import au.com.addstar.slackapi.exceptions.*;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
-import org.eclipse.jetty.util.IO;
 
 @SuppressWarnings("WeakerAccess")
 public class SlackConnection
 {
-    private String token;
+    private final String token;
     private boolean isRateLimited;
     private long retryEnd;
 
-    public SlackConnection(String token)
+    public SlackConnection(final String token)
     {
         this.token = token;
 
-        isRateLimited = false;
-        retryEnd = 0;
+        this.isRateLimited = false;
+        this.retryEnd = 0;
     }
 
-    private String encodeRequest(Map<String, Object> params)
+    private String encodeRequest(final Map<String, Object> params)
     {
         try
         {
-            StringBuilder data = new StringBuilder();
+            final StringBuilder data = new StringBuilder();
             data.append("token=");
-            data.append(URLEncoder.encode(token, "UTF-8"));
-            for (Entry<String, Object> param : params.entrySet())
+            data.append(URLEncoder.encode(this.token, "UTF-8"));
+            for (final Entry<String, Object> param : params.entrySet())
             {
                 data.append('&');
                 data.append(URLEncoder.encode(param.getKey(), "UTF-8"));
@@ -58,203 +54,145 @@ public class SlackConnection
             }
 
             return data.toString();
-        }
-        catch (UnsupportedEncodingException e)
+        } catch (final UnsupportedEncodingException e)
         {
             // Should never happen
             throw new AssertionError();
         }
     }
 
-    private HttpsURLConnection createGetConnection(String method) throws IOException {
-        URL queryUrl = new URL("https", SlackConstants.HOST, "/api/" + method);
-        HttpsURLConnection connection = (HttpsURLConnection)queryUrl.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setRequestProperty("Authorization","Bearer "+ token);
-        connection.setDoInput(true);
-        connection.setDoOutput(true);
-        return connection;
-    }
-
-    private HttpsURLConnection createConnection(String method, JsonObject base) throws IOException {
-        URL queryUrl = new URL("https", SlackConstants.HOST, "/api/" + method);
-        HttpsURLConnection connection = (HttpsURLConnection)queryUrl.openConnection();
+    private HttpsURLConnection createConnection(final SlackConstants method, final JsonObject base) throws IOException {
+        final URL queryUrl = new URL("https", SlackConstants.HOST.toString(), "/api/" + method);
+        final HttpsURLConnection connection = (HttpsURLConnection) queryUrl.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-        connection.setRequestProperty("Authorization","Bearer "+ token);
+        connection.setRequestProperty("Authorization", "Bearer " + this.token);
         connection.setDoInput(true);
         connection.setDoOutput(true);
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream(), "UTF-8"));
+        final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream(), StandardCharsets.UTF_8));
         writer.write(base.toString());
         writer.close();
         return connection;
     }
 
-    private HttpsURLConnection createConnection(String method, Map<String, Object> params) throws IOException, MalformedURLException
-    {
+    private HttpsURLConnection createConnection(final SlackConstants method, final Map<String, Object> params) throws IOException {
         try
         {
-            URL queryUrl = new URL("https", SlackConstants.HOST, "/api/" + method);
-            HttpsURLConnection connection = (HttpsURLConnection)queryUrl.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
+            final URL queryUrl = new URL("https", SlackConstants.HOST.toString(), "/api/" + method);
+            final HttpsURLConnection connection = (HttpsURLConnection) queryUrl.openConnection();
+            if (method.isPost()) {
+                connection.setRequestMethod("POST");
+            } else {
+                connection.setRequestMethod("GET");
+            }
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             connection.setDoInput(true);
             connection.setDoOutput(true);
 
             // Add request params
-            String request = encodeRequest(params);
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream(), "UTF-8"));
+            final String request = this.encodeRequest(params);
+            final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream(), StandardCharsets.UTF_8));
             writer.write(request);
             writer.close();
 
             return connection;
-        }
-        catch ( ProtocolException e )
+        } catch (final ProtocolException e)
         {
             // Should not happen
             throw new AssertionError();
         }
     }
-    public JsonObject call(String method) throws IOException {
-        if (isRateLimited)
-        {
-            if (System.currentTimeMillis() < retryEnd)
-                throw new SlackRequestLimitException(retryEnd);
 
-            isRateLimited = false;
-        }
-        HttpsURLConnection connection = createGetConnection(method);
-        connection.connect();
-        if (connection.getResponseCode() == 429) // Too many requests
-        {
-            int delay = connection.getHeaderFieldInt("Retry-After", 2);
-            isRateLimited = true;
-            retryEnd = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(delay);
-            throw new SlackRequestLimitException(retryEnd);
-        }
-        JsonReader reader = new JsonReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-
-        JsonParser parser = new JsonParser();
-        JsonElement result = parser.parse(reader);
-
-        reader.close();
-        return result.getAsJsonObject();
-    }
-
-    public JsonElement callMethod(String method, JsonObject object) throws IOException {
-        if (isRateLimited)
-        {
-            if (System.currentTimeMillis() < retryEnd)
-                throw new SlackRequestLimitException(retryEnd);
-
-            isRateLimited = false;
-        }
-        HttpsURLConnection connection = createConnection(method, object);
-        connection.connect();
-        if (connection.getResponseCode() == 429) // Too many requests
-        {
-            int delay = connection.getHeaderFieldInt("Retry-After", 2);
-            isRateLimited = true;
-            retryEnd = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(delay);
-            throw new SlackRequestLimitException(retryEnd);
-        }
-        JsonReader reader = new JsonReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-
-        JsonParser parser = new JsonParser();
-        JsonElement result = parser.parse(reader);
-
-        reader.close();
-
-        return result;
-    }
-    public JsonObject callMethodHandled(String method,JsonObject object) throws IOException, SlackException {
-        JsonObject base = callMethod(method,object).getAsJsonObject();
-        boolean ok = base.get("ok").getAsBoolean();
-        if (!ok)
-        {
-            String code = base.get("error").getAsString();
-            switch (code)
-            {
-                case "not_authed":
-                case "invalid_auth":
-                case "account_inactive":
-                    throw new SlackAuthException(code);
-
-                case "restricted_action":
-                case "user_is_bot":
-                case "user_is_restricted":
-                    throw new SlackRestrictedException(code);
-
-                default:
-                    throw new SlackException(code);
+    public JsonElement callMethod(final SlackConstants method, final JsonObject object) throws IOException {
+        if (this.isRateLimited) {
+            if (System.currentTimeMillis() < this.retryEnd) {
+                throw new SlackRequestLimitException(this.retryEnd);
             }
-        }
-        else
-            return base;
 
+            this.isRateLimited = false;
+        }
+        final HttpsURLConnection connection = this.createConnection(method, object);
+        connection.connect();
+        return this.processConnectionResult(connection);
     }
 
-    public JsonElement callMethod(String method, Map<String, Object> params) throws IOException, SlackRequestLimitException
-    {
-        if (isRateLimited)
-        {
-            if (System.currentTimeMillis() < retryEnd)
-                throw new SlackRequestLimitException(retryEnd);
-
-            isRateLimited = false;
-        }
-
-        HttpsURLConnection connection = createConnection(method, params);
-        connection.connect();
-
+    private JsonElement processConnectionResult(final HttpsURLConnection connection) throws IOException {
         if (connection.getResponseCode() == 429) // Too many requests
         {
-            int delay = connection.getHeaderFieldInt("Retry-After", 2);
-            isRateLimited = true;
-            retryEnd = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(delay);
-            throw new SlackRequestLimitException(retryEnd);
+            final int delay = connection.getHeaderFieldInt("Retry-After", 2);
+            this.isRateLimited = true;
+            this.retryEnd = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(delay);
+            throw new SlackRequestLimitException(this.retryEnd);
         }
-
-        JsonReader reader = new JsonReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-
-        JsonParser parser = new JsonParser();
-        JsonElement result = parser.parse(reader);
-
+        final JsonReader reader = new JsonReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+        final JsonParser parser = new JsonParser();
+        final JsonElement result = parser.parse(reader);
         reader.close();
-
         return result;
     }
 
-    public JsonObject callMethodHandled(String method, Map<String, Object> params) throws SlackException, IOException
-    {
-        JsonObject base = callMethod(method, params).getAsJsonObject();
-        boolean ok = base.get("ok").getAsBoolean();
-
+    public JsonObject callMethodHandled(final SlackConstants method, final JsonObject object) throws IOException, SlackException {
+        MessageValidator.validateMessage(object, method);
+        final JsonObject base = this.callMethod(method, object).getAsJsonObject();
+        final boolean ok = base.get("ok").getAsBoolean();
         if (!ok)
         {
-            String code = base.get("error").getAsString();
-            switch (code)
-            {
+            final String code = base.get("error").getAsString();
+            throw this.validateErrorCode(code);
+        }
+        return base;
+    }
+
+    private SlackException validateErrorCode(final String code) {
+        switch (code) {
             case "not_authed":
             case "invalid_auth":
             case "account_inactive":
-                throw new SlackAuthException(code);
-
+                return new SlackAuthException(code);
             case "restricted_action":
             case "user_is_bot":
             case "user_is_restricted":
-                throw new SlackRestrictedException(code);
-
+                return new SlackRestrictedException(code);
             default:
-                throw new SlackException(code);
-            }
+                return new SlackException(code);
         }
-        else
-            return base;
     }
 
-    public JsonObject callMethodHandled(String method) throws SlackException, IOException
+    public JsonElement callMethod(final SlackConstants method, final Map<String, Object> params) throws IOException {
+        if (this.isRateLimited) {
+            if (System.currentTimeMillis() < this.retryEnd)
+                throw new SlackRequestLimitException(this.retryEnd);
+
+            this.isRateLimited = false;
+        }
+
+        final HttpsURLConnection connection = this.createConnection(method, params);
+        connection.connect();
+        return this.processConnectionResult(connection);
+
+    }
+
+    public JsonObject callMethodHandled(final SlackConstants method, final Map<String, Object> params) throws SlackException, IOException {
+        final JsonObject base = this.callMethod(method, params).getAsJsonObject();
+        final boolean ok = base.get("ok").getAsBoolean();
+
+        if (!ok) {
+            final String code = base.get("error").getAsString();
+            throw this.validateErrorCode(code);
+        } else if (SlackAPI.isDebug() && base.has("warning")) {
+            try {
+                final String warning = base.get("warning").getAsString();
+                throw new SlackMesssageInvalidException("warning", "DEBUG ENABLED : " + method + " Response contained a warning :" + warning);
+            } catch (final SlackException e) {
+                e.printStackTrace();
+            }
+            return base;
+        }
+        return base;
+    }
+
+    public JsonObject callMethodHandled(final SlackConstants method) throws SlackException, IOException
     {
-        return callMethodHandled(method, Utilities.EMPTY_MAP);
+        return this.callMethodHandled(method, Utilities.EMPTY_MAP);
     }
 }

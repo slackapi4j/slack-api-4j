@@ -16,6 +16,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.*;
 
 /**
@@ -40,9 +41,9 @@ public class Message extends IdBaseObject
     @Setter
     private String text;
     /**
-     * The object that represents the source. - generally a conversation (which could be private or public
+     * The conversion that represents the source or destination of the message. - generally a conversation (which could be private or public
      */
-    private ObjectID sourceId;
+    private ObjectID conversationID;
     /**
      * When the message was created
      */
@@ -93,10 +94,10 @@ public class Message extends IdBaseObject
 
     public Message(String text, IdBaseObject channel)
     {
-        this.sourceId = channel.getId();
+        this.conversationID = channel.getId();
         this.text = text;
         this.subtype = MessageType.Sent;
-        as_user = true;
+        this.as_user = false;
     }
 
     public static Object getGsonAdapter()
@@ -132,7 +133,7 @@ public class Message extends IdBaseObject
             message.as_user = Utilities.getAsBoolean(root.get("as_user"),true);
             message.timestamp = Utilities.getAsTimestamp(root.get("ts"));
             if (root.has("channel"))
-                message.sourceId = new ObjectID(root.get("channel").getAsString());
+                message.conversationID = new ObjectID(root.get("channel").getAsString());
 
             if (root.has("edited"))
             {
@@ -165,11 +166,12 @@ public class Message extends IdBaseObject
         {
             JsonObject object = new JsonObject();
             object.addProperty("type", "message");
-            object.addProperty("channel", src.sourceId.toString());
+            object.addProperty("channel", src.conversationID.toString());
             object.addProperty("text", src.text);
             object.addProperty("thread_ts",src.thread_ts);
             object.addProperty("as_user",src.as_user);
-            object.addProperty("user",src.userId.getId());
+            if (src.userId != null)
+                object.addProperty("user", src.userId.toString());
             if (src.attachments != null)
             {
                 JsonArray attachments = new JsonArray();

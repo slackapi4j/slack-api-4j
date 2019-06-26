@@ -3,8 +3,10 @@ package au.com.addstar.slackapi;
 import au.com.addstar.slackapi.exceptions.SlackException;
 import au.com.addstar.slackapi.exceptions.SlackRequestLimitException;
 import au.com.addstar.slackapi.internal.SlackConnection;
+import au.com.addstar.slackapi.internal.SlackConstants;
 import au.com.addstar.slackapi.objects.Conversation;
 import au.com.addstar.slackapi.objects.Message;
+import au.com.addstar.slackapi.objects.ObjectID;
 import au.com.addstar.slackapi.objects.User;
 import au.com.addstar.slackapi.objects.blocks.*;
 import au.com.addstar.slackapi.objects.blocks.composition.ConfirmObject;
@@ -22,7 +24,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -42,7 +46,7 @@ public class SlackAPITest {
         Map<String,Object> map = new HashMap<>();
         map.put("foo","bar");
         try {
-            JsonElement result = connection.callMethod("api.test", map);
+            JsonElement result = connection.callMethod(SlackConstants.API_TEST, map);
             JsonObject i = result.getAsJsonObject();
             String val = i.get("args").getAsJsonObject().get("foo").getAsString();
             assertEquals("bar",val);
@@ -66,17 +70,32 @@ public class SlackAPITest {
             session.close();
             Message message = new Message("Plain Message Test",c);
             message.setUserId(u.getId());
-           // Message response = api.sendMessage(message);
-            List<User> users = api.getUsers();
-            User user = users.stream().filter(new Predicate<User>() {
+            Message response = api.sendMessage(message);
+            assertTrue(response.getTimestamp() > 0);
+            List<ObjectID> users = api.getConversations().getMembers(c);
+            User target = users.stream().map(new Function<ObjectID, User>() {
+                /**
+                 * Applies this function to the given argument.
+                 *
+                 * @param objectID the function argument
+                 * @return the function result
+                 */
+                @Override
+                public User apply(ObjectID objectID) {
+                    return session.getUserById(objectID);
+                }
+            }).filter(new Predicate<User>() {
                 @Override
                 public boolean test(User user) {
-                    return user.getRealName().equals("Narimm");
+                    return "Narimm".equals(user.getRealName());
                 }
-            }).findFirst().get();
+            }).findFirst().orElse(null);
+            Message ephem = new Message("Ephemeral Message Test",c);
+            ephem.setUserId(target.getId());
+            api.sendEphemeral(ephem);
             Message test = Message.builder().
-                    sourceId(c.getId())
-                    .userId(user.getId())
+                    conversationID(c.getId())
+                    .userId(u.getId())
                     .as_user(true)
                     .blocks(new ArrayList<>())
                     .subtype(Message.MessageType.Normal)
@@ -99,12 +118,12 @@ public class SlackAPITest {
             test.addBlock(section);
             test.addBlock(new Divider());
             test.addBlock(image);
-            Message sent = api.sendEphemeral(test);
+            Message sent = api.sendMessage(test);
             assertTrue(sent.getTimestamp() >0);
             Message question = Message.builder()
                     .as_user(true)
                     .blocks(new ArrayList<>())
-                    .sourceId(c.getId())
+                    .conversationID(c.getId())
                     .build();
             ActionBlock actions = new ActionBlock();
             List<Element> elements = new ArrayList<>();

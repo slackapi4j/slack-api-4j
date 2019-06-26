@@ -25,6 +25,15 @@ public class SlackAPI
     private SlackConnection connection;
     private Gson gson;
 
+    private static boolean debug = false;
+
+    public static boolean isDebug() {
+        return debug;
+    }
+
+    public static void setDebug(final boolean debug) {
+        SlackAPI.debug = debug;
+    }
     private final ChannelManager channels;
     private final GroupManager groups;
     private final ConversationsManager conversations;
@@ -70,9 +79,19 @@ public class SlackAPI
         return new RealTimeSession(root, this);
     }
 
-    public Message sendMessage(String message, IdBaseObject channel) throws SlackException, IOException
-    {
-       return sendMessage(message, channel, MessageOptions.DEFAULT);
+    /**
+     * Ideally encode the target conversation into the message.
+     *
+     * @param message
+     * @param channel
+     * @return
+     * @throws SlackException
+     * @throws IOException
+     * @deprecated use {@link #sendMessage(Message)}
+     */
+    @Deprecated
+    public Message sendMessage(String message, IdBaseObject channel) throws SlackException, IOException {
+        return sendMessage(message, channel, MessageOptions.DEFAULT);
     }
 
     /**
@@ -156,8 +175,9 @@ public class SlackAPI
         out.setSubtype(Message.MessageType.Sent);
         return out;
     }
-    List<User> getUsers() throws IOException {
-        JsonObject root = connection.call(SlackConstants.USER_LIST);
+
+    List<User> getUsers() throws SlackException, IOException {
+        JsonObject root = connection.callMethodHandled(SlackConstants.USER_LIST);
         TypeToken<List<User>> token = new TypeToken<List<User>>(){};
         List<User> user = gson.fromJson(root.get("members"), token.getType());
         return user;
