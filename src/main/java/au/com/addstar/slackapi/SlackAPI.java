@@ -102,11 +102,36 @@ public class SlackAPI
      * @throws SlackException
      */
     public Message sendMessage(Message message) throws IOException, SlackException {
-        JsonElement obj = gson.toJsonTree(message);
-        JsonObject root = connection.callMethodHandled(SlackConstants.CHAT_POST, obj.getAsJsonObject());
-        return gson.fromJson(root.get("message"), Message.class);
+        JsonElement elem = gson.toJsonTree(message);
+        JsonObject obj = elem.getAsJsonObject();
+        this.addDefaultOptions(obj);
+        JsonObject root = this.connection.callMethodHandled(SlackConstants.CHAT_POST, obj);
+        return this.gson.fromJson(root.get("message"), Message.class);
     }
 
+    private void addDefaultOptions(JsonObject object) {
+        MessageOptions options = MessageOptions.DEFAULT;
+        object.addProperty("as_user", options.isAsUser());
+        object.addProperty("link_names", options.isLinkNames() ? 1 : 0);
+        object.addProperty("unfurl_links", options.isUnfurlLinks());
+        object.addProperty("unfurl_media", options.isUnfurlMedia());
+        if (options.getIconEmoji() != null)
+            object.addProperty("icon_emoji", options.getIconEmoji());
+        else if (options.getIconUrl() != null)
+            object.addProperty("icon_url", options.getIconUrl().toExternalForm());
+        if (options.getMode() != null) {
+            switch (options.getMode()) {
+                case Full:
+                    object.addProperty("parse", "full");
+                    break;
+                case None:
+                    object.addProperty("parse", "none");
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
     /**
      * Sends an ephemeral message.
      * @param message
@@ -116,7 +141,9 @@ public class SlackAPI
      */
     public Message sendEphemeral(Message message) throws IOException, SlackException {
         JsonElement obj = gson.toJsonTree(message);
-        JsonObject root = connection.callMethodHandled(SlackConstants.CHAT_POSTEMPHEMERAL, obj.getAsJsonObject());
+        JsonObject out = obj.getAsJsonObject();
+        addDefaultOptions(out);
+        JsonObject root = connection.callMethodHandled(SlackConstants.CHAT_POSTEMPHEMERAL, out);
         return gson.fromJson(root.get("message"), Message.class);
     }
     /**
