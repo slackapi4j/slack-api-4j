@@ -102,15 +102,16 @@ public class SlackAPI
      * @throws SlackException
      */
     public Message sendMessage(Message message) throws IOException, SlackException {
+        return sendMessage(message,MessageOptions.DEFAULT);
+    }
+    public Message sendMessage(Message message, MessageOptions options) throws IOException, SlackException {
         JsonElement elem = gson.toJsonTree(message);
         JsonObject obj = elem.getAsJsonObject();
-        this.addDefaultOptions(obj);
+        this.addDefaultOptions(obj,options);
         JsonObject root = this.connection.callMethodHandled(SlackConstants.CHAT_POST, obj);
         return this.gson.fromJson(root.get("message"), Message.class);
     }
-
-    private void addDefaultOptions(JsonObject object) {
-        MessageOptions options = MessageOptions.DEFAULT;
+    private void addDefaultOptions(JsonObject object, MessageOptions options) {
         object.addProperty("as_user", options.isAsUser());
         object.addProperty("link_names", options.isLinkNames() ? 1 : 0);
         object.addProperty("unfurl_links", options.isUnfurlLinks());
@@ -140,9 +141,13 @@ public class SlackAPI
      * @throws SlackException
      */
     public Message sendEphemeral(Message message) throws IOException, SlackException {
+        return sendEphemeral(message,MessageOptions.DEFAULT);
+    }
+
+    public Message sendEphemeral(Message message, MessageOptions options) throws IOException, SlackException {
         JsonElement obj = gson.toJsonTree(message);
         JsonObject out = obj.getAsJsonObject();
-        addDefaultOptions(out);
+        addDefaultOptions(out,options);
         JsonObject root = connection.callMethodHandled(SlackConstants.CHAT_POSTEMPHEMERAL, out);
         return gson.fromJson(root.get("message"), Message.class);
     }
