@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,15 +35,16 @@ public class Conversation extends TimeStampedBaseObject {
     private boolean isMPIM;
     private boolean isIM;
     private List<ObjectID> members;
+    @Nullable
     private String topic;
     private ObjectID topicUpdateUserId;
     private long topicUpdateDate;
     private boolean isUserDeleted;
-
+    @Nullable
     private String purpose;
     private ObjectID purposeUpdateUserId;
     private long purposeUpdateDate;
-
+    @Nullable
     private String normalized_name;
     private List<String> previous_names;
     private int num_members;
@@ -107,8 +109,7 @@ public class Conversation extends TimeStampedBaseObject {
         }else{
             previous_names = Collections.emptyList();
         }
-        if(root.has("num_member")){
-            num_members = root.get("num_members").getAsInt();
-        }
+        num_members = Utilities.getAsInt(root.get("num_members"));
+
     }
 }

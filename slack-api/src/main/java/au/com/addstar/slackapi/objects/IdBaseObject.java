@@ -1,13 +1,12 @@
 package au.com.addstar.slackapi.objects;
 
 
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.*;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
-import lombok.NoArgsConstructor;
+
+import javax.annotation.Nonnull;
 
 /**
  * An object that contains a unique identifier
@@ -17,7 +16,8 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper=true)
 public abstract class IdBaseObject extends BaseObject
 {
-    private ObjectID id;
+    @Nonnull
+    private @NonNull ObjectID id;
 
     protected void load(JsonObject root, JsonDeserializationContext context)
     {
