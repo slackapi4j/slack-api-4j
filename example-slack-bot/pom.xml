@@ -8,7 +8,7 @@
         <version>0.0.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>exampl-slack-bot</artifactId>
+    <artifactId>example-slack-bot</artifactId>
     <dependencies>
         <dependency>
             <groupId>au.com.addstar</groupId>

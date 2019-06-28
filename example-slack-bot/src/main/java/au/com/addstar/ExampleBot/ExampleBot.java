@@ -1,11 +1,11 @@
 package au.com.addstar.ExampleBot;
 
+import au.com.addstar.ExampleBot.listeners.ExampleListener;
 import au.com.addstar.slackapi.RealTimeSession;
 import au.com.addstar.slackapi.SlackAPI;
 import au.com.addstar.slackapi.exceptions.SlackException;
 
 import java.io.IOException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 /**
@@ -24,6 +24,7 @@ public class ExampleBot {
                 () -> {
                     try {
                         session = api.startRTSession();
+                        new ExampleListener(session);
                     } catch (SlackException | IOException e) {
                         e.printStackTrace();
                     }

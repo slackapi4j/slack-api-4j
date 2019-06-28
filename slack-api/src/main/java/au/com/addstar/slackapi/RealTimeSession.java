@@ -7,8 +7,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.function.BiConsumer;
 
+import au.com.addstar.slackapi.eventListeners.RealTimeListener;
 import au.com.addstar.slackapi.events.*;
 import au.com.addstar.slackapi.objects.*;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
@@ -35,6 +35,7 @@ import javax.annotation.Nonnull;
 public class RealTimeSession implements Closeable
 {
     private final Gson gson;
+    @Getter
     private final SlackAPI api;
     private final ExecutorService service;
 

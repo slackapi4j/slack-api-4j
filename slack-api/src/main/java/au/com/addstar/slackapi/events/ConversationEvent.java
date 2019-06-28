@@ -4,6 +4,7 @@ import au.com.addstar.slackapi.objects.ObjectID;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  * Event when a conversations details or members change or is created / removed etc
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 @Getter
+@ToString
 public class ConversationEvent extends RealTimeEvent {
     /**
      * This object may be incomplete as

@@ -1,4 +1,4 @@
-package au.com.addstar.slackapi;
+package au.com.addstar.slackapi.eventListeners;
 
 import au.com.addstar.slackapi.events.ConversationEvent;
 import au.com.addstar.slackapi.events.RealTimeEvent;

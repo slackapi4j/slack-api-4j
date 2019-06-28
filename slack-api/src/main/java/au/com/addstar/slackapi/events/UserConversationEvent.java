@@ -3,6 +3,7 @@ package au.com.addstar.slackapi.events;
 import au.com.addstar.slackapi.objects.ObjectID;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 
 /**
  * Events where a conversation modification was caused by a specific user.
@@ -10,6 +11,7 @@ import lombok.NonNull;
  * Created by benjicharlton on 27/06/2019.
  */
 @Getter
+@ToString(callSuper = true)
 public class UserConversationEvent extends ConversationEvent {
 
     private final @NonNull ObjectID userID;
