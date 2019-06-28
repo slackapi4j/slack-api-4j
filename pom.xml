@@ -5,6 +5,11 @@
     <artifactId>api-parent</artifactId>
     <packaging>pom</packaging>
     <version>0.0.2-SNAPSHOT</version>
+    <organization>
+        <name>SlackApi4J</name>
+    </organization>
+    <inceptionYear>2018</inceptionYear>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slackToken/> <!--A System.env variable called SLACK_TOKEN must be set for testing to pass -->
@@ -12,8 +17,6 @@
     <licenses>
         <license>
             <name>MIT</name>
-            <url></url>
-            <comments></comments>
         </license>
     </licenses>
     <scm>
@@ -39,6 +42,26 @@
         <module>example-slack-bot</module>
     </modules>
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>1.20</version>
+                <configuration>
+                    <licenseName>mit</licenseName>
+                    <licenseFile>LICENSE</licenseFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>update-header</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>update-file-header</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -53,7 +76,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>license-maven-plugin</artifactId>
-                    <version>2.0.0</version>
+                    <version>1.20</version>
                     <executions>
                         <execution>
                             <id>download-licenses</id>
