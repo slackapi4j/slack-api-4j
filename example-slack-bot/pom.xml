@@ -3,16 +3,16 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
+        <groupId>io.github.slackapi4j</groupId>
         <artifactId>api-parent</artifactId>
-        <groupId>au.com.addstar</groupId>
         <version>0.0.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>example-slack-bot</artifactId>
     <dependencies>
         <dependency>
-            <groupId>au.com.addstar</groupId>
-            <artifactId>slack-api</artifactId>
+            <groupId>io.github.slackapi4j</groupId>
+            <artifactId>slack-api-4j</artifactId>
             <version>0.0.2-SNAPSHOT</version>
         </dependency>
     </dependencies>

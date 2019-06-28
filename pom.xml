@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>au.com.addstar</groupId>
+    <groupId>io.github.slackapi4j</groupId>
     <artifactId>api-parent</artifactId>
     <packaging>pom</packaging>
     <version>0.0.2-SNAPSHOT</version>
@@ -9,6 +9,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slackToken/> <!--A System.env variable called SLACK_TOKEN must be set for testing to pass -->
     </properties>
+    <licenses>
+        <license>
+            <name>MIT</name>
+            <url></url>
+            <comments></comments>
+        </license>
+    </licenses>
     <scm>
         <connection>scm:git:git@github.com:AddstarMC/slack-api.git</connection>
         <developerConnection>scm:git:git@github.com:AddstarMC/slack-api.git</developerConnection>
@@ -28,7 +35,7 @@
         </snapshotRepository>
     </distributionManagement>
     <modules>
-        <module>slack-api</module>
+        <module>slack-api-4j</module>
         <module>example-slack-bot</module>
     </modules>
     <build>
@@ -42,6 +49,19 @@
                         <source>1.8</source>
                         <target>1.8</target>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>2.0.0</version>
+                    <executions>
+                        <execution>
+                            <id>download-licenses</id>
+                            <goals>
+                                <goal>download-licenses</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
