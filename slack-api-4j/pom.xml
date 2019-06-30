@@ -11,24 +11,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slackToken/> <!--A System.env variable called SLACK_TOKEN must be set for testing to pass -->
     </properties>
-    <scm>
-        <connection>scm:git:git@github.com:AddstarMC/slack-api.git</connection>
-        <developerConnection>scm:git:git@github.com:AddstarMC/slack-api.git</developerConnection>
-        <url>https://www.github.com/AddstarMC/slack-api</url>
-        <tag>HEAD</tag>
-    </scm>
-    <distributionManagement>
-        <repository>
-            <id>maven.addstar.com.au</id>
-            <name>maven.addstar.com.au-releases</name>
-            <url>https://maven.addstar.com.au/artifactory/ext-release-local</url>
-        </repository>
-        <snapshotRepository>
-            <id>maven.addstar.com.au</id>
-            <name>maven.addstar.com.au-snapshots</name>
-            <url>https://maven.addstar.com.au/artifactory/ext-snapshots-local</url>
-        </snapshotRepository>
-    </distributionManagement>
     <dependencies>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -65,6 +47,12 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <version>5.4.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mock-server</groupId>
+            <artifactId>mockserver-netty</artifactId>
+            <version>5.6.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

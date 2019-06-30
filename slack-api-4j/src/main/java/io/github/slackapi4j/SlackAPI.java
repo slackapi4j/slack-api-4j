@@ -55,10 +55,11 @@ public class SlackAPI
     private final GroupManager groups;
     private final ConversationsManager conversations;
 
-    @SuppressWarnings("deprecation")
-    public SlackAPI(final String token)
-    {
-        this.connection = new SlackConnection(token);
+    public SlackAPI(final String token, String url){
+        if(url!=null)
+            this.connection = new SlackConnection(token,url);
+        else
+            this.connection = new SlackConnection(token);
         final GsonBuilder builder = new GsonBuilder();
         builder.registerTypeAdapter(NormalChannel.class, NormalChannel.getGsonAdapter());
         builder.registerTypeAdapter(GroupChannel.class, GroupChannel.getGsonAdapter());
@@ -75,6 +76,12 @@ public class SlackAPI
         this.channels = new ChannelManager(this);
         this.groups = new GroupManager(this);
         this.conversations = new ConversationsManager(this);
+    }
+
+    @SuppressWarnings("deprecation")
+    public SlackAPI(final String token)
+    {
+        this(token,null);
     }
 
     public static boolean isDebug() {
@@ -110,6 +117,7 @@ public class SlackAPI
     public RealTimeSession startRTSession() throws SlackException, IOException
     {
         final JsonObject root = this.connection.callMethodHandled(SlackConstants.RTM_START);
+        if(SlackAPI.s_debug)System.out.println(root);
         return new RealTimeSession(root, this);
     }
 

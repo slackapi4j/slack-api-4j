@@ -82,7 +82,7 @@ public class RealTimeSession implements Closeable
     private final Map<ObjectID, User> userIdMap;
     private final Map<ObjectID, Conversation> channelIdMap;
     private final Set<Conversation> joined;
-
+    @Getter
     private WebSocketClient client;
     private Session session;
     private int nextMessageId = 1;
@@ -580,6 +580,8 @@ public class RealTimeSession implements Closeable
 
         @Override
         public void onWebSocketText(final String message ) {
+            if(SlackAPI.isDebug())
+                System.out.println("WEBSOCKET MESSAGE: "+message);
             final JsonObject event = RealTimeSession.this.gson.fromJson(message, JsonElement.class).getAsJsonObject();
             if (event.has("ok")) {
                 RealTimeSession.this.onReply(event);

@@ -26,6 +26,10 @@ package io.github.slackapi4j;
  * #L%
  */
 
+import com.fasterxml.jackson.core.json.JsonReadContext;
+import com.google.common.collect.Lists;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
 import io.github.slackapi4j.exceptions.SlackException;
 import io.github.slackapi4j.internal.SlackConnection;
 import io.github.slackapi4j.internal.SlackConstants;
@@ -44,14 +48,19 @@ import io.github.slackapi4j.objects.blocks.elements.SelectElement;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.github.slackapi4j.objects.blocks.ImageBlock;
+import org.eclipse.jetty.util.IO;
+import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
+import org.mockserver.client.MockServerClient;
+import org.mockserver.integration.ClientAndServer;
+import org.mockserver.mockserver.MockServer;
+import org.mockserver.model.HttpRequest;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -62,17 +71,37 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Created by benjamincharlton on 19/02/2019.
  */
 public class SlackAPITest {
-    private static final String token = System.getenv("SLACK_TOKEN");
+    protected static final String TEST_TOKEN = "abscdefghijklim";
+    protected static final String token = (System.getenv("SLACK_TOKEN")!=null)?System.getenv("SLACK_TOKEN"):TEST_TOKEN;
+    @Before
+    private void setup(){
 
+    }
     @Test
     public void getSlack() {
-        if (token == null | token.isEmpty()) {
+        if (token.equals(TEST_TOKEN)) {
             return;
         }
+        TestSlackServer client = new TestSlackServer();
+
+        //client.addAuthResponses();
+        if(client.isRunning()){
+            //yay!
+        }
         SlackAPI api = new SlackAPI(token);
+        api.getSlack().setTest();
         SlackConnection connection = api.getSlack();
         Map<String,Object> map = new HashMap<>();
         map.put("foo","bar");
+        try{
+            JsonElement result = connection.callMethodHandled(SlackConstants.AUTH_TEST);
+            JsonObject i = result.getAsJsonObject();
+            JsonParser parser = new JsonParser();
+            JsonElement obj = parser.parse("{\"ok\":true,\"url\":\"https://addstarmc.slack.com/\",\"team\":\"AddstarMC\",\"user\":\"mcbot\",\"team_id\":\"T03QHU9NF\",\"user_id\":\"UGBBH4R0S\"}");
+            assertEquals(obj.getAsJsonObject(),i);
+        }catch (SlackException | IOException e){
+            e.printStackTrace();
+        }
         try {
             JsonElement result = connection.callMethod(SlackConstants.API_TEST, map);
             JsonObject i = result.getAsJsonObject();
@@ -84,7 +113,7 @@ public class SlackAPITest {
     }
 
     @Test void testMessaging() {
-        if (token == null | token.isEmpty()) {
+        if (token.equals(TEST_TOKEN)) {
             return;
         }
         SlackAPI api = new SlackAPI(token);

@@ -55,13 +55,23 @@ public class SlackConnection
     private final String token;
     private boolean isRateLimited;
     private long retryEnd;
-
-    public SlackConnection(final String token)
-    {
+    private String url;
+    private Integer port;
+    public SlackConnection(final String token,final String url){
         this.token = token;
-
+        this.url = url;
         this.isRateLimited = false;
         this.retryEnd = 0;
+        this.port = null;//not required unless testing
+    }
+
+    public void setTest(){
+        this.url = "localhost";
+        this.port = 1080;
+    }
+    public SlackConnection(final String token)
+    {
+        this(token,SlackConstants.HOST.toString());
     }
 
     private String encodeRequest(final Map<String, Object> params)
@@ -88,7 +98,11 @@ public class SlackConnection
     }
 
     private HttpsURLConnection createConnection(final SlackConstants method, final JsonObject base) throws IOException {
-        final URL queryUrl = new URL("https", SlackConstants.HOST.toString(), "/api/" + method);
+        final URL queryUrl;
+        if(port!=null)
+            queryUrl = new URL("https",url,port,"/api/" + method);
+        else
+            queryUrl = new URL("https", url, "/api/" + method);
         final HttpsURLConnection connection = (HttpsURLConnection) queryUrl.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
@@ -104,7 +118,7 @@ public class SlackConnection
     private HttpsURLConnection createConnection(final SlackConstants method, final Map<String, Object> params) throws IOException {
         try
         {
-            final URL queryUrl = new URL("https", SlackConstants.HOST.toString(), "/api/" + method);
+            final URL queryUrl = new URL("https", url, "/api/" + method);
             final HttpsURLConnection connection = (HttpsURLConnection) queryUrl.openConnection();
             if (method.isPost()) {
                 connection.setRequestMethod("POST");

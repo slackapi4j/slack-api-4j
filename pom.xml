@@ -26,16 +26,15 @@
         <tag>HEAD</tag>
     </scm>
     <distributionManagement>
-        <repository>
-            <id>maven.addstar.com.au</id>
-            <name>maven.addstar.com.au-releases</name>
-            <url>https://maven.addstar.com.au/artifactory/ext-release-local</url>
-        </repository>
         <snapshotRepository>
-            <id>maven.addstar.com.au</id>
-            <name>maven.addstar.com.au-snapshots</name>
-            <url>https://maven.addstar.com.au/artifactory/ext-snapshots-local</url>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/
+            </url>
+        </repository>
     </distributionManagement>
     <modules>
         <module>slack-api-4j</module>
@@ -44,6 +43,24 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <localCheckout>true</localCheckout>
+                    <pushChanges>false</pushChanges>
+                    <mavenExecutorId>forked-path</mavenExecutorId>
+                    <arguments>-Dgpg.passphrase=${gpg.passphrase}</arguments>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.scm</groupId>
+                        <artifactId>maven-scm-provider-gitexe</artifactId>
+                        <version>1.9.5</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <version>1.20</version>
@@ -51,15 +68,6 @@
                     <licenseName>mit</licenseName>
                     <licenseFile>LICENSE</licenseFile>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>update-header</id>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>update-file-header</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
         <pluginManagement>
@@ -89,4 +97,33 @@
             </plugins>
         </pluginManagement>
     </build>
+    <profiles>
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

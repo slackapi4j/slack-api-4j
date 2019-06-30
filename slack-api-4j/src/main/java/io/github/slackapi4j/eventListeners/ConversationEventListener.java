@@ -36,7 +36,7 @@ import io.github.slackapi4j.events.RealTimeEvent;
  */
 public abstract class ConversationEventListener implements RealTimeListener {
 
-    abstract void onEvent(ConversationEvent event);
+    protected abstract void onEvent(ConversationEvent event);
 
     @Override
     public final void onEvent(final RealTimeEvent event) {
