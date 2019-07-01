@@ -11,19 +11,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slackToken/> <!--A System.env variable called SLACK_TOKEN must be set for testing to pass -->
     </properties>
-
-    <distributionManagement>
-        <repository>
-            <id>maven.addstar.com.au</id>
-            <name>maven.addstar.com.au-releases</name>
-            <url>https://maven.addstar.com.au/artifactory/ext-release-local</url>
-        </repository>
-        <snapshotRepository>
-            <id>maven.addstar.com.au</id>
-            <name>maven.addstar.com.au-snapshots</name>
-            <url>https://maven.addstar.com.au/artifactory/ext-snapshots-local</url>
-        </snapshotRepository>
-    </distributionManagement>
     <dependencies>
         <dependency>
             <groupId>com.google.code.gson</groupId>
