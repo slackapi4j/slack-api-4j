@@ -1,17 +1,16 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.slackapi4j</groupId>
     <artifactId>api-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.2</version>
     <organization>
         <name>SlackApi4J</name>
     </organization>
     <inceptionYear>2018</inceptionYear>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <slackToken/> <!--A System.env variable called SLACK_TOKEN must be set for testing to pass -->
+        <slackToken /> <!--A System.env variable called SLACK_TOKEN must be set for testing to pass -->
     </properties>
     <licenses>
         <license>
@@ -22,7 +21,7 @@
         <connection>scm:git:git@github.com:SlackApi4j/slack-api-4j.git</connection>
         <developerConnection>scm:git:git@github.com:SlackApi4j/slack-api-4j.git</developerConnection>
         <url>https://github.com/slackapi4j/slack-api-4/</url>
-        <tag>HEAD</tag>
+        <tag>api-parent-0.0.2</tag>
     </scm>
     <distributionManagement>
         <snapshotRepository>
