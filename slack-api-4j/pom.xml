@@ -11,12 +11,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slackToken/> <!--A System.env variable called SLACK_TOKEN must be set for testing to pass -->
     </properties>
-    <scm>
-        <connection>scm:git:git@github.com:AddstarMC/slack-api.git</connection>
-        <developerConnection>scm:git:git@github.com:AddstarMC/slack-api.git</developerConnection>
-        <url>https://www.github.com/AddstarMC/slack-api</url>
-        <tag>HEAD</tag>
-    </scm>
+
     <distributionManagement>
         <repository>
             <id>maven.addstar.com.au</id>
@@ -122,17 +117,51 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.1.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                </configuration>
                 <executions>
                     <execution>
-                        <id>attach-sources</id>
+                        <id>attach-javadocs</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>jar-no-fork</goal>
+                            <goal>javadoc-no-fork</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

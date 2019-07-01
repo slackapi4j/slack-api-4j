@@ -91,7 +91,7 @@ public class SlackAPI
 
     /**
      * @return ChannelManager
-     * @deprecated use {@link this#getConversations}
+     * @deprecated use {@link SlackAPI#getConversations()}
      */
     @Deprecated
     public ChannelManager getChannelManager() {
@@ -100,7 +100,7 @@ public class SlackAPI
 
     /**
      * @return groupmanager
-     * @deprecated use {@link this#getConversations}
+     * @deprecated use {@link SlackAPI#getConversations()}
      */
     @Deprecated
     public GroupManager getGroupManager() {
@@ -120,7 +120,7 @@ public class SlackAPI
      * @return the message as it arrived - it will now have a timestamp
      * @throws SlackException if there was a error with the api
      * @throws IOException encoding errors
-     * @deprecated use {@link this#sendMessage(Message)}
+     * @deprecated use {@link SlackAPI#sendMessage(Message)}
      */
     @Deprecated
     public Message sendMessage(final String message, final IdBaseObject channel) throws SlackException, IOException {
@@ -188,7 +188,7 @@ public class SlackAPI
         return this.gson.fromJson(root.get("message"), Message.class);
     }
     /**
-     * @deprecated use {@link #sendMessage(Message)}
+     * @deprecated use {@link SlackAPI#sendMessage(Message)}
      * @param message The string message
      * @param channel the channel to send it too
      * @param options a set of options to apply

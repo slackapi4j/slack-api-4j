@@ -64,8 +64,8 @@ public class ConversationsManager {
      * List Conversations / Channels in workspace
      * @param types the Types to list
      * @return List of Conversations
-     * @throws SlackException
-     * @throws IOException
+     * @throws SlackException for sending errors
+     * @throws IOException for encoding errors
      */
     public List<Conversation> listConversations(final List<SlackConversationType> types) throws SlackException, IOException {
         return this.listConversations(types,true);
@@ -73,10 +73,10 @@ public class ConversationsManager {
     
     /**
      * Gets a conversation based on an ID.
-     * @param conversationID
+     * @param conversationID the id for the channel
      * @return Conversation
-     * @throws IOException
-     * @throws SlackException
+     * @throws IOException encoding errors
+     * @throws SlackException sending errors
      */
     public Conversation getConversation(final String conversationID) throws IOException, SlackException {
         final ImmutableMap.Builder<String, Object> mapBuilder = ImmutableMap.<String, Object>builder()
@@ -91,8 +91,8 @@ public class ConversationsManager {
      * @param types A list of types to return
      * @param excludeArchived if true will not return archived conversations
      * @return List
-     * @throws SlackException
-     * @throws IOException
+     * @throws SlackException sending errors
+     * @throws IOException encoding errors
      */
     public List<Conversation> listConversations(final List<SlackConversationType> types, final boolean excludeArchived) throws SlackException, IOException
     {
@@ -119,7 +119,7 @@ public class ConversationsManager {
     /**
      * returns true if the Bot is a member of the channel
      * @param c The conversation
-     * @return
+     * @return true if a member
      */
     public boolean isMember(final Conversation c){
         return c.isMember();
@@ -129,8 +129,8 @@ public class ConversationsManager {
      * Deletes all messages from a conversation
      * @param c the conversation / channel
      * @return true if deleted
-     * @throws SlackException
-     * @throws IOException
+     * @throws SlackException sending errors
+     * @throws IOException encoding errors
      */
     public boolean purgeChannel (final Conversation c)  throws SlackException, IOException{
         final Map<String, Object> params = ImmutableMap.<String, Object>builder()
@@ -152,6 +152,12 @@ public class ConversationsManager {
         return true;
     }
 
+    /**
+     * @param conversation the Conversation to check
+     * @return List of Ids for members of the conversation
+     * @throws SlackException sending error
+     * @throws IOException    encoding error
+     */
     public List<ObjectID> getMembers(Conversation conversation) throws SlackException, IOException {
         final Map<String, Object> params = ImmutableMap.<String, Object>builder()
                 .put("channel", conversation.getId())
@@ -167,9 +173,9 @@ public class ConversationsManager {
     /**
      * Returns a conversation thats is a MultiParty DM
      * @param users the users to add.
-     * @return
-     * @throws IOException
-     * @throws SlackException
+     * @return a Conversation
+     * @throws IOException encoding errors
+     * @throws SlackException sending errors
      */
     public Conversation createDMConversation(final List<User> users) throws IOException, SlackException {
         if (users.size() == 0) {
@@ -191,10 +197,10 @@ public class ConversationsManager {
     
     /**
      * Closes a Group or DM Channel. It wont close a public or private Channel.
-     * @param conversation
+     * @param conversation the conversation to close.
      * @return true if closed.
-     * @throws IOException
-     * @throws SlackException
+     * @throws IOException encoding error
+     * @throws SlackException sending error
      */
     public boolean closeMultiPartyMessage(Conversation conversation) throws IOException, SlackException {
             final Map<String, Object> params = ImmutableMap.<String, Object>builder().

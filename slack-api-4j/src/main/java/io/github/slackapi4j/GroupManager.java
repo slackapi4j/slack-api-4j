@@ -44,7 +44,7 @@ import com.google.gson.JsonObject;
 
 /**
  * This is used to manager group channels
- * @deprecated Use {@link ConversationsManager)
+ * @deprecated Use {@link io.github.slackapi4j.objects.Conversation}
  */
 
 @Deprecated

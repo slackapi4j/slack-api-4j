@@ -42,7 +42,7 @@ public class MessageValidator {
      *
      * @param object   the object being checked
      * @param constant the endpoint your checking for.
-     * @throws SlackException if not valid
+     * @throws SlackMesssageInvalidException if not valid
      */
     public static void validateMessage(final JsonObject object, final SlackConstants constant) throws SlackMesssageInvalidException {
         try {
