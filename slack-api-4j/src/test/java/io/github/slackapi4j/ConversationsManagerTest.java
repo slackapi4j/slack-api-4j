@@ -53,7 +53,7 @@ public class ConversationsManagerTest {
     @Test
     @SuppressWarnings("deprecation")
     public void sendMessage() {
-        if (TOKEN == null | TOKEN.isEmpty()) {
+        if (TOKEN == null || TOKEN.isEmpty()) {
             return;
         }
         SlackAPI api = new SlackAPI(TOKEN);

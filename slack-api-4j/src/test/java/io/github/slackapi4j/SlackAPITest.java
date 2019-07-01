@@ -66,7 +66,7 @@ public class SlackAPITest {
 
     @Test
     public void getSlack() {
-        if (token == null | token.isEmpty()) {
+        if (token == null || token.isEmpty()) {
             return;
         }
         SlackAPI api = new SlackAPI(token);
@@ -84,7 +84,7 @@ public class SlackAPITest {
     }
 
     @Test void testMessaging() {
-        if (token == null | token.isEmpty()) {
+        if (token == null || token.isEmpty()) {
             return;
         }
         SlackAPI api = new SlackAPI(token);
