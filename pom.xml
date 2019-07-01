@@ -3,7 +3,7 @@
     <groupId>io.github.slackapi4j</groupId>
     <artifactId>api-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.2</version>
+    <version>0.0.3-SNAPSHOT</version>
     <organization>
         <name>SlackApi4J</name>
     </organization>
@@ -21,7 +21,7 @@
         <connection>scm:git:git@github.com:SlackApi4j/slack-api-4j.git</connection>
         <developerConnection>scm:git:git@github.com:SlackApi4j/slack-api-4j.git</developerConnection>
         <url>https://github.com/slackapi4j/slack-api-4/</url>
-        <tag>api-parent-0.0.2</tag>
+        <tag>HEAD</tag>
     </scm>
     <distributionManagement>
         <snapshotRepository>
