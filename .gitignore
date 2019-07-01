@@ -1,10 +1,9 @@
-/target/
+**/target/
 /.settings
 .classpath
 .project
 /.idea/
 dependency-reduced-pom.xml
 **/*.iml
-# Project exclude paths
-/example-slack-bot/target/
-/slack-api-4j/target/
+release.properties
+pom.xml.releaseBackup
