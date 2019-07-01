@@ -1,5 +1,7 @@
 #Slack Api 4 Java 
 
+[![Join the chat at https://gitter.im/slack-api-4j/community](https://badges.gitter.im/slack-api-4j/community.svg)](https://gitter.im/slack-api-4j/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Is an implementation of the Slack  api 
 
 It uses both realtime sessions plus the post/get Api to recieve and send messages to Slack 
