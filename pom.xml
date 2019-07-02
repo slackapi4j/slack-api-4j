@@ -7,6 +7,20 @@
     <organization>
         <name>SlackApi4J</name>
     </organization>
+    <name>Slack-Api-4J-Parent</name>
+    <description>The parent project for the Slack Library for Java</description>
+    <url>https://slackapi4j.github.io/slack-api-4j/</url>
+    <developers>
+        <developer>
+            <id>Narimm</id>
+            <email>benjicharlton@gmail.com</email>
+            <name>Ben C</name>
+            <roles>
+                <role>Developer</role>
+                <role>Maintainer</role>
+            </roles>
+        </developer>
+    </developers>
     <inceptionYear>2018</inceptionYear>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,7 +34,7 @@
     <scm>
         <connection>scm:git:git@github.com:SlackApi4j/slack-api-4j.git</connection>
         <developerConnection>scm:git:git@github.com:SlackApi4j/slack-api-4j.git</developerConnection>
-        <url>https://github.com/slackapi4j/slack-api-4/</url>
+        <url>https://github.com/slackapi4j/slack-api-4j/</url>
         <tag>api-parent-0.0.2</tag>
     </scm>
     <distributionManagement>
@@ -36,7 +50,6 @@
     </distributionManagement>
     <modules>
         <module>slack-api-4j</module>
-        <module>example-slack-bot</module>
     </modules>
     <build>
         <plugins>
@@ -60,6 +73,20 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.3</version>
                 <configuration>
@@ -76,9 +103,25 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.8.2</version>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -131,4 +174,17 @@
             </plugins>
         </pluginManagement>
     </build>
+    <profiles>
+        <profile>
+            <id>no-deploy</id>
+            <activation>
+                <property>
+                    <name>!deploy</name>
+                </property>
+            </activation>
+            <modules>
+                <module>example-slack-bot</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>
