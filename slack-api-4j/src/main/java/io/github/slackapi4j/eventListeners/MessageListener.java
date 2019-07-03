@@ -35,14 +35,17 @@ import io.github.slackapi4j.events.RealTimeEvent;
  * Created by benjicharlton on 27/06/2019.
  */
 public abstract class MessageListener implements RealTimeListener {
-
-
-    abstract void onEvent(MessageEvent event);
+    /**
+     * This event will be called when a MessageEvent is recieved.
+     *
+     * @param event the event
+     */
+    public abstract void onMessage(MessageEvent event);
 
     @Override
     public final void onEvent(final RealTimeEvent event) {
         if (event instanceof MessageEvent) {
-            this.onEvent((MessageEvent) event);
+            this.onMessage((MessageEvent) event);
         }
     }
 }

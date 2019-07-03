@@ -26,44 +26,50 @@ package io.github.slackapi4j.exampleBot.listeners;
  * #L%
  */
 
-import io.github.slackapi4j.eventListeners.RealTimeListener;
 import io.github.slackapi4j.RealTimeSession;
-import io.github.slackapi4j.events.RealTimeEvent;
+import io.github.slackapi4j.eventListeners.ConversationEventListener;
+import io.github.slackapi4j.events.ConversationEvent;
 import io.github.slackapi4j.exceptions.SlackRTException;
+import io.github.slackapi4j.objects.Message;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.logging.Logger;
 
 /**
  * Created for the Charlton IT Project.
- * Created by benjicharlton on 27/06/2019.
+ * Created by benjicharlton on 3/07/2019.
  */
-public class ExampleListener implements RealTimeListener {
-
+public class ConversationExampleListener extends ConversationEventListener {
     private final RealTimeSession session;
     private final Logger log = Logger.getAnonymousLogger();
 
-    public ExampleListener(final RealTimeSession session) {
+    public ConversationExampleListener(final RealTimeSession session) {
+        super();
         this.session = session;
         session.addListener(this);
     }
 
     @Override
     public void onLoginComplete() {
-        this.log.info("Logged into Slack as " + this.session.getSelf().getName());
-        //further tasks once logged in here.
+
     }
 
     @Override
-    public void onEvent(RealTimeEvent event) {
-        this.log.info(event.toString());
+    public void onConversation(ConversationEvent event) {
+        this.log.info(event.getType().name() + ":" + event.getConversationID());
+        System.out.println(event);
+        if (event.getType() == ConversationEvent.EventType.Join) {
+            Message message = Message.builder()
+                    .text("If you !PING I will pong!")
+                    .conversationID(event.getConversationID())
+                    .as_user(false)
+                    .build();
+            this.session.sendMessage(message);
+        }
     }
 
     @Override
     public void onError(SlackRTException cause) {
-        this.log.info(cause.getMessage());
-        cause.printStackTrace();
+
     }
 
     @Override

@@ -35,13 +35,17 @@ import io.github.slackapi4j.events.RealTimeEvent;
  * Created by benjicharlton on 27/06/2019.
  */
 public abstract class ConversationEventListener implements RealTimeListener {
-
-    abstract void onEvent(ConversationEvent event);
-
+    /**
+     * This event will be called with a ConversationEvent is recieved.
+     * For event types {@link ConversationEvent.EventType}
+     *
+     * @param event
+     */
+    public abstract void onConversation(ConversationEvent event);
     @Override
     public final void onEvent(final RealTimeEvent event) {
         if (event instanceof ConversationEvent) {
-            this.onEvent((ConversationEvent) event);
+            this.onConversation((ConversationEvent) event);
         }
     }
 }

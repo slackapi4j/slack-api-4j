@@ -29,6 +29,7 @@ package io.github.slackapi4j.exampleBot;
 import io.github.slackapi4j.exampleBot.listeners.ExampleListener;
 import io.github.slackapi4j.RealTimeSession;
 import io.github.slackapi4j.SlackAPI;
+import io.github.slackapi4j.exampleBot.listeners.MessageExampleListener;
 import io.github.slackapi4j.exceptions.SlackException;
 
 import java.io.IOException;
@@ -53,6 +54,7 @@ public class ExampleBot {
                     try {
                         session = api.startRTSession();
                         new ExampleListener(session);
+                        new MessageExampleListener(session);
                     } catch (SlackException | IOException e) {
                         e.printStackTrace();
                     }
