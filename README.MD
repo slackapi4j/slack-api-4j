@@ -1,5 +1,7 @@
 #Slack Api 4 Java 
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/44d12e126c7d446d93611327a31fdc2c)](https://app.codacy.com/app/Narimm/slack-api-4j?utm_source=github.com&utm_medium=referral&utm_content=slackapi4j/slack-api-4j&utm_campaign=Badge_Grade_Dashboard)
+
 Is an implementation of the Slack  api 
 
 It uses both realtime sessions plus the post/get Api to recieve and send messages to Slack 
