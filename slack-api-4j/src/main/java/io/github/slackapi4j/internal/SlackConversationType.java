@@ -27,21 +27,22 @@ package io.github.slackapi4j.internal;
  */
 
 /**
- * Created for use for the Add5tar MC Minecraft server
  * Created by benjamincharlton on 20/02/2019.
  */
 public enum SlackConversationType {
-    PUBLIC("public"),
-    PRIVATE("private"),
-    IM("im"),
-    MPIM("mpim");
+  PUBLIC("public"),
+  PRIVATE("private"),
+  IM("im"),
+  MPIM("mpim");
 
-    private final String value;
-    SlackConversationType(String value) {
-        this.value = value;
-    }
+  private final String value;
 
-    @Override
-    public String toString() {
-        return this.value;
-    }}
+  SlackConversationType(final String value) {
+    this.value = value;
+  }
+
+  @Override
+  public String toString() {
+    return value;
+  }
+}

@@ -1,4 +1,4 @@
-package io.github.slackapi4j.eventListeners;
+package io.github.slackapi4j.exceptions;
 
 /*-
  * #%L
@@ -26,14 +26,12 @@ package io.github.slackapi4j.eventListeners;
  * #L%
  */
 
-import io.github.slackapi4j.events.RealTimeEvent;
-import io.github.slackapi4j.exceptions.SlackRTException;
-
-@SuppressWarnings("WeakerAccess")
-public interface RealTimeListener
-{
-    void onLoginComplete();
-    void onEvent(RealTimeEvent event);
-    void onError(SlackRTException cause);
-    void onClose();
+/**
+ * Created for the Charlton IT Project.
+ * Created by Narimm on 26/06/2019.
+ */
+public class SlackMessageInvalidException extends SlackException {
+  public SlackMessageInvalidException(final String errorCode, final String message) {
+    super(errorCode, message);
+  }
 }

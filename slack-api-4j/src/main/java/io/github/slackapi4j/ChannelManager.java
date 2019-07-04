@@ -26,119 +26,159 @@ package io.github.slackapi4j;
  * #L%
  */
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import io.github.slackapi4j.objects.Message;
-import io.github.slackapi4j.objects.NormalChannel;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import io.github.slackapi4j.exceptions.SlackException;
 import io.github.slackapi4j.internal.SlackConnection;
 import io.github.slackapi4j.internal.SlackConstants;
+import io.github.slackapi4j.objects.Message;
+import io.github.slackapi4j.objects.NormalChannel;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
+ * This class should not be used it exists only for compatibility back to the Slack APi v 1.
+ *
  * @deprecated use {@link ConversationsManager}
  */
 @Deprecated
-public class ChannelManager
-{
-    private final Gson gson;
-    private final SlackConnection connection;
+public class ChannelManager {
+  private final Gson gson;
+  private final SlackConnection connection;
 
-    ChannelManager(SlackAPI main)
-    {
-        this.gson = main.getGson();
-        this.connection = main.getSlack();
+  ChannelManager(final SlackApi main) {
+    gson = main.getGson();
+    connection = main.getSlack();
+  }
+
+  public NormalChannel create(final String name) throws SlackException, IOException {
+    throw new UnsupportedOperationException("Not yet implemented");
+  }
+
+  /**
+   * Join a Channel.
+   *
+   * @param channel the channel
+   * @return true on success
+   * @throws SlackException If the session generates an error
+   * @throws IOException    if the {@link Gson} object returned cannot be decoded
+   */
+  public boolean joinChannel(final NormalChannel channel) throws SlackException, IOException {
+    final Map<String, Object> params = ImmutableMap.<String, Object>builder()
+        .put("channel", channel.getName())
+        .build();
+
+    final JsonObject result = connection.callMethodHandled(SlackConstants.CHANNEL_INFO, params);
+    return !(result.has("already_in_channel") && result.get("already_in_channel").getAsBoolean());
+  }
+
+  /**
+   * Leave  a Channel.
+   *
+   * @param channel the channel
+   * @return true on success
+   * @throws SlackException If the session generates an error
+   * @throws IOException    if the {@link Gson} object returned cannot be decoded
+   */
+
+  public boolean leaveChannel(final NormalChannel channel) throws SlackException, IOException {
+    final Map<String, Object> params = ImmutableMap.<String, Object>builder()
+        .put("channel", channel.getId())
+        .build();
+
+    final JsonObject result = connection.callMethodHandled(SlackConstants.CHANNEL_INFO, params);
+    return !(result.has("not_in_channel") && result.get("not_in_channel").getAsBoolean());
+  }
+
+  /**
+   * Get a Channel.
+   *
+   * @param id the id as a string to retrieve
+   * @return The Channel
+   * @throws SlackException If the session generates an error
+   * @throws IOException    if the gson object returned cannot be decoded
+   */
+
+  public NormalChannel getChannel(final String id) throws SlackException, IOException {
+    final Map<String, Object> params = ImmutableMap.<String, Object>builder()
+        .put("channel", id)
+        .build();
+
+    final JsonObject raw = connection.callMethodHandled(SlackConstants.CHANNEL_INFO, params);
+    return gson.fromJson(raw.getAsJsonObject("channel"), NormalChannel.class);
+  }
+
+  public List<NormalChannel> getChannels() throws SlackException, IOException {
+    return getChannels(true);
+  }
+
+  /**
+   * Join a Channel.
+   *
+   * @param includeArchived if you want archived channels as well
+   * @return A list of channels
+   * @throws SlackException If the session generates an error
+   * @throws IOException    if the gson object returned cannot be decoded
+   */
+
+  public List<NormalChannel> getChannels(final boolean includeArchived)
+      throws SlackException, IOException {
+    final JsonObject raw;
+    if (includeArchived) {
+      raw = connection.callMethodHandled(SlackConstants.CHANNEL_LIST);
+    } else {
+      final Map<String, Object> params = ImmutableMap.<String, Object>builder()
+          .put("exclude_archived", 1)
+          .build();
+      raw = connection.callMethodHandled(SlackConstants.CHANNEL_LIST, params);
     }
 
-    public NormalChannel create(String name) throws SlackException, IOException
-    {
-        throw new UnsupportedOperationException("Not yet implemented");
+    final JsonArray rawList = raw.getAsJsonArray("channels");
+    final ImmutableList.Builder<NormalChannel> channels = ImmutableList.builder();
+
+    for (final JsonElement rawChannel : rawList) {
+      channels.add(gson.fromJson(rawChannel, NormalChannel.class));
     }
 
-    public boolean joinChannel(NormalChannel channel) throws SlackException, IOException
-    {
-        Map<String, Object> params = ImmutableMap.<String, Object>builder()
-            .put("channel", channel.getName())
-            .build();
+    return channels.build();
+  }
 
-        JsonObject result = this.connection.callMethodHandled(SlackConstants.CHANNEL_INFO, params);
-        return !(result.has("already_in_channel") && result.get("already_in_channel").getAsBoolean());
-    }
+  /**
+   * Purge a Channel.
+   *
+   * @param id the channel id
+   * @return true on success
+   * @throws IOException if the gson object returned cannot be decoded
+   */
 
-    public boolean leaveChannel(NormalChannel channel) throws SlackException, IOException
-    {
-        Map<String, Object> params = ImmutableMap.<String, Object>builder()
-            .put("channel", channel.getId())
-            .build();
-
-        JsonObject result = this.connection.callMethodHandled(SlackConstants.CHANNEL_INFO, params);
-        return !(result.has("not_in_channel") && result.get("not_in_channel").getAsBoolean());
-    }
-
-    public NormalChannel getChannel(String id) throws SlackException, IOException
-    {
-        Map<String, Object> params = ImmutableMap.<String, Object>builder()
+  public boolean purgeChannel(final String id) throws IOException {
+    final Map<String, Object> params = ImmutableMap.<String, Object>builder()
+        .put("channel", id)
+        .build();
+    try {
+      final JsonObject raw = connection.callMethodHandled(SlackConstants.CHANNEL_HISTORY, params);
+      final JsonArray rawList = raw.getAsJsonArray("messages");
+      final List<Message> messages = new ArrayList<>();
+      for (final JsonElement message : rawList) {
+        messages.add(gson.fromJson(message, Message.class));
+      }
+      for (final Message message : messages) {
+        final Map<String, Object> p = ImmutableMap.<String, Object>builder()
             .put("channel", id)
+            .put("ts", message.getTimestamp())
             .build();
-
-        JsonObject raw = this.connection.callMethodHandled(SlackConstants.CHANNEL_INFO, params);
-        return this.gson.fromJson(raw.getAsJsonObject("channel"), NormalChannel.class);
+        connection.callMethodHandled(SlackConstants.CHAT_DELETE, p);
+      }
+    } catch (final SlackException e) {
+      return false;
     }
-
-    public List<NormalChannel> getChannels() throws SlackException, IOException
-    {
-        return this.getChannels(true);
-    }
-
-    public List<NormalChannel> getChannels(boolean includeArchived) throws SlackException, IOException
-    {
-        JsonObject raw;
-        if (includeArchived) {
-            raw = connection.callMethodHandled(SlackConstants.CHANNEL_LIST);
-        } else
-        {
-            Map<String, Object> params = ImmutableMap.<String, Object>builder()
-                .put("exclude_archived", 1)
-                .build();
-            raw = this.connection.callMethodHandled(SlackConstants.CHANNEL_LIST, params);
-        }
-
-        JsonArray rawList = raw.getAsJsonArray("channels");
-        ImmutableList.Builder<NormalChannel> channels = ImmutableList.builder();
-
-        for (JsonElement rawChannel : rawList) {
-            channels.add(gson.fromJson(rawChannel, NormalChannel.class));
-        }
-
-        return channels.build();
-    }
-
-    public boolean purgeChannel (String id)  throws SlackException, IOException{
-        Map<String, Object> params = ImmutableMap.<String, Object>builder()
-                .put("channel",id)
-                .build();
-        JsonObject raw = this.connection.callMethodHandled(SlackConstants.CHANNEL_HISTORY, params);
-        JsonArray rawList = raw.getAsJsonArray("messages");
-        List<Message> messages = new ArrayList<>();
-        for (JsonElement message : rawList){
-            messages.add(this.gson.fromJson(message, Message.class));
-        }
-        for (Message message: messages) {
-            Map<String, Object> p = ImmutableMap.<String, Object>builder()
-                    .put("channel",id)
-                    .put("ts",message.getTimestamp())
-                    .build();
-            this.connection.callMethodHandled(SlackConstants.CHAT_DELETE, p);
-        }
-        return true;
-    }
+    return true;
+  }
 }

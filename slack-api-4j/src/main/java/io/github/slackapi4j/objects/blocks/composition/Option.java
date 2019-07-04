@@ -26,36 +26,40 @@ package io.github.slackapi4j.objects.blocks.composition;
  * #L%
  */
 
-import io.github.slackapi4j.internal.Utilities;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import lombok.*;
+import io.github.slackapi4j.internal.Utilities;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
- * Created for the AddstarMC Project. Created by Narimm on 21/02/2019.
+ * Created by Narimm on 21/02/2019.
  */
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@EqualsAndHashCode(callSuper=true)
+@EqualsAndHashCode(callSuper = true)
 public class Option extends CompositionObject {
-    private TextObject text;
-    private String value;
-    
-    @Override
-    protected void load(JsonObject root, JsonDeserializationContext context) {
-        this.text = Utilities.getTextObject(root.get("text"), context, TextObject.TextType.PLAIN);
-        this.value = Utilities.getAsString(root.get("value"));
-    }
-    
-    @Override
-    protected JsonElement save(JsonObject root, JsonSerializationContext context) {
-        JsonObject t = new JsonObject();
-        root.add("text", context.serialize(this.text));
-        root.addProperty("value", this.value);
-        return root;
-    }
+  private TextObject text;
+  private String value;
+
+  @Override
+  protected void load(final JsonObject root, final JsonDeserializationContext context) {
+    text = Utilities.getTextObject(root.get("text"), context, TextObject.TextType.PLAIN);
+    value = Utilities.getAsString(root.get("value"));
+  }
+
+  @Override
+  protected JsonElement save(final JsonObject root, final JsonSerializationContext context) {
+    final JsonObject t = new JsonObject();
+    root.add("text", context.serialize(text));
+    root.addProperty("value", value);
+    return root;
+  }
 }

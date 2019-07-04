@@ -1,4 +1,4 @@
-package io.github.slackapi4j.exampleBot.listeners;
+package io.github.slackapi4j.examplebot.listeners;
 
 /*-
  * #%L
@@ -27,53 +27,57 @@ package io.github.slackapi4j.exampleBot.listeners;
  */
 
 import io.github.slackapi4j.RealTimeSession;
-import io.github.slackapi4j.eventListeners.ConversationEventListener;
+import io.github.slackapi4j.eventlisteners.ConversationEventListener;
 import io.github.slackapi4j.events.ConversationEvent;
-import io.github.slackapi4j.exceptions.SlackRTException;
+import io.github.slackapi4j.exceptions.SlackRtException;
 import io.github.slackapi4j.objects.Message;
 
 import java.util.logging.Logger;
 
 /**
- * Created for the Charlton IT Project.
- * Created by benjicharlton on 3/07/2019.
+ * Created by Narimm on 3/07/2019.
  */
 public class ConversationExampleListener extends ConversationEventListener {
-    private final RealTimeSession session;
-    private final Logger log = Logger.getAnonymousLogger();
+  private final RealTimeSession session;
+  private final Logger log = Logger.getAnonymousLogger();
 
-    public ConversationExampleListener(final RealTimeSession session) {
-        super();
-        this.session = session;
-        session.addListener(this);
+  /**
+   * An Example of a ConversationEvent listener.
+   *
+   * @param session the session to listen in
+   */
+  public ConversationExampleListener(final RealTimeSession session) {
+    super();
+    this.session = session;
+    session.addListener(this);
+  }
+
+  @Override
+  public void onLoginComplete() {
+
+  }
+
+  @Override
+  public void onConversation(final ConversationEvent event) {
+    log.info(event.getType().name() + ':' + event.getConversationID());
+    System.out.println(event);
+    if (event.getType() == ConversationEvent.EventType.Join) {
+      final Message message = Message.builder()
+          .text("If you !PING I will pong!")
+          .conversationID(event.getConversationID())
+          .asUser(false)
+          .build();
+      session.sendMessage(message);
     }
+  }
 
-    @Override
-    public void onLoginComplete() {
+  @Override
+  public void onError(final SlackRtException cause) {
 
-    }
+  }
 
-    @Override
-    public void onConversation(ConversationEvent event) {
-        this.log.info(event.getType().name() + ":" + event.getConversationID());
-        System.out.println(event);
-        if (event.getType() == ConversationEvent.EventType.Join) {
-            Message message = Message.builder()
-                    .text("If you !PING I will pong!")
-                    .conversationID(event.getConversationID())
-                    .as_user(false)
-                    .build();
-            this.session.sendMessage(message);
-        }
-    }
+  @Override
+  public void onClose() {
 
-    @Override
-    public void onError(SlackRTException cause) {
-
-    }
-
-    @Override
-    public void onClose() {
-
-    }
+  }
 }

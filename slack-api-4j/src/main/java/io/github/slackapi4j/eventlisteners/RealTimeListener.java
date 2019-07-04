@@ -1,4 +1,4 @@
-package io.github.slackapi4j.eventListeners;
+package io.github.slackapi4j.eventlisteners;
 
 /*-
  * #%L
@@ -26,26 +26,16 @@ package io.github.slackapi4j.eventListeners;
  * #L%
  */
 
-import io.github.slackapi4j.events.MessageEvent;
 import io.github.slackapi4j.events.RealTimeEvent;
+import io.github.slackapi4j.exceptions.SlackRtException;
 
-/**
- * Only handles message events
- * Created for the Charlton IT Project.
- * Created by benjicharlton on 27/06/2019.
- */
-public abstract class MessageListener implements RealTimeListener {
-    /**
-     * This event will be called when a MessageEvent is recieved.
-     *
-     * @param event the event
-     */
-    public abstract void onMessage(MessageEvent event);
+@SuppressWarnings("WeakerAccess")
+public interface RealTimeListener {
+  void onLoginComplete();
 
-    @Override
-    public final void onEvent(final RealTimeEvent event) {
-        if (event instanceof MessageEvent) {
-            this.onMessage((MessageEvent) event);
-        }
-    }
+  void onEvent(RealTimeEvent event);
+
+  void onError(SlackRtException cause);
+
+  void onClose();
 }

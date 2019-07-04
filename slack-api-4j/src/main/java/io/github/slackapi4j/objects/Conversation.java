@@ -26,16 +26,16 @@ package io.github.slackapi4j.objects;
  * #L%
  */
 
-import io.github.slackapi4j.internal.Utilities;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.github.slackapi4j.internal.Utilities;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -46,97 +46,94 @@ import java.util.List;
  */
 @NoArgsConstructor
 @Getter
-@EqualsAndHashCode(callSuper=true)
+@EqualsAndHashCode(callSuper = true)
 public class Conversation extends TimeStampedBaseObject {
 
-    private String name;
-    private boolean isChannel;
-    private ObjectID creationUserId;
-    private boolean isArchived;
-    private boolean isGeneral;
-    private boolean isShared;
-    private boolean isOrgShared;
-    private boolean isMember;
-    private boolean isPrivate;
-    private boolean isMPIM;
-    private boolean isIM;
-    private List<ObjectID> members;
-    @Nullable
-    private String topic;
-    private ObjectID topicUpdateUserId;
-    private long topicUpdateDate;
-    private boolean isUserDeleted;
-    @Nullable
-    private String purpose;
-    private ObjectID purposeUpdateUserId;
-    private long purposeUpdateDate;
-    @Nullable
-    private String normalized_name;
-    private List<String> previous_names;
-    private int num_members;
+  private String name;
+  private boolean isChannel;
+  private ObjectID creationUserId;
+  private boolean isArchived;
+  private boolean isGeneral;
+  private boolean isShared;
+  private boolean isOrgShared;
+  private boolean isMember;
+  private boolean isPrivate;
+  private boolean isMpIm;
+  private boolean isIm;
+  private List<ObjectID> members;
+  @Nullable
+  private String topic;
+  private ObjectID topicUpdateUserId;
+  private long topicUpdateDate;
+  private boolean isUserDeleted;
+  @Nullable
+  private String purpose;
+  private ObjectID purposeUpdateUserId;
+  private long purposeUpdateDate;
+  @Nullable
+  private String normalizedName;
+  private List<String> previousNames;
+  private int numMembers;
 
 
-    @Override
-    protected void load(JsonObject root, JsonDeserializationContext context) {
-        super.load(root, context);
-        this.isIM = Utilities.getAsBoolean(root.get("is_im"), false);
-        this.members = new ArrayList<>();
-        if (this.isIM) {
-            //this message is on a direct channel and as a result it wont have certain params
-            this.creationUserId = new ObjectID(root.get("user").getAsString());
-            this.members.add(this.creationUserId);
-        }
-        this.isChannel = Utilities.getAsBoolean(root.get("is_channel"), false);
-        if (this.isChannel) {
-            this.name = root.get("name").getAsString();
-            this.creationUserId = new ObjectID(root.get("creator").getAsString());
-            this.isArchived = Utilities.getAsBoolean(root.get("is_archived"), false);
-            this.isGeneral = Utilities.getAsBoolean(root.get("is_general"), false);
-        }
-        if (root.has("members"))
-        {
-            JsonArray memberArray = root.get("members").getAsJsonArray();
-            List<ObjectID> memberList = new ArrayList<>(memberArray.size());
-            for (JsonElement member : memberArray) {
-                memberList.add(new ObjectID(member.getAsString()));
-            }
-            this.members = memberList;
-        }
-        if (root.has("topic"))
-        {
-            JsonObject topic = root.get("topic").getAsJsonObject();
-            this.topic = topic.get("value").getAsString();
-            this.topicUpdateDate = Utilities.getAsTimestamp(topic.get("last_set"));
-            this.topicUpdateUserId = new ObjectID(topic.get("creator").getAsString());
-        }
-
-        if (root.has("purpose"))
-        {
-            JsonObject purpose = root.get("purpose").getAsJsonObject();
-            this.purpose = purpose.get("value").getAsString();
-            this.purposeUpdateDate = Utilities.getAsTimestamp(purpose.get("last_set"));
-            this.purposeUpdateUserId = new ObjectID(purpose.get("creator").getAsString());
-        }
-        this.isMember = Utilities.getAsBoolean(root.get("is_member"), false);
-        this.isShared = Utilities.getAsBoolean(root.get("is_shared"), false);
-        this.isPrivate = Utilities.getAsBoolean(root.get("is_private"), false);
-        this.isPrivate = Utilities.getAsBoolean(root.get("is_private"), false);
-        this.isOrgShared = Utilities.getAsBoolean(root.get("is_org_shared"), false);
-        this.isMPIM = Utilities.getAsBoolean(root.get("is_mpim"), false);
-        if(root.has("name_normalized")){
-            this.normalized_name = root.get("name_normalized").getAsString();
-        }
-        if(root.has("previous_names")){
-            JsonArray array = root.getAsJsonArray("previous_names");
-            List<String> names = new ArrayList<>(array.size());
-            for(JsonElement object: array){
-                names.add(object.getAsString());
-            }
-            this.previous_names = names;
-        }else{
-            this.previous_names = Collections.emptyList();
-        }
-        this.num_members = Utilities.getAsInt(root.get("num_members"));
-
+  @Override
+  protected void load(final JsonObject root, final JsonDeserializationContext context) {
+    super.load(root, context);
+    isIm = Utilities.getAsBoolean(root.get("is_im"), false);
+    members = new ArrayList<>();
+    if (isIm) {
+      //this message is on a direct channel and as a result it wont have certain params
+      creationUserId = new ObjectID(root.get("user").getAsString());
+      members.add(creationUserId);
     }
+    isChannel = Utilities.getAsBoolean(root.get("is_channel"), false);
+    if (isChannel) {
+      name = root.get("name").getAsString();
+      creationUserId = new ObjectID(root.get("creator").getAsString());
+      isArchived = Utilities.getAsBoolean(root.get("is_archived"), false);
+      isGeneral = Utilities.getAsBoolean(root.get("is_general"), false);
+    }
+    if (root.has("members")) {
+      final JsonArray memberArray = root.get("members").getAsJsonArray();
+      final List<ObjectID> memberList = new ArrayList<>(memberArray.size());
+      for (final JsonElement member : memberArray) {
+        memberList.add(new ObjectID(member.getAsString()));
+      }
+      members = memberList;
+    }
+    if (root.has("topic")) {
+      final JsonObject topic = root.get("topic").getAsJsonObject();
+      this.topic = topic.get("value").getAsString();
+      topicUpdateDate = Utilities.getAsTimestamp(topic.get("last_set"));
+      topicUpdateUserId = new ObjectID(topic.get("creator").getAsString());
+    }
+
+    if (root.has("purpose")) {
+      final JsonObject purpose = root.get("purpose").getAsJsonObject();
+      this.purpose = purpose.get("value").getAsString();
+      purposeUpdateDate = Utilities.getAsTimestamp(purpose.get("last_set"));
+      purposeUpdateUserId = new ObjectID(purpose.get("creator").getAsString());
+    }
+    isMember = Utilities.getAsBoolean(root.get("is_member"), false);
+    isShared = Utilities.getAsBoolean(root.get("is_shared"), false);
+    isPrivate = Utilities.getAsBoolean(root.get("is_private"), false);
+    isPrivate = Utilities.getAsBoolean(root.get("is_private"), false);
+    isOrgShared = Utilities.getAsBoolean(root.get("is_org_shared"), false);
+    isMpIm = Utilities.getAsBoolean(root.get("is_mpim"), false);
+    if (root.has("name_normalized")) {
+      normalizedName = root.get("name_normalized").getAsString();
+    }
+    if (root.has("previous_names")) {
+      final JsonArray array = root.getAsJsonArray("previous_names");
+      final List<String> names = new ArrayList<>(array.size());
+      for (final JsonElement object : array) {
+        names.add(object.getAsString());
+      }
+      previousNames = names;
+    } else {
+      previousNames = Collections.emptyList();
+    }
+    numMembers = Utilities.getAsInt(root.get("num_members"));
+
+  }
 }

@@ -26,59 +26,74 @@ package io.github.slackapi4j.objects.blocks.composition;
  * #L%
  */
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import io.github.slackapi4j.objects.BaseObject;
+
 import java.lang.reflect.Type;
 
-import io.github.slackapi4j.objects.BaseObject;
-import com.google.gson.*;
-
 /**
- * Created for the AddstarMC Project. Created by Narimm on 21/02/2019.
+ * These objects are used to compose message blocks
+ * Created by Narimm on 21/02/2019.
  */
 public abstract class CompositionObject extends BaseObject {
-    
-    
-    public static void addGsonAdapters(GsonBuilder builder)
-    {
-        builder.registerTypeAdapter(TextObject.class, getGsonAdapter());
-        builder.registerTypeAdapter(Option.class, getGsonAdapter());
-        builder.registerTypeAdapter(ConfirmObject.class, getGsonAdapter());
-        builder.registerTypeAdapter(OptionGroup.class, getGsonAdapter());
+
+  /**
+   * Add Json adapters to a {@link GsonBuilder} for this class.
+   *
+   * @param builder the builder to modify
+   */
+  public static void addGsonAdapters(final GsonBuilder builder) {
+    builder.registerTypeAdapter(TextObject.class, getGsonAdapter());
+    builder.registerTypeAdapter(Option.class, getGsonAdapter());
+    builder.registerTypeAdapter(ConfirmObject.class, getGsonAdapter());
+    builder.registerTypeAdapter(OptionGroup.class, getGsonAdapter());
+  }
+
+  public static CompositionObjectJsonAdapter getGsonAdapter() {
+    return new CompositionObjectJsonAdapter();
+  }
+
+  protected abstract JsonElement save(JsonObject root, JsonSerializationContext context);
+
+  private static class CompositionObjectJsonAdapter
+      implements JsonDeserializer<CompositionObject>, JsonSerializer<CompositionObject> {
+    @Override
+    public JsonElement serialize(final CompositionObject compositionObject,
+                                 final Type type, final JsonSerializationContext context) {
+      final JsonObject root = new JsonObject();
+      compositionObject.save(root, context);
+      return root;
     }
-    
-    public static CompositionObjectJSONAdapter getGsonAdapter(){
-        return new CompositionObjectJSONAdapter();
+
+    @Override
+    public CompositionObject deserialize(final JsonElement json, final Type type,
+                                         final JsonDeserializationContext context)
+        throws JsonParseException {
+      if (!(json instanceof JsonObject)) {
+        throw new JsonParseException("Expected JSONObject as channel root");
+      }
+      final JsonObject root = (JsonObject) json;
+      final CompositionObject object;
+      if (type.equals(TextObject.class)) {
+        object = new TextObject();
+      } else if (type.equals(Option.class)) {
+        object = new Option();
+      } else if (type.equals(ConfirmObject.class)) {
+        object = new ConfirmObject();
+      } else if (type.equals(OptionGroup.class)) {
+        object = new OptionGroup();
+      } else {
+        throw new JsonParseException("Cant load unknown Composition type");
+      }
+      object.load(root, context);
+      return object;
     }
-    
-    private static class CompositionObjectJSONAdapter implements JsonDeserializer<CompositionObject>, JsonSerializer<CompositionObject> {
-        @Override
-        public JsonElement serialize(CompositionObject compositionObject, Type type, JsonSerializationContext context) {
-            JsonObject root = new JsonObject();
-            compositionObject.save(root,context);
-            return root;
-        }
-    
-        @Override
-        public CompositionObject deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
-            if (!(json instanceof JsonObject)) {
-                throw new JsonParseException("Expected JSONObject as channel root");
-            }
-            JsonObject root = (JsonObject)json;
-            CompositionObject object;
-            if(type.equals(TextObject.class)){
-                object = new TextObject();
-            } else if (type.equals(Option.class)){
-                object = new Option();
-            } else if(type.equals(ConfirmObject.class)){
-                object = new ConfirmObject();
-            } else if(type.equals(OptionGroup.class)){
-                object = new OptionGroup();
-            } else {
-                throw new JsonParseException("Cant load unknown Composition type");
-            }
-            object.load(root,context);
-            return object;
-        }
-    }
-    
-    protected abstract JsonElement save(JsonObject root, JsonSerializationContext context);
+  }
 }

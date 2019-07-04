@@ -52,90 +52,82 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Created for use for the Add5tar MC Minecraft server
  * Created by benjamincharlton on 19/02/2019.
  */
-public class SlackAPITest {
-    private static final String token = System.getenv("SLACK_TOKEN");
+public class SlackApiTest {
+  private static final String TOKEN = System.getenv("SLACK_TOKEN");
 
     @Test
     public void getSlack() {
-        if (token == null || token.isEmpty()) {
+      if (TOKEN == null || TOKEN.isEmpty()) {
             return;
         }
-        SlackAPI api = new SlackAPI(token);
-        SlackConnection connection = api.getSlack();
-        Map<String,Object> map = new HashMap<>();
+      final SlackApi api = new SlackApi(TOKEN);
+      final SlackConnection connection = api.getSlack();
+      final Map<String, Object> map = new HashMap<>();
         map.put("foo","bar");
         try {
-            JsonElement result = connection.callMethod(SlackConstants.API_TEST, map);
-            JsonObject i = result.getAsJsonObject();
-            String val = i.get("args").getAsJsonObject().get("foo").getAsString();
+          final JsonElement result = connection.callMethod(SlackConstants.API_TEST, map);
+          final JsonObject i = result.getAsJsonObject();
+          final String val = i.get("args").getAsJsonObject().get("foo").getAsString();
             assertEquals("bar",val);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
     }
 
     @Test void testMessaging() {
-        if (token == null || token.isEmpty()) {
+      if (TOKEN == null || TOKEN.isEmpty()) {
             return;
         }
-        SlackAPI api = new SlackAPI(token);
+      final SlackApi api = new SlackApi(TOKEN);
         try {
-            RealTimeSession session = api.startRTSession();
-            Conversation c = session.getChannel("bot-test");
+          final RealTimeSession session = api.startRtSession();
+          final Conversation c = session.getChannel("bot-test");
             if(c==null)
                 //exit we had the wrong channel for the test token....stop rather than fail.
             {
                 return;
             }
-            User u = session.getSelf();
+          final User u = session.getSelf();
             session.close();
-            Message message = new Message("Plain Message Test",c);
+          final Message message = new Message("Plain Message Test", c);
             message.setUserId(u.getId());
-            Message response = api.sendMessage(message);
+          final Message response = api.sendMessage(message);
             assertTrue(response.getTimestamp() > 0);
-            List<ObjectID> users = api.getConversations().getMembers(c);
-            User target = users.stream().map(new Function<ObjectID, User>() {
-                /**
-                 * Applies this function to the given argument.
-                 *
-                 * @param objectID the function argument
-                 * @return the function result
-                 */
-                @Override
-                public User apply(ObjectID objectID) {
-                    return session.getUserById(objectID);
-                }
-            }).filter(user -> "Narimm".equals(user.getRealName())).findFirst().orElse(null);
-            Message ephem = new Message("Ephemeral Message Test",c);
+          final List<ObjectID> users = api.getConversations().getMembers(c);
+          final User target = users.stream().map(session::getUserById)
+              .filter(user -> "Narimm".equals(user.getRealName()))
+              .findFirst()
+              .orElse(null);
+          final Message ephem = new Message("Ephemeral Message Test", c);
+          if (target == null) {
+            return;
+          }
             ephem.setUserId(target.getId());
             api.sendEphemeral(ephem);
-            Message test = Message.builder().
+          final Message test = Message.builder().
                     conversationID(c.getId())
                     .userId(u.getId())
-                    .as_user(true)
+              .asUser(true)
                     .blocks(new ArrayList<>())
                     .subtype(Message.MessageType.Normal)
                    // .thread_ts(response.getTs())
                     .build();
-            ImageBlock image = new ImageBlock();
-            TextObject title = new TextObject();
+          final ImageBlock image = new ImageBlock();
+          final TextObject title = new TextObject();
             title.setText("Some Random Image :thumbsup:");
             title.setType(TextObject.TextType.PLAIN);
             title.setEmoji(true);
             image.setTitle(title);
             image.setImageUrl(new URL("http://1.bp.blogspot.com/-fgm36vPUvMI/Tmz08xaOSEI/AAAAAAAAA6w/su3tQSL7yBc/s1600/food-art7.jpg"));
             image.setAltText("A random Apple");
-            Section section = new Section();
-            TextObject text = new TextObject();
+          final Section section = new Section();
+          final TextObject text = new TextObject();
             text.setText("~Formatted Block Text~ :thumbsup:");
             text.setType(TextObject.TextType.MARKDOWN);
             text.setVerbatim(false);
@@ -145,15 +137,15 @@ public class SlackAPITest {
             test.addBlock(image);
             Message sent = api.sendMessage(test);
             assertTrue(sent.getTimestamp() >0);
-            Message question = Message.builder()
-                    .as_user(true)
+          final Message question = Message.builder()
+              .asUser(true)
                     .blocks(new ArrayList<>())
                     .conversationID(c.getId())
                     .build();
-            ActionBlock actions = new ActionBlock();
-            List<Element> elements = new ArrayList<>();
-            SelectElement select  = new SelectElement();
-            List<Option> options = new ArrayList<>();
+          final ActionBlock actions = new ActionBlock();
+          final List<Element> elements = new ArrayList<>();
+          final SelectElement select = new SelectElement();
+          final List<Option> options = new ArrayList<>();
             options.add(Option.builder()
                     .text(TextObject.builder()
                     .text("The best option")
@@ -192,7 +184,7 @@ public class SlackAPITest {
             question.addBlock(actions);
             sent = api.sendMessage(question);
             assertTrue(sent.getTimestamp() >0);
-        } catch (SlackException | IOException e) {
+        } catch (final SlackException | IOException e) {
             e.printStackTrace();
         }
 

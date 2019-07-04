@@ -26,12 +26,24 @@ package io.github.slackapi4j.exceptions;
  * #L%
  */
 
-/**
- * Created for the Charlton IT Project.
- * Created by benjicharlton on 26/06/2019.
- */
-public class SlackMesssageInvalidException extends SlackException {
-    public SlackMesssageInvalidException(final String errorCode, final String message) {
-        super(errorCode, message);
-    }
+public class SlackRtException extends Exception {
+  private static final long serialVersionUID = 5189878895672200892L;
+
+  private final int errorCode;
+
+  public SlackRtException(final int code, final String message) {
+    super(message);
+    errorCode = code;
+  }
+
+  public int getErrorCode() {
+    return errorCode;
+  }
+
+  @Override
+  public String toString() {
+    final String s = getClass().getName();
+    final String message = getLocalizedMessage();
+    return s + ": " + errorCode + (message != null ? " - " + message : s);
+  }
 }

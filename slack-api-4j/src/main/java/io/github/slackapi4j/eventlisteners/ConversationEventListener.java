@@ -1,4 +1,4 @@
-package io.github.slackapi4j.exceptions;
+package io.github.slackapi4j.eventlisteners;
 
 /*-
  * #%L
@@ -26,28 +26,26 @@ package io.github.slackapi4j.exceptions;
  * #L%
  */
 
-public class SlackRTException extends Exception
-{
-    private static final long serialVersionUID = 5189878895672200892L;
+import io.github.slackapi4j.events.ConversationEvent;
+import io.github.slackapi4j.events.RealTimeEvent;
 
-    private final int errorCode;
-    
-    public SlackRTException(final int code, final String message)
-    {
-        super(message);
-        this.errorCode = code;
+/**
+ * Extending this class means your listener handles on Conversation Events
+ * Created by Narimm on 27/06/2019.
+ */
+public abstract class ConversationEventListener implements RealTimeListener {
+  /**
+   * This event will be called with a ConversationEvent is received.
+   * For event types {@link ConversationEvent.EventType}
+   *
+   * @param event the event to process
+   */
+  public abstract void onConversation(ConversationEvent event);
+
+  @Override
+  public final void onEvent(final RealTimeEvent event) {
+    if (event instanceof ConversationEvent) {
+      onConversation((ConversationEvent) event);
     }
-    
-    public int getErrorCode()
-    {
-        return this.errorCode;
-    }
-    
-    @Override
-    public String toString()
-    {
-        final String s = this.getClass().getName();
-        final String message = this.getLocalizedMessage();
-        return s + ": " + this.errorCode + (message != null ? " - " + message : s);
-    }
+  }
 }

@@ -26,7 +26,6 @@ package io.github.slackapi4j.events;
  * #L%
  */
 
-public class RealTimeEvent
-{
+public class RealTimeEvent {
 
 }

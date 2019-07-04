@@ -1,4 +1,4 @@
-package io.github.slackapi4j.eventListeners;
+package io.github.slackapi4j.eventlisteners;
 
 /*-
  * #%L
@@ -26,26 +26,26 @@ package io.github.slackapi4j.eventListeners;
  * #L%
  */
 
-import io.github.slackapi4j.events.ConversationEvent;
+import io.github.slackapi4j.events.MessageEvent;
 import io.github.slackapi4j.events.RealTimeEvent;
 
 /**
- * Extending this class means your listener handles on Conversation Events
+ * Only handles message events
  * Created for the Charlton IT Project.
- * Created by benjicharlton on 27/06/2019.
+ * Created by Narimm on 27/06/2019.
  */
-public abstract class ConversationEventListener implements RealTimeListener {
-    /**
-     * This event will be called with a ConversationEvent is recieved.
-     * For event types {@link ConversationEvent.EventType}
-     *
-     * @param event
-     */
-    public abstract void onConversation(ConversationEvent event);
-    @Override
-    public final void onEvent(final RealTimeEvent event) {
-        if (event instanceof ConversationEvent) {
-            this.onConversation((ConversationEvent) event);
-        }
+public abstract class MessageListener implements RealTimeListener {
+  /**
+   * This event will be called when a MessageEvent is received.
+   *
+   * @param event the event
+   */
+  public abstract void onMessage(MessageEvent event);
+
+  @Override
+  public final void onEvent(final RealTimeEvent event) {
+    if (event instanceof MessageEvent) {
+      onMessage((MessageEvent) event);
     }
+  }
 }

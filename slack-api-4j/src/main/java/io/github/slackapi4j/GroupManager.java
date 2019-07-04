@@ -26,64 +26,68 @@ package io.github.slackapi4j;
  * #L%
  */
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
-import io.github.slackapi4j.exceptions.SlackException;
-import io.github.slackapi4j.internal.SlackConnection;
-import io.github.slackapi4j.internal.SlackConstants;
-
-import io.github.slackapi4j.objects.GroupChannel;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.github.slackapi4j.exceptions.SlackException;
+import io.github.slackapi4j.internal.SlackConnection;
+import io.github.slackapi4j.internal.SlackConstants;
+import io.github.slackapi4j.objects.GroupChannel;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
- * This is used to manager group channels
+ * This is used to manager group channels.
+ *
  * @deprecated Use {@link io.github.slackapi4j.objects.Conversation}
  */
 
 @Deprecated
-public class GroupManager
-{
-    private final Gson gson;
-    private final SlackConnection connection;
+public class GroupManager {
+  private final Gson gson;
+  private final SlackConnection connection;
 
-    GroupManager(SlackAPI main)
-    {
-        this.gson = main.getGson();
-        this.connection = main.getSlack();
+  GroupManager(final SlackApi main) {
+    gson = main.getGson();
+    connection = main.getSlack();
+  }
+
+  public List<GroupChannel> getGroups() throws SlackException, IOException {
+    return getGroups(true);
+  }
+
+  /**
+   * Get the GroupChannels optional the archived ones.
+   *
+   * @param includeArchived true if you want archived
+   * @return A list of channels
+   * @throws SlackException for endpoint errors
+   * @throws IOException    encoding errors
+   */
+  public List<GroupChannel> getGroups(final boolean includeArchived)
+      throws SlackException, IOException {
+    final JsonObject raw;
+    if (includeArchived) {
+      raw = connection.callMethodHandled(SlackConstants.GROUP_LIST);
+    } else {
+      final Map<String, Object> params = ImmutableMap.<String, Object>builder()
+          .put("exclude_archived", 1)
+          .build();
+      raw = connection.callMethodHandled(SlackConstants.GROUP_LIST, params);
     }
 
-    public List<GroupChannel> getGroups() throws SlackException, IOException
-    {
-        return this.getGroups(true);
+    final JsonArray rawList = raw.getAsJsonArray("groups");
+    final ImmutableList.Builder<GroupChannel> groups = ImmutableList.builder();
+
+    for (final JsonElement rawGroup : rawList) {
+      groups.add(gson.fromJson(rawGroup, GroupChannel.class));
     }
 
-    public List<GroupChannel> getGroups(boolean includeArchived) throws SlackException, IOException
-    {
-        JsonObject raw;
-        if (includeArchived) {
-            raw = connection.callMethodHandled(SlackConstants.GROUP_LIST);
-        } else
-        {
-            Map<String, Object> params = ImmutableMap.<String, Object>builder()
-                .put("exclude_archived", 1)
-                .build();
-            raw = this.connection.callMethodHandled(SlackConstants.GROUP_LIST, params);
-        }
-
-        JsonArray rawList = raw.getAsJsonArray("groups");
-        ImmutableList.Builder<GroupChannel> groups = ImmutableList.builder();
-
-        for (JsonElement rawGroup : rawList) {
-            groups.add(gson.fromJson(rawGroup, GroupChannel.class));
-        }
-
-        return groups.build();
-    }
+    return groups.build();
+  }
 }

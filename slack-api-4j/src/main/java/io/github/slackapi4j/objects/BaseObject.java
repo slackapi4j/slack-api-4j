@@ -26,55 +26,56 @@ package io.github.slackapi4j.objects;
  * #L%
  */
 
-import com.google.gson.*;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
 
 /**
- * The Basic object - that support serialization and deserialization via GSON
- *
- * Created for use for the Add5tar MC Minecraft server
+ * The Basic object - that support serialization and deserialization via
+ * {@link com.google.gson.Gson}
  * Created by benjamincharlton on 20/02/2019.
  */
 public abstract class BaseObject {
 
-    protected abstract void load(JsonObject root, JsonDeserializationContext context);
-    
-    
-    public static Object getGsonAdapter()
-    {
-        return new ChannelJsonAdapter();
+  public static Object getGsonAdapter() {
+    return new ChannelJsonAdapter();
+  }
+
+  protected abstract void load(JsonObject root, JsonDeserializationContext context);
+
+  private static class ChannelJsonAdapter implements JsonDeserializer<BaseObject> {
+    @Override
+    @SuppressWarnings("deprecation")
+    public BaseObject deserialize(final JsonElement element, final Type type,
+                                  final JsonDeserializationContext context)
+        throws JsonParseException {
+      if (!(element instanceof JsonObject)) {
+        throw new JsonParseException("Expected JSONObject as channel root");
+      }
+
+      final JsonObject root = (JsonObject) element;
+
+      final BaseObject object;
+      if (type.equals(User.class)) {
+        object = new User();
+      } else if (type.equals(Conversation.class)) {
+        object = new Conversation();
+      } else if (type.equals(GroupChannel.class)) {
+        object = new GroupChannel();
+      } else if (type.equals(NormalChannel.class)) {
+        object = new NormalChannel();
+      } else if (type.equals(DirectChannel.class)) {
+        object = new DirectChannel();
+      } else {
+        throw new JsonParseException("Cant load unknown channel type");
+      }
+
+      object.load(root, context);
+      return object;
     }
-
-    private static class ChannelJsonAdapter implements JsonDeserializer<BaseObject>
-    {
-        @Override
-        @SuppressWarnings("deprecation")
-        public BaseObject deserialize(JsonElement element, Type type, JsonDeserializationContext context ) throws JsonParseException
-        {
-            if (!(element instanceof JsonObject)) {
-                throw new JsonParseException("Expected JSONObject as channel root");
-            }
-
-            JsonObject root = (JsonObject)element;
-
-            BaseObject object;
-            if (type.equals(User.class)) {
-                object = new User();
-            } else if (type.equals(Conversation.class)) {
-                object = new Conversation();
-            } else if (type.equals(GroupChannel.class)) {
-                object = new GroupChannel();
-            } else if (type.equals(NormalChannel.class)) {
-                object = new NormalChannel();
-            } else if (type.equals(DirectChannel.class)) {
-                object = new DirectChannel();
-            } else {
-                throw new JsonParseException("Cant load unknown channel type");
-            }
-
-            object.load(root, context);
-            return object;
-        }
-    }
+  }
 }

@@ -1,4 +1,4 @@
-package io.github.slackapi4j.exampleBot.listeners;
+package io.github.slackapi4j.examplebot.listeners;
 
 /*-
  * #%L
@@ -26,48 +26,49 @@ package io.github.slackapi4j.exampleBot.listeners;
  * #L%
  */
 
-import io.github.slackapi4j.eventListeners.RealTimeListener;
 import io.github.slackapi4j.RealTimeSession;
+import io.github.slackapi4j.eventlisteners.RealTimeListener;
 import io.github.slackapi4j.events.RealTimeEvent;
-import io.github.slackapi4j.exceptions.SlackRTException;
+import io.github.slackapi4j.exceptions.SlackRtException;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.logging.Logger;
 
 /**
  * Created for the Charlton IT Project.
- * Created by benjicharlton on 27/06/2019.
+ * Created by Narimm on 27/06/2019.
  */
 public class ExampleListener implements RealTimeListener {
 
-    private final RealTimeSession session;
-    private final Logger log = Logger.getAnonymousLogger();
+  private final RealTimeSession session;
+  private final Logger log = Logger.getAnonymousLogger();
 
-    public ExampleListener(final RealTimeSession session) {
-        this.session = session;
-        session.addListener(this);
-    }
+  public ExampleListener(final RealTimeSession session) {
+    this.session = session;
+    session.addListener(this);
+  }
 
-    @Override
-    public void onLoginComplete() {
-        this.log.info("Logged into Slack as " + this.session.getSelf().getName());
-        //further tasks once logged in here.
-    }
+  @Override
+  public void onLoginComplete() {
+    log.info("Logged into Slack as " + session.getSelf().getName());
+    //further tasks once logged in here.
+  }
 
-    @Override
-    public void onEvent(RealTimeEvent event) {
-        this.log.info(event.toString());
-    }
+  @Override
+  public void onEvent(final RealTimeEvent event) {
+    log.info(event.toString());
+  }
 
-    @Override
-    public void onError(SlackRTException cause) {
-        this.log.info(cause.getMessage());
-        cause.printStackTrace();
-    }
+  @Override
+  public void onError(final SlackRtException cause) {
+    log.info(cause.getMessage());
+    cause.printStackTrace();
+  }
 
-    @Override
-    public void onClose() {
-
-    }
+  /**
+   * We could do something her on close if we wanted too.
+   */
+  @Override
+  public void onClose() {
+    log.info("ExampleListener: We are closing the session ...");
+  }
 }

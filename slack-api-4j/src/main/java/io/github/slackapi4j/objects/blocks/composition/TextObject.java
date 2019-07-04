@@ -26,68 +26,82 @@ package io.github.slackapi4j.objects.blocks.composition;
  * #L%
  */
 
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
 import io.github.slackapi4j.internal.Utilities;
-import com.google.gson.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 /**
  * Created by benjamincharlton on 20/02/2019.
  */
 @Data
 @Builder
-@EqualsAndHashCode(callSuper=true)
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
-public class TextObject extends CompositionObject  {
+public class TextObject extends CompositionObject {
 
-    private TextType type = TextType.PLAIN;
-    private Boolean emoji;
-    private Boolean verbatim;
-    private String text;
+  private TextType type = TextType.PLAIN;
+  private Boolean emoji;
+  private Boolean verbatim;
+  private String text;
 
-    public TextObject() {
+  public TextObject() {
+    super();
+  }
+
+  @Override
+  protected void load(final JsonObject root, final JsonDeserializationContext context) {
+    type = TextType.getTextType(root.get("type").getAsString());
+    emoji = Utilities.getAsBoolean(root.get("emoji"), false);
+    verbatim = Utilities.getAsBoolean(root.get("verbatim"), false);
+    text = root.get("text").getAsString();
+  }
+
+  @Override
+  protected JsonElement save(final JsonObject root, final JsonSerializationContext context) {
+    root.addProperty("type", type.getValue());
+    if (emoji != null && type == TextType.PLAIN) {
+      root.addProperty("emoji", emoji);
+    }
+    if (verbatim != null) {
+      root.addProperty("verbatim", verbatim);
+    }
+    root.addProperty("text", text);
+    return root;
+  }
+
+  public enum TextType {
+    PLAIN("plain_text"),
+    MARKDOWN("mrkdwn");
+    @Getter
+    private final String value;
+
+    TextType(final String value) {
+      this.value = value;
     }
 
-    @Override
-    protected void load(JsonObject root, JsonDeserializationContext context) {
-        this.type = TextType.getTextType(root.get("type").getAsString());
-        this.emoji = Utilities.getAsBoolean(root.get("emoji"), false);
-        this.verbatim = Utilities.getAsBoolean(root.get("verbatim"), false);
-        this.text = root.get("text").getAsString();
+    /**
+     * Returns a TextType from a String value.
+     *
+     * @param val a String to parse
+     * @return TextType
+     */
+    public static TextType getTextType(final String val) {
+      if (PLAIN.value.equals(val)) {
+        return PLAIN;
+      }
+      if (MARKDOWN.value.equals(val)) {
+        return MARKDOWN;
+      } else {
+        throw new JsonParseException("Invalid TextObject Type: " + val);
+      }
     }
-    
-    @Override
-    protected JsonElement save(JsonObject root, JsonSerializationContext context) {
-        root.addProperty("type", this.type.getValue());
-        if (this.emoji != null && this.type == TextType.PLAIN) {
-            root.addProperty("emoji", this.emoji);
-        }
-        if (this.verbatim != null) {
-            root.addProperty("verbatim", this.verbatim);
-        }
-        root.addProperty("text", this.text);
-        return root;
-    }
-    
-    public enum TextType {
-        PLAIN("plain_text"),
-        MARKDOWN("mrkdwn");
-        @Getter
-        private final String value;
-
-        TextType(String value) {
-            this.value = value;
-        }
-        
-        public static TextType getTextType(final String val){
-            if(PLAIN.value.equals(val)) {
-                return PLAIN;
-            }
-            if(MARKDOWN.value.equals(val)) {
-                return MARKDOWN;
-            }
-            else {
-                throw new JsonParseException("Invalid TextObject Type: " + val);
-            }
-        }
-    }
+  }
 }
