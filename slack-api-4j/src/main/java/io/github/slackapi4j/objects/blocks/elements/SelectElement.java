@@ -32,7 +32,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
-import io.github.slackapi4j.internal.Utilities;
+import io.github.slackapi4j.internal.SlackUtil;
 import io.github.slackapi4j.objects.blocks.composition.ConfirmObject;
 import io.github.slackapi4j.objects.blocks.composition.Option;
 import io.github.slackapi4j.objects.blocks.composition.OptionGroup;
@@ -67,9 +67,9 @@ public class SelectElement extends Element {
   @Override
   protected void load(final JsonObject root, final JsonDeserializationContext context) {
     super.load(root, context);
-    placeHolder = Utilities.getTextObject(root.get("placeholder"), context,
+    placeHolder = SlackUtil.getTextObject(root.get("placeholder"), context,
         TextObject.TextType.PLAIN);
-    actionId = Utilities.getAsString(root.get("action_id"));
+    actionId = SlackUtil.getAsString(root.get("action_id"));
     if (root.has("options")) {
       if (root.has("optionGroups")) {
         throw new JsonParseException("SelectElement cannot have both Options and OptionGroups");
@@ -93,7 +93,7 @@ public class SelectElement extends Element {
   @Override
   protected JsonObject save(final JsonObject root, final JsonSerializationContext context) {
     super.save(root, context);
-    Utilities.serializeTextObject(root, "placeholder", placeHolder, context);
+    SlackUtil.serializeTextObject(root, "placeholder", placeHolder, context);
     root.addProperty("action_id", actionId);
     if (options != null && !options.isEmpty()) {
       if (optionGroups != null && !optionGroups.isEmpty()) {

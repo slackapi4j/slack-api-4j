@@ -35,7 +35,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import io.github.slackapi4j.internal.Utilities;
+import io.github.slackapi4j.internal.SlackUtil;
 import io.github.slackapi4j.objects.blocks.Block;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -218,11 +218,11 @@ public class Message extends IdBaseObject {
         message.userId = new ObjectID(root.get("user").getAsString());
       }
 
-      message.text = Utilities.getAsString(root.get("text"));
-      message.threadTs = Utilities.getAsString(root.get("thread_ts"));
-      message.ts = Utilities.getAsString(root.get("ts"));
-      message.asUser = Utilities.getAsBoolean(root.get("as_user"), true);
-      message.timestamp = Utilities.getAsTimestamp(root.get("ts"));
+      message.text = SlackUtil.getAsString(root.get("text"));
+      message.threadTs = SlackUtil.getAsString(root.get("thread_ts"));
+      message.ts = SlackUtil.getAsString(root.get("ts"));
+      message.asUser = SlackUtil.getAsBoolean(root.get("as_user"), true);
+      message.timestamp = SlackUtil.getAsTimestamp(root.get("ts"));
       if (root.has("channel")) {
         message.conversationID = new ObjectID(root.get("channel").getAsString());
       }
@@ -230,10 +230,10 @@ public class Message extends IdBaseObject {
       if (root.has("edited")) {
         final JsonObject edited = root.getAsJsonObject("edited");
         message.editUserId = new ObjectID(edited.get("user").getAsString());
-        message.editTimestamp = Utilities.getAsTimestamp(edited.get("ts"));
+        message.editTimestamp = SlackUtil.getAsTimestamp(edited.get("ts"));
       }
 
-      message.subtype = MessageType.fromId(Utilities.getAsString(root.get("subtype")));
+      message.subtype = MessageType.fromId(SlackUtil.getAsString(root.get("subtype")));
 
       if (root.has("attachments")) {
         message.attachments = Lists.newArrayList();

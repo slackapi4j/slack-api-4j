@@ -31,7 +31,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import io.github.slackapi4j.internal.Utilities;
+import io.github.slackapi4j.internal.SlackUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -53,7 +53,7 @@ public class OptionGroup extends CompositionObject {
 
   @Override
   protected JsonElement save(final JsonObject root, final JsonSerializationContext context) {
-    Utilities.serializeTextObject(root, "label", label, context);
+    SlackUtil.serializeTextObject(root, "label", label, context);
     final JsonArray arr = new JsonArray();
     for (final Option opt : options) {
       arr.add(context.serialize(opt, Option.class));
@@ -64,7 +64,7 @@ public class OptionGroup extends CompositionObject {
 
   @Override
   protected void load(final JsonObject root, final JsonDeserializationContext context) {
-    label = Utilities.getTextObject(root.get("label"), context, TextObject.TextType.PLAIN);
+    label = SlackUtil.getTextObject(root.get("label"), context, TextObject.TextType.PLAIN);
     final JsonArray array = root.getAsJsonArray("options");
     options = new ArrayList<>();
     for (final JsonElement el : array) {

@@ -30,7 +30,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
-import io.github.slackapi4j.internal.Utilities;
+import io.github.slackapi4j.internal.SlackUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -62,7 +62,7 @@ public class ImageElement extends Element {
     } catch (final MalformedURLException e) {
       throw new JsonParseException("URL could not be decoded");
     }
-    altText = Utilities.getAsString(root.get("alt_text"));
+    altText = SlackUtil.getAsString(root.get("alt_text"));
   }
 
   @Override

@@ -80,8 +80,10 @@ public class SlackApiTest {
         }
     }
 
-    @Test void testMessaging() {
+    @Test
+    public void testMessaging() {
       if (TOKEN == null || TOKEN.isEmpty()) {
+            assertTrue(true);
             return;
         }
       final SlackApi api = new SlackApi(TOKEN);
@@ -91,7 +93,8 @@ public class SlackApiTest {
             if(c==null)
                 //exit we had the wrong channel for the test token....stop rather than fail.
             {
-                return;
+              assertTrue(true);
+              return;
             }
           final User u = session.getSelf();
             session.close();

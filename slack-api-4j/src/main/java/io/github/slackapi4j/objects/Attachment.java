@@ -37,7 +37,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import io.github.slackapi4j.internal.Utilities;
+import io.github.slackapi4j.internal.SlackUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -167,11 +167,11 @@ public class Attachment {
       final JsonObject object = json.getAsJsonObject();
 
       final Attachment attachment = new Attachment(object.get("fallback").getAsString());
-      attachment.color = Utilities.getAsString(object.get("color"));
-      attachment.pretext = Utilities.getAsString(object.get("pretext"));
-      attachment.text = Utilities.getAsString(object.get("text"));
+      attachment.color = SlackUtil.getAsString(object.get("color"));
+      attachment.pretext = SlackUtil.getAsString(object.get("pretext"));
+      attachment.text = SlackUtil.getAsString(object.get("text"));
 
-      attachment.authorName = Utilities.getAsString(object.get("author_name"));
+      attachment.authorName = SlackUtil.getAsString(object.get("author_name"));
       if (object.has("author_link")) {
         attachment.authorLink = context.deserialize(object.get("author_link"), URL.class);
       }
@@ -179,7 +179,7 @@ public class Attachment {
         attachment.authorIcon = context.deserialize(object.get("author_link"), URL.class);
       }
 
-      attachment.title = Utilities.getAsString(object.get("title"));
+      attachment.title = SlackUtil.getAsString(object.get("title"));
       if (object.has("title_link")) {
         attachment.titleLink = context.deserialize(object.get("title_link"), URL.class);
       }
@@ -207,7 +207,7 @@ public class Attachment {
         throws JsonParseException {
       final JsonObject root = json.getAsJsonObject();
       return new AttachmentField(root.get("title").getAsString(), root.get("value").getAsString(),
-          Utilities.getAsBoolean(root.get("short"), false));
+          SlackUtil.getAsBoolean(root.get("short"), false));
     }
 
     @Override

@@ -32,7 +32,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
-import io.github.slackapi4j.internal.Utilities;
+import io.github.slackapi4j.internal.SlackUtil;
 import io.github.slackapi4j.objects.BaseObject;
 import io.github.slackapi4j.objects.blocks.composition.TextObject;
 import io.github.slackapi4j.objects.blocks.elements.ButtonElement;
@@ -66,7 +66,7 @@ public class ContextBlock extends Block {
       Type type = null;
       try {
         final Element.ElementType elType = Element.ElementType.valueOf(
-            Utilities.getAsString(el.getAsJsonObject().get("type")).toUpperCase());
+            SlackUtil.getAsString(el.getAsJsonObject().get("type")).toUpperCase());
         switch (elType) {
           case IMAGE:
             type = ImageElement.class;
@@ -85,7 +85,7 @@ public class ContextBlock extends Block {
       }
       try {
         final TextObject.TextType textType = TextObject.TextType.getTextType(
-            Utilities.getAsString(el.getAsJsonObject().get("type")));
+            SlackUtil.getAsString(el.getAsJsonObject().get("type")));
         switch (textType) {
           case PLAIN:
           case MARKDOWN:

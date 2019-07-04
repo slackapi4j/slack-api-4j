@@ -1,4 +1,4 @@
-#Slack Api 4 Java 
+# Slack Api 4 Java 
 
 ![Maven Badge](https://img.shields.io/maven-metadata/v/https/repo1.maven.org/maven2/io/github/slackapi4j/slack-api-4j/maven-metadata.xml.svg)
 ![Nexus SnapShots](https://img.shields.io/nexus/s/https/oss.sonatype.org/io.github.slackapi4j/slack-api-4j.svg)
@@ -18,7 +18,7 @@ We are working on adding the Event - API as well
 Thanks
 Narimm
 
-###Stable
+### Stable
 
 For the Stable Release
         
@@ -37,7 +37,7 @@ For the Stable Release
           <version>0.0.2</version>
         </dependency>
 
-###Snapshots
+### Snapshots
 
         <dependency>
           <groupId>io.github.slackapi4j</groupId>

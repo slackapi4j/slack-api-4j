@@ -37,7 +37,7 @@ import io.github.slackapi4j.objects.blocks.composition.TextObject;
 import java.util.Collections;
 import java.util.Map;
 
-public class Utilities {
+public class SlackUtil {
   /**
    * So I dont have to force type Collections.emptyMap() for parameters
    */

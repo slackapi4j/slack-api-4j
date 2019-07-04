@@ -30,7 +30,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
-import io.github.slackapi4j.internal.Utilities;
+import io.github.slackapi4j.internal.SlackUtil;
 import io.github.slackapi4j.objects.blocks.composition.TextObject;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -61,9 +61,9 @@ public class ButtonElement extends Element {
   @Override
   protected void load(final JsonObject root, final JsonDeserializationContext context) {
     super.load(root, context);
-    text = Utilities.getTextObject(root.get("text"), context, TextObject.TextType.PLAIN);
-    actionId = Utilities.getAsString(root.get("action_id"));
-    value = Utilities.getAsString(root.get("value"));
+    text = SlackUtil.getTextObject(root.get("text"), context, TextObject.TextType.PLAIN);
+    actionId = SlackUtil.getAsString(root.get("action_id"));
+    value = SlackUtil.getAsString(root.get("value"));
     try {
       url = new URL(root.get("url").getAsString());
     } catch (final MalformedURLException e) {

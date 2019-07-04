@@ -34,7 +34,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import io.github.slackapi4j.internal.Utilities;
+import io.github.slackapi4j.internal.SlackUtil;
 import io.github.slackapi4j.objects.BaseObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -74,7 +74,7 @@ public class Block extends BaseObject {
 
   protected void load(final JsonObject root, final JsonDeserializationContext context) {
     type = BlockType.valueOf(root.get("type").getAsString().toUpperCase());
-    blockId = Utilities.getAsString(root.get("block_id"));
+    blockId = SlackUtil.getAsString(root.get("block_id"));
   }
 
   protected JsonObject save(final JsonObject root, final JsonSerializationContext context) {

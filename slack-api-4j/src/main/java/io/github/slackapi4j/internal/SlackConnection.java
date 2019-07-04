@@ -274,6 +274,6 @@ public class SlackConnection {
 
   public JsonObject callMethodHandled(final SlackConstants method)
       throws SlackException, IOException {
-    return callMethodHandled(method, Utilities.EMPTY_MAP);
+    return callMethodHandled(method, SlackUtil.EMPTY_MAP);
   }
 }

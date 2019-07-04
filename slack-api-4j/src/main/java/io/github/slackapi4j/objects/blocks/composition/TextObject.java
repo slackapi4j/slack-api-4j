@@ -31,7 +31,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
-import io.github.slackapi4j.internal.Utilities;
+import io.github.slackapi4j.internal.SlackUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -60,8 +60,8 @@ public class TextObject extends CompositionObject {
   @Override
   protected void load(final JsonObject root, final JsonDeserializationContext context) {
     type = TextType.getTextType(root.get("type").getAsString());
-    emoji = Utilities.getAsBoolean(root.get("emoji"), false);
-    verbatim = Utilities.getAsBoolean(root.get("verbatim"), false);
+    emoji = SlackUtil.getAsBoolean(root.get("emoji"), false);
+    verbatim = SlackUtil.getAsBoolean(root.get("verbatim"), false);
     text = root.get("text").getAsString();
   }
 

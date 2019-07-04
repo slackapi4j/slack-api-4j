@@ -28,7 +28,7 @@ package io.github.slackapi4j.objects;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
-import io.github.slackapi4j.internal.Utilities;
+import io.github.slackapi4j.internal.SlackUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -51,6 +51,6 @@ public class TimeStampedBaseObject extends IdBaseObject {
       throw new IllegalStateException("This is not a valid object");
     }
 
-    creationDate = Utilities.getAsTimestamp(object.get("created"));
+    creationDate = SlackUtil.getAsTimestamp(object.get("created"));
   }
 }

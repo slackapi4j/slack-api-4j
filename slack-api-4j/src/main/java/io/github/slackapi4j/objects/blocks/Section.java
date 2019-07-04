@@ -31,7 +31,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import io.github.slackapi4j.internal.Utilities;
+import io.github.slackapi4j.internal.SlackUtil;
 import io.github.slackapi4j.objects.blocks.composition.TextObject;
 import io.github.slackapi4j.objects.blocks.elements.Element;
 import lombok.EqualsAndHashCode;
@@ -83,7 +83,7 @@ public class Section extends Block {
       final JsonArray ar = root.getAsJsonArray("fields");
       setFields(new ArrayList<>());
       for (final JsonElement el : ar) {
-        fields.add(Utilities.getTextObject(el, context, null));
+        fields.add(SlackUtil.getTextObject(el, context, null));
       }
     } else {
       setFields(null);

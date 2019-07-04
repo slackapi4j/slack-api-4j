@@ -30,7 +30,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
-import io.github.slackapi4j.internal.Utilities;
+import io.github.slackapi4j.internal.SlackUtil;
 import io.github.slackapi4j.objects.blocks.composition.TextObject;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -58,20 +58,20 @@ public class ImageBlock extends Block {
   @Override
   protected void load(final JsonObject root, final JsonDeserializationContext context) {
     super.load(root, context);
-    title = Utilities.getTextObject(root.get("title"), context, TextObject.TextType.PLAIN);
+    title = SlackUtil.getTextObject(root.get("title"), context, TextObject.TextType.PLAIN);
     try {
       imageUrl = new URL(root.get("imageURL").getAsString());
     } catch (final MalformedURLException e) {
       throw new JsonParseException("URL could not be decoded");
     }
-    altText = Utilities.getAsString(root.get("alt_text"));
+    altText = SlackUtil.getAsString(root.get("alt_text"));
 
   }
 
   @Override
   protected JsonObject save(final JsonObject root, final JsonSerializationContext context) {
     super.save(root, context);
-    Utilities.serializeTextObject(root, "title", title, context);
+    SlackUtil.serializeTextObject(root, "title", title, context);
     root.addProperty("alt_text", altText);
     root.addProperty("image_url", imageUrl.toString());
     return root;

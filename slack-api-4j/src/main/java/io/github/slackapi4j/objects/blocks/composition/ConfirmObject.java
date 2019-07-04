@@ -30,7 +30,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import io.github.slackapi4j.internal.Utilities;
+import io.github.slackapi4j.internal.SlackUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -54,18 +54,18 @@ public class ConfirmObject extends CompositionObject {
 
   @Override
   protected JsonElement save(final JsonObject root, final JsonSerializationContext context) {
-    Utilities.serializeTextObject(root, "title", title, context);
-    Utilities.serializeTextObject(root, "text", text, context);
-    Utilities.serializeTextObject(root, "confirm", confirm, context);
-    Utilities.serializeTextObject(root, "deny", deny, context);
+    SlackUtil.serializeTextObject(root, "title", title, context);
+    SlackUtil.serializeTextObject(root, "text", text, context);
+    SlackUtil.serializeTextObject(root, "confirm", confirm, context);
+    SlackUtil.serializeTextObject(root, "deny", deny, context);
     return root;
   }
 
   @Override
   protected void load(final JsonObject root, final JsonDeserializationContext context) {
-    title = Utilities.getTextObject(root.get("title"), context, TextObject.TextType.PLAIN);
-    text = Utilities.getTextObject(root.get("text"), context, null);
-    confirm = Utilities.getTextObject(root.get("confirm"), context, TextObject.TextType.PLAIN);
-    deny = Utilities.getTextObject(root.get("deny"), context, TextObject.TextType.PLAIN);
+    title = SlackUtil.getTextObject(root.get("title"), context, TextObject.TextType.PLAIN);
+    text = SlackUtil.getTextObject(root.get("text"), context, null);
+    confirm = SlackUtil.getTextObject(root.get("confirm"), context, TextObject.TextType.PLAIN);
+    deny = SlackUtil.getTextObject(root.get("deny"), context, TextObject.TextType.PLAIN);
   }
 }
