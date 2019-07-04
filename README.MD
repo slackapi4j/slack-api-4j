@@ -1,6 +1,9 @@
 #Slack Api 4 Java 
-
+![Maven Badge](https://img.shields.io/maven-metadata/v/https/repo1.maven.org/maven2/io/github/slackapi4j/slack-api-4j/maven-metadata.xml.svg)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/44d12e126c7d446d93611327a31fdc2c)](https://app.codacy.com/app/Narimm/slack-api-4j?utm_source=github.com&utm_medium=referral&utm_content=slackapi4j/slack-api-4j&utm_campaign=Badge_Grade_Dashboard)
+[![Join the chat at https://gitter.im/slack-api-4j/community](https://badges.gitter.im/slack-api-4j/community.svg)](https://gitter.im/slack-api-4j/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+![Last Commit](https://img.shields.io/github/last-commit/slackapi4j/slack-api-4j.svg)
+![Travis CI](https://travis-ci.com/slackapi4j/slack-api-4j.svg?branch=master)
 
 Is an implementation of the Slack  api 
 
