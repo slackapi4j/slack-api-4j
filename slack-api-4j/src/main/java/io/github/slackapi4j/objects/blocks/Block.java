@@ -37,7 +37,6 @@ import com.google.gson.JsonSerializer;
 import io.github.slackapi4j.internal.Utilities;
 import io.github.slackapi4j.objects.BaseObject;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -49,7 +48,6 @@ import java.lang.reflect.Type;
  */
 @NoArgsConstructor
 @Getter
-@Builder
 public class Block extends BaseObject {
   @Setter
   private BlockType type;

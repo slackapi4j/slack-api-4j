@@ -34,7 +34,6 @@ import com.google.gson.JsonSerializationContext;
 import io.github.slackapi4j.internal.Utilities;
 import io.github.slackapi4j.objects.blocks.composition.TextObject;
 import io.github.slackapi4j.objects.blocks.elements.Element;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -49,7 +48,6 @@ import java.util.List;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-@Builder
 public class Section extends Block {
   private TextObject text;
   private List<TextObject> fields;

@@ -70,7 +70,7 @@ public class SelectElement extends Element {
     placeHolder = Utilities.getTextObject(root.get("placeholder"), context,
         TextObject.TextType.PLAIN);
     actionId = Utilities.getAsString(root.get("action_id"));
-    if (root.has("optons")) {
+    if (root.has("options")) {
       if (root.has("optionGroups")) {
         throw new JsonParseException("SelectElement cannot have both Options and OptionGroups");
       } else {

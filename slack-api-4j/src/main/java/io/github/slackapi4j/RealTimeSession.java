@@ -526,9 +526,24 @@ public class RealTimeSession implements Closeable {
   }
 
   private class SocketClient implements WebSocketListener {
+    /**
+     * A WebSocket binary frame has been received.
+     *
+     * @param payload the raw payload array received
+     * @param offset  the offset in the payload array where the data starts
+     * @param len     the length of bytes in the payload
+     */
     @Override
     public void onWebSocketBinary(final byte[] payload, final int offset, final int len) {
     }
+
+    /**
+     * A Close Event was received.
+     * The underlying Connection will be considered closed at this point.
+     * @param statusCode the close status code.
+     *                   (See {@link org.eclipse.jetty.websocket.api.StatusCode})
+     * @param reason the optional reason for the close.
+     */
 
     @Override
     public void onWebSocketClose(final int statusCode, final String reason) {
@@ -540,10 +555,24 @@ public class RealTimeSession implements Closeable {
       RealTimeSession.this.session = session;
     }
 
+    /**
+     * A WebSocket exception has occurred.
+     * This is a way for the internal implementation to notify of exceptions occurred during the
+     * processing of websocket. Usually this occurs from bad / malformed incoming packets.
+     * (example: bad UTF8 data, frames that are too big, violations of the spec)
+     * This will result in the {@link Session} being closed by the implementing side.
+     * @param cause the error that occurred.
+     */
+
     @Override
     public void onWebSocketError(final Throwable cause) {
       cause.printStackTrace();
     }
+
+    /**
+     * A WebSocket Text frame was received.
+     * @param message the message
+     */
 
     @Override
     public void onWebSocketText(final String message) {

@@ -199,13 +199,13 @@ public class ConversationsManager {
   public Conversation createDmConversation(final List<User> users)
       throws IOException, SlackException {
     if (users.isEmpty()) {
-      throw new IOException("No users to recieve");
+      throw new IOException("No users to receive");
     }
-    final StringBuilder userlist = new StringBuilder();
+    final StringBuilder userList = new StringBuilder();
     for (final User u : users) {
-      userlist.append(u.getId()).append(',');
+      userList.append(u.getId()).append(',');
     }
-    final String userString = userlist.toString().substring(0, userlist.length() - 1);
+    final String userString = userList.toString().substring(0, userList.length() - 1);
     final ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
     builder.put("users", userString);
     builder.put("return_im", true);
@@ -221,14 +221,17 @@ public class ConversationsManager {
    * @param conversation the conversation to close.
    * @return true if closed.
    * @throws IOException    encoding error
-   * @throws SlackException sending error
    */
   public boolean closeMultiPartyMessage(final Conversation conversation)
-      throws IOException, SlackException {
+      throws IOException {
     final Map<String, Object> params = ImmutableMap.<String, Object>builder()
         .put("channel", conversation.getId())
         .build();
-    final JsonObject raw = connection.callMethodHandled(SlackConstants.CONVERSATION_CLOSE, params);
+    try {
+      connection.callMethodHandled(SlackConstants.CONVERSATION_CLOSE, params);
+    } catch (SlackException e) {
+      return false;
+    }
     return true;
   }
 }
