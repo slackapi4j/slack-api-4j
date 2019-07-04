@@ -49,7 +49,6 @@ import java.util.List;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-@Builder
 public class Section extends Block {
   private TextObject text;
   private List<TextObject> fields;

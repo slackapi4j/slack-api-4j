@@ -78,7 +78,6 @@ public class SlackApi {
     builder.registerTypeAdapter(Conversation.class, Conversation.getGsonAdapter());
     builder.registerTypeAdapter(User.class, User.getGsonAdapter());
     builder.registerTypeAdapter(Message.class, Message.getGsonAdapter());
-    Attachment.addGsonAdapters(builder);
     Block.addGsonAdapters(builder);
     CompositionObject.addGsonAdapters(builder);
     Element.addGsonAdapters(builder);
@@ -194,6 +193,15 @@ public class SlackApi {
   @Deprecated
   public Message sendMessage(final String message, final IdBaseObject channel,
                              final MessageOptions options) throws SlackException, IOException {
+    final Map<String, Object> params = createParams(options, channel, message);
+    final JsonObject root = connection.callMethodHandled(SlackConstants.CHAT_POST, params);
+    final Message out = gson.fromJson(root.get("message"), Message.class);
+    out.setSubtype(Message.MessageType.Sent);
+    return out;
+  }
+
+  @Deprecated
+  private Map<String, Object> createParams(final MessageOptions options, final IdBaseObject channel, final String message) {
     final Map<String, Object> params = Maps.newHashMap();
     params.put("channel", channel.getId().toString());
     params.put("text", message);
@@ -221,7 +229,6 @@ public class SlackApi {
           break;
       }
     }
-
     if (options.getAttachments() != null) {
       final JsonArray attachments = new JsonArray();
       for (final Attachment attachment : options.getAttachments()) {
@@ -229,13 +236,9 @@ public class SlackApi {
       }
       params.put("attachments", attachments);
     }
-
     params.put("mrkdwn", options.isFormat());
 
-    final JsonObject root = connection.callMethodHandled(SlackConstants.CHAT_POST, params);
-    final Message out = gson.fromJson(root.get("message"), Message.class);
-    out.setSubtype(Message.MessageType.Sent);
-    return out;
+    return params;
   }
 
   private void addDefaultOptions(final JsonObject object, final MessageOptions options) {

@@ -99,6 +99,7 @@ public class Message extends IdBaseObject {
   /**
    * Message sent as a user.
    */
+  @Builder.Default
   private boolean asUser = false;
   /**
    * A list of attachments.

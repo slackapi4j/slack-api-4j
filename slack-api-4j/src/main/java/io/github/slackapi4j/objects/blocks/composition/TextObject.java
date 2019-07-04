@@ -47,6 +47,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class TextObject extends CompositionObject {
 
+  @Builder.Default
   private TextType type = TextType.PLAIN;
   private Boolean emoji;
   private Boolean verbatim;

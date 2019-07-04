@@ -221,14 +221,17 @@ public class ConversationsManager {
    * @param conversation the conversation to close.
    * @return true if closed.
    * @throws IOException    encoding error
-   * @throws SlackException sending error
    */
   public boolean closeMultiPartyMessage(final Conversation conversation)
-      throws IOException, SlackException {
+      throws IOException {
     final Map<String, Object> params = ImmutableMap.<String, Object>builder()
         .put("channel", conversation.getId())
         .build();
-    final JsonObject raw = connection.callMethodHandled(SlackConstants.CONVERSATION_CLOSE, params);
+    try {
+      connection.callMethodHandled(SlackConstants.CONVERSATION_CLOSE, params);
+    } catch (SlackException e) {
+      return false;
+    }
     return true;
   }
 }

@@ -46,18 +46,23 @@ public class MessageOptions {
       .mode(ParseMode.Partial)
       .format(false)
       .build();
-
+  @Builder.Default
   private boolean unfurlLinks = true;
+  @Builder.Default
   private boolean unfurlMedia = false;
   private URL iconUrl;
   private String iconEmoji;
+  @Builder.Default
   private boolean asUser = false;
+  @Builder.Default
   private boolean linkNames = false;
   private String username;
+  @Builder.Default
   private ParseMode mode = ParseMode.Partial;
   @SuppressWarnings("deprecation")
   private List<Attachment> attachments;
   private List<Block> blocks;
+  @Builder.Default
   private boolean format = false;
 
   public enum ParseMode {

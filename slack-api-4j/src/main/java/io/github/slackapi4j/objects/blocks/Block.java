@@ -49,7 +49,6 @@ import java.lang.reflect.Type;
  */
 @NoArgsConstructor
 @Getter
-@Builder
 public class Block extends BaseObject {
   @Setter
   private BlockType type;
