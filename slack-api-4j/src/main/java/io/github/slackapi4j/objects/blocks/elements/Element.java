@@ -35,7 +35,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import io.github.slackapi4j.internal.Utilities;
+import io.github.slackapi4j.internal.SlackUtil;
 import io.github.slackapi4j.objects.BaseObject;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -84,7 +84,7 @@ public abstract class Element extends BaseObject {
       final Element obj;
       try {
         final ElementType type = ElementType.valueOf(
-            Utilities.getAsString(el.getAsJsonObject().get("type")).toUpperCase());
+            SlackUtil.getAsString(el.getAsJsonObject().get("type")).toUpperCase());
         switch (type) {
           case IMAGE:
             obj = context.deserialize(el, ImageElement.class);
@@ -112,7 +112,7 @@ public abstract class Element extends BaseObject {
 
   @Override
   protected void load(final JsonObject root, final JsonDeserializationContext context) {
-    type = ElementType.valueOf(Utilities.getAsString(root.get("type")).toUpperCase());
+    type = ElementType.valueOf(SlackUtil.getAsString(root.get("type")).toUpperCase());
   }
 
   protected JsonObject save(final JsonObject root, final JsonSerializationContext context) {

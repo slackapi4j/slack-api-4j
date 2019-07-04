@@ -33,6 +33,7 @@ import io.github.slackapi4j.internal.SlackConversationType;
 import io.github.slackapi4j.objects.Conversation;
 import io.github.slackapi4j.objects.Message;
 import io.github.slackapi4j.objects.User;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -41,6 +42,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by benjamincharlton on 19/02/2019.
@@ -52,7 +54,8 @@ public class ConversationsManagerTest {
     @SuppressWarnings("deprecation")
     public void sendMessage() {
         if (TOKEN == null || TOKEN.isEmpty()) {
-            return;
+          assertTrue(true);
+          return;
         }
       final SlackApi api = new SlackApi(TOKEN);
         try {

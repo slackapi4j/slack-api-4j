@@ -28,7 +28,7 @@ package io.github.slackapi4j.objects;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
-import io.github.slackapi4j.internal.Utilities;
+import io.github.slackapi4j.internal.SlackUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -50,7 +50,7 @@ public class NormalChannel extends Conversation {
     super.load(root, context);
 
     if (super.isMember() && root.has("last_read")) {
-      lastRead = Utilities.getAsTimestamp(root.get("last_read"));
+      lastRead = SlackUtil.getAsTimestamp(root.get("last_read"));
       latest = context.deserialize(root.get("latest"), Message.class);
       unreadCount = root.get("unread_count").getAsInt();
       unreadCountDisplay = root.get("unread_count_display").getAsInt();

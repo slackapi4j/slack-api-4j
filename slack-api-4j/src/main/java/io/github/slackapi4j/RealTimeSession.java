@@ -39,7 +39,7 @@ import io.github.slackapi4j.events.MessageEvent;
 import io.github.slackapi4j.events.RealTimeEvent;
 import io.github.slackapi4j.events.UserConversationEvent;
 import io.github.slackapi4j.exceptions.SlackRtException;
-import io.github.slackapi4j.internal.Utilities;
+import io.github.slackapi4j.internal.SlackUtil;
 import io.github.slackapi4j.objects.Conversation;
 import io.github.slackapi4j.objects.Message;
 import io.github.slackapi4j.objects.Message.MessageType;
@@ -404,7 +404,7 @@ public class RealTimeSession implements Closeable {
   }
 
   private void onEvent(final JsonObject event) {
-    final String type = Utilities.getAsString(event.get("type"));
+    final String type = SlackUtil.getAsString(event.get("type"));
     if (type == null) {
       return;
     }

@@ -28,7 +28,7 @@ package io.github.slackapi4j.objects;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
-import io.github.slackapi4j.internal.Utilities;
+import io.github.slackapi4j.internal.SlackUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -52,12 +52,12 @@ public class DirectChannel extends TimeStampedBaseObject {
     super.load(object, context);
 
     userId = new ObjectID(object.get("user").getAsString());
-    isUserDeleted = Utilities.getAsBoolean(object.get("is_user_deleted"), false);
+    isUserDeleted = SlackUtil.getAsBoolean(object.get("is_user_deleted"), false);
 
-    isOpen = Utilities.getAsBoolean(object.get("is_open"), true);
+    isOpen = SlackUtil.getAsBoolean(object.get("is_open"), true);
     if (object.has("last_read")) {
-      lastRead = Utilities.getAsTimestamp(object.get("last_read"));
-      unreadCount = Utilities.getAsInt(object.get("unread_count"));
+      lastRead = SlackUtil.getAsTimestamp(object.get("last_read"));
+      unreadCount = SlackUtil.getAsInt(object.get("unread_count"));
       latest = context.deserialize(object.get("latest"), Message.class);
     }
   }

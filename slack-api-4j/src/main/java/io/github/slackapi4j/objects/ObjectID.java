@@ -69,10 +69,10 @@ public class ObjectID {
   @Getter
   @RequiredArgsConstructor
   private enum ObjectType {
-    User('U', io.github.slackapi4j.objects.User.class),
-    Conversation('C', io.github.slackapi4j.objects.Conversation.class),
-    GroupConversation('G', io.github.slackapi4j.objects.Conversation.class),
-    DirectConversation('D', io.github.slackapi4j.objects.Conversation.class),
+    User('U', User.class),
+    Conversation('C', Conversation.class),
+    GroupConversation('G', Conversation.class),
+    DirectConversation('D', Conversation.class),
     Team('T', null),
     Bot('B', null),
     Unknown('\0', null);

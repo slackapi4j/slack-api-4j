@@ -201,7 +201,8 @@ public class SlackApi {
   }
 
   @Deprecated
-  private Map<String, Object> createParams(final MessageOptions options, final IdBaseObject channel, final String message) {
+  private Map<String, Object> createParams(final MessageOptions options, final IdBaseObject channel,
+                                           final String message) {
     final Map<String, Object> params = Maps.newHashMap();
     params.put("channel", channel.getId().toString());
     params.put("text", message);

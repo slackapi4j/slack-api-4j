@@ -28,7 +28,7 @@ package io.github.slackapi4j.objects;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
-import io.github.slackapi4j.internal.Utilities;
+import io.github.slackapi4j.internal.SlackUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -83,12 +83,12 @@ public class User extends IdBaseObject {
 
     if (root.has("profile")) {
       final JsonObject profile = root.get("profile").getAsJsonObject();
-      firstName = Utilities.getAsString(profile.get("first_name"));
-      lastName = Utilities.getAsString(profile.get("last_name"));
-      realName = Utilities.getAsString(profile.get("real_name"));
-      email = Utilities.getAsString(profile.get("email"));
-      skype = Utilities.getAsString(profile.get("skype"));
-      phone = Utilities.getAsString(profile.get("phone"));
+      firstName = SlackUtil.getAsString(profile.get("first_name"));
+      lastName = SlackUtil.getAsString(profile.get("last_name"));
+      realName = SlackUtil.getAsString(profile.get("real_name"));
+      email = SlackUtil.getAsString(profile.get("email"));
+      skype = SlackUtil.getAsString(profile.get("skype"));
+      phone = SlackUtil.getAsString(profile.get("phone"));
       if (profile.has("image_24")) {
         profileImage24 = context.deserialize(profile.get("image_24"), URL.class);
         profileImage32 = context.deserialize(profile.get("image_32"), URL.class);
