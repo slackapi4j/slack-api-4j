@@ -77,7 +77,7 @@ public class MessageExampleListener extends MessageListener {
   @Override
   public void onMessage(final MessageEvent event) {
     log.info(event.getMessage().getText());
-    System.out.println(event);
+    log.info(event.toString());
     if (event.getMessage().getText().contains("!PING")) { //this can mach for emoji so watch out.
       final TextObject text = new TextObject();
       text.setText("#PONG!!!# :baseball: ");
@@ -94,9 +94,9 @@ public class MessageExampleListener extends MessageListener {
           .build();
       message.addBlock(section);
       try {
-        System.out.println("Sent:" + message.getTimestamp());
+        log.info("Sent:" + message.getTimestamp());
         final Message sent = session.getApi().sendEphemeral(message);
-        System.out.println("Sent:" + sent.getTimestamp());
+        log.info("Sent:" + sent.getTimestamp());
       } catch (final IOException | SlackException e) {
         Logger.getAnonymousLogger().warning(e.getMessage());
       }

@@ -26,29 +26,40 @@ package io.github.slackapi4j.objects;
  * #L%
  */
 
+import com.google.gson.annotations.SerializedName;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
  * Created by benjamincharlton on 26/08/2018.
  */
 @NoArgsConstructor
-@Getter
+@Data
 @EqualsAndHashCode(callSuper = true)
 public class FileObject extends TimeStampedBaseObject {
   private String name;
   private String title;
+  @SerializedName("mimetype")
   private String mimeType;
+  @SerializedName("filetype")
   private String fileType;
+  @SerializedName("pretty_type")
   private String prettyType;
-  private ObjectID user;
+  @SerializedName("user")
+  private ObjectID userId;
   private boolean editable;
   private long size;
   private Mode mode;
+  @SerializedName("is_external")
   private boolean isExternal;
+  @SerializedName("external_type")
+  private String externalType;
+  @SerializedName("is_public")
   private boolean isPublic;
+  @SerializedName("public_url_shared")
   private boolean publicUrlShared;
+  @SerializedName("display_as_bot")
   private boolean displayAsBot;
 
   enum Mode {

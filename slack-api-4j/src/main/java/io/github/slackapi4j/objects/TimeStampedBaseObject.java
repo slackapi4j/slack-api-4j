@@ -28,6 +28,7 @@ package io.github.slackapi4j.objects;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
+import com.google.gson.annotations.SerializedName;
 import io.github.slackapi4j.internal.SlackUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -43,6 +44,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 public class TimeStampedBaseObject extends IdBaseObject {
 
+  @SerializedName("created")
   private long creationDate;
 
   protected void load(final JsonObject object, final JsonDeserializationContext context) {

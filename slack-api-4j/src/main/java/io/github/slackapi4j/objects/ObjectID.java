@@ -77,6 +77,7 @@ public class ObjectID {
     Conversation('C', Conversation.class),
     GroupConversation('G', Conversation.class),
     DirectConversation('D', Conversation.class),
+    File('F',FileObject.class),
     Team('T', null),
     Bot('B', null),
     Unknown('\0', null);

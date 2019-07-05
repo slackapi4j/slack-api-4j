@@ -60,7 +60,7 @@ public class ConversationExampleListener extends ConversationEventListener {
   @Override
   public void onConversation(final ConversationEvent event) {
     log.info(event.getType().name() + ':' + event.getConversationID());
-    System.out.println(event);
+    log.info(event.toString());
     if (event.getType() == ConversationEvent.EventType.Join) {
       final Message message = Message.builder()
           .text("If you !PING I will pong!")

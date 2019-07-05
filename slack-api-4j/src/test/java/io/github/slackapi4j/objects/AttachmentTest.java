@@ -28,15 +28,13 @@ package io.github.slackapi4j.objects;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Created by Narimm on 4/07/2019.
@@ -44,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class AttachmentTest {
 
   @Test
-  void testSerialization() {
+  protected void testSerialization() {
     final Attachment attachment = new Attachment("test fallback");
     attachment.setColor("red");
     Attachment.MarkDownFormats formats = new Attachment.MarkDownFormats();
