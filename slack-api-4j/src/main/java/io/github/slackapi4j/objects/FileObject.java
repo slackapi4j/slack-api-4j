@@ -26,9 +26,16 @@ package io.github.slackapi4j.objects;
  * #L%
  */
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 /**
  * Created by benjamincharlton on 26/08/2018.
  */
+@NoArgsConstructor
+@Getter
+@EqualsAndHashCode(callSuper = true)
 public class FileObject extends TimeStampedBaseObject {
   private String name;
   private String title;

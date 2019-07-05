@@ -211,8 +211,7 @@ public class ConversationsManager {
     builder.put("return_im", true);
     final Map<String, Object> params = builder.build();
     final JsonObject raw = connection.callMethodHandled(SlackConstants.CONVERSATION_OPEN, params);
-    final Conversation con = gson.fromJson(raw.get("channel"), Conversation.class);
-    return con;
+    return gson.fromJson(raw.get("channel"), Conversation.class);
   }
 
   /**

@@ -62,7 +62,7 @@ public class ImageBlock extends Block {
     try {
       imageUrl = new URL(root.get("imageURL").getAsString());
     } catch (final MalformedURLException e) {
-      throw new JsonParseException("URL could not be decoded");
+      throw new JsonParseException("URL could not be decoded", e);
     }
     altText = SlackUtil.getAsString(root.get("alt_text"));
 

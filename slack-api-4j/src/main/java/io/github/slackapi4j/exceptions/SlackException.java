@@ -41,6 +41,12 @@ public class SlackException extends Exception {
     this.code = code;
   }
 
+  protected SlackException(final String code, final String message, final Throwable e) {
+    super(message, e);
+    this.code = code;
+
+  }
+
   public final String getCode() {
     return code;
   }

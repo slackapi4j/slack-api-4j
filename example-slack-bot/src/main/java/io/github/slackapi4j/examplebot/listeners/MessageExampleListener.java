@@ -98,7 +98,7 @@ public class MessageExampleListener extends MessageListener {
         final Message sent = session.getApi().sendEphemeral(message);
         System.out.println("Sent:" + sent.getTimestamp());
       } catch (final IOException | SlackException e) {
-        e.printStackTrace();
+        Logger.getAnonymousLogger().warning(e.getMessage());
       }
 
     }

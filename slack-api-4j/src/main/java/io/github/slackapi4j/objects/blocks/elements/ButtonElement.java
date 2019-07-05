@@ -67,7 +67,7 @@ public class ButtonElement extends Element {
     try {
       url = new URL(root.get("url").getAsString());
     } catch (final MalformedURLException e) {
-      throw new JsonParseException("URL could not be decoded");
+      throw new JsonParseException("URL could not be decoded", e);
     }
   }
 

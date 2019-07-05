@@ -33,7 +33,6 @@ import io.github.slackapi4j.internal.SlackConversationType;
 import io.github.slackapi4j.objects.Conversation;
 import io.github.slackapi4j.objects.Message;
 import io.github.slackapi4j.objects.User;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

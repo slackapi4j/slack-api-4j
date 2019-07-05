@@ -66,6 +66,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("WeakerAccess")
@@ -90,6 +91,7 @@ public class RealTimeSession implements Closeable {
   private Session session;
   private int nextMessageId = 1;
   private boolean needJoinConfirm;
+  private final Logger logger;
 
   RealTimeSession(final JsonObject object, final SlackApi main) throws IOException {
     api = main;
@@ -98,6 +100,7 @@ public class RealTimeSession implements Closeable {
     listeners = Lists.newArrayList();
     pendingMessages = Maps.newHashMap();
     futureConversations = Maps.newHashMap();
+    logger = main.getLogger();
 
     final JsonArray channels = object.getAsJsonArray("channels");
     final JsonArray users = object.getAsJsonArray("users");
@@ -180,8 +183,10 @@ public class RealTimeSession implements Closeable {
         }
         addUser(loaded);
       } catch (final Throwable e) {
-        System.err.println("Unable to load user " + user);
-        e.printStackTrace();
+        logger.warning("Unable to load user " + user);
+        if (SlackApi.isDebug()) {
+          e.printStackTrace();
+        }
       }
     }
     // Load Conversations
@@ -207,8 +212,6 @@ public class RealTimeSession implements Closeable {
       nextMessageId = 1;
     } catch (final URISyntaxException e) {
       // Should never happen
-    } catch (final IOException e) {
-      throw e;
     } catch (final InterruptedException e) {
       throw new IOException(e.getCause());
     } catch (final ExecutionException e) {
@@ -218,7 +221,7 @@ public class RealTimeSession implements Closeable {
         throw new IOException(e.getCause());
       }
     } catch (final TimeoutException e) {
-      throw new SocketTimeoutException(); // Probably wont
+      throw new SocketTimeoutException(e.getMessage()); // Probably wont
     } catch (final Exception e) {     // Sigh, couldn't they pick a more specific one? :/
       throw new IOException(e);
     }
@@ -275,10 +278,6 @@ public class RealTimeSession implements Closeable {
     }
   }
 
-  private void removeChannel(@Nonnull final Conversation channel) {
-    removeChannel(channel.getId());
-  }
-
   /**
    * This method may add a relatively incomplete object to the channel list
    * but the deign is such that it is update by a call to then api to get a full object.
@@ -316,7 +315,10 @@ public class RealTimeSession implements Closeable {
             removeChannel(f.getValue());
           }
         } catch (final InterruptedException | ExecutionException e) {
-          e.printStackTrace();
+          logger.warning("Exception Occured " + e.getMessage());
+          if (SlackApi.isDebug()) {
+            e.printStackTrace();
+          }
         }
 
       }
@@ -375,7 +377,9 @@ public class RealTimeSession implements Closeable {
           conversationFuture.cancel(true));
       futureConversations.clear();
     } catch (final Exception e) {
-      // Its shutting down, I dont care
+      if (SlackApi.isDebug()) {
+        logger.severe(e.getMessage());
+      }
     }
   }
 
@@ -423,9 +427,6 @@ public class RealTimeSession implements Closeable {
     }
 
     final RealTimeEvent newEvent;
-    final Conversation conversation;
-    final ObjectID conID;
-    final ObjectID userID;
     switch (type) {
       case "message": {
         // A message from a previous session
@@ -444,65 +445,52 @@ public class RealTimeSession implements Closeable {
       }
       case "channel_created":
       case "im_created":
-        conversation = gson.fromJson(event.get("channel"), Conversation.class);
-        newEvent = new ConversationEvent(conversation.getId(), ConversationEvent.EventType.Create);
-        updateChannel(conversation);
+        newEvent = makeConversationEvent(event, ConversationEvent.EventType.Create);
+        updateChannel(((ConversationEvent) newEvent).getConversationID());
         break;
       case "channel_joined":
       case "group_joined":
-        conversation = gson.fromJson(event.get("channel"), Conversation.class);
-        conID = conversation.getId();
-        newEvent = new ConversationEvent(conID, ConversationEvent.EventType.Join);
-        updateChannel(conversation);
+        newEvent = makeConversationEvent(event, ConversationEvent.EventType.Join);
+        updateChannel(((ConversationEvent) newEvent).getConversationID());
         break;
       case "group_deleted":
       case "channel_deleted":
-        conID = new ObjectID(event.get("channel").toString());
-        newEvent = new ConversationEvent(conID, ConversationEvent.EventType.Delete);
-        updateChannel(conID);
+        newEvent = makeConversationEvent(event, ConversationEvent.EventType.Delete);
+        updateChannel(((ConversationEvent) newEvent).getConversationID());
         break;
       case "channel_left":
       case "group_left":
-        conID = new ObjectID(event.get("channel").toString());
-        newEvent = new ConversationEvent(conID, ConversationEvent.EventType.Join);
-        updateChannel(conID);
+        newEvent = makeConversationEvent(event, ConversationEvent.EventType.Leave);
+        updateChannel(((ConversationEvent) newEvent).getConversationID());
         break;
       case "channel_rename":
       case "group_rename":
-        conversation = gson.fromJson(event.get("channel"), Conversation.class);
-        newEvent = new ConversationEvent(conversation.getId(), ConversationEvent.EventType.Rename);
-        final Conversation oldObject = channelIdMap.get(conversation.getId());
+        newEvent = makeConversationEvent(event, ConversationEvent.EventType.Archive);
+        final Conversation oldObject = channelIdMap
+            .get(((ConversationEvent) newEvent).getConversationID());
         channelMap.remove(oldObject.getName());
         channelIdMap.remove(oldObject.getId());
-        updateChannel(conversation);
+        updateChannel(((ConversationEvent) newEvent).getConversationID());
         break;
       case "channel_archive":
       case "group_archive":
-        conID = new ObjectID(event.get("channel").toString());
-        userID = new ObjectID(event.get("user").toString());
-        newEvent = new UserConversationEvent(conID, userID, ConversationEvent.EventType.Archive);
-        updateChannel(conID);
+        newEvent = makeConversationEvent(event, ConversationEvent.EventType.Archive);
+        updateChannel(((ConversationEvent) newEvent).getConversationID());
         break;
       case "channel_unarchive":
       case "group_unarchive":
-        conID = new ObjectID(event.get("channel").toString());
-        userID = new ObjectID(event.get("user").toString());
-        newEvent = new UserConversationEvent(conID, userID, ConversationEvent.EventType.Unarchive);
-        updateChannel(conID);
+        newEvent = makeConversationEvent(event, ConversationEvent.EventType.Unarchive);
+        updateChannel(((ConversationEvent) newEvent).getConversationID());
         break;
       case "group_open":
       case "im_open":
-        conID = new ObjectID(event.get("channel").toString());
-        userID = new ObjectID(event.get("user").toString());
-        newEvent = new UserConversationEvent(conID, userID, ConversationEvent.EventType.Open);
-        updateChannel(conID);
+        newEvent = makeConversationEvent(event, ConversationEvent.EventType.Open);
+        updateChannel(((ConversationEvent) newEvent).getConversationID());
         break;
       case "group_close":
       case "im_close":
-        conID = new ObjectID(event.get("channel").toString());
-        userID = new ObjectID(event.get("user").toString());
-        newEvent = new UserConversationEvent(conID, userID, ConversationEvent.EventType.Close);
-        updateChannel(conID);
+        newEvent = makeConversationEvent(event, ConversationEvent.EventType.Close);
+        updateChannel(((ConversationEvent) newEvent).getConversationID());
         break;
       case "user_change":
         final User user = gson.fromJson(event.get("user"), User.class);
@@ -522,6 +510,27 @@ public class RealTimeSession implements Closeable {
     }
     if (newEvent != null) {
       postEvent(newEvent);
+    }
+  }
+
+  private ConversationEvent makeConversationEvent(final JsonObject event,
+                                                  final ConversationEvent.EventType type) {
+    if (event.has("user")) {
+      return new UserConversationEvent(new ObjectID(event.get("channel").toString()),
+          new ObjectID(event.get("user").toString()), type);
+    } else {
+      final JsonElement obj = event.get("channel");
+      if (obj.isJsonArray()) {
+        final Conversation conversation = gson.fromJson(event.get("channel"), Conversation.class);
+        return new ConversationEvent(conversation.getId(), type);
+      } else {
+        final ObjectID objectID = new ObjectID(event.get("channel").toString());
+        if (objectID.isUnknown()) {
+          logger.warning("An unknow Object ID has been recieved please notify the Slackapi4J "
+              + "developers: " + objectID);
+        }
+        return new ConversationEvent(objectID, type);
+      }
     }
   }
 
@@ -566,7 +575,10 @@ public class RealTimeSession implements Closeable {
 
     @Override
     public void onWebSocketError(final Throwable cause) {
-      cause.printStackTrace();
+      logger.warning(cause.getMessage());
+      if (SlackApi.isDebug()) {
+        cause.printStackTrace();
+      }
     }
 
     /**

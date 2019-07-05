@@ -99,7 +99,7 @@ public abstract class Element extends BaseObject {
             throw new JsonParseException("Could not decode element");
         }
       } catch (final IllegalArgumentException e) {
-        throw new JsonParseException("Could not parse Element: " + e.getMessage());
+        throw new JsonParseException("Could not parse Element: " + e.getMessage(), e);
       }
       result.add(obj);
     }

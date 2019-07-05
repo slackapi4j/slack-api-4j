@@ -63,7 +63,7 @@ public class MessageValidator {
           //valid
       }
     } catch (final SlackMessageInvalidException e) {
-      throw new SlackMessageInvalidException(e.getCode(), constant + " : " + e.getMessage());
+      throw new SlackMessageInvalidException(e.getCode(), constant + " : " + e.getMessage(), e);
     }
   }
 

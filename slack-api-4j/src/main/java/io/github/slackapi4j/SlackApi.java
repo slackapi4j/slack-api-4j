@@ -51,6 +51,7 @@ import io.github.slackapi4j.objects.blocks.elements.Element;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 @SuppressWarnings("WeakerAccess")
 public class SlackApi {
@@ -63,13 +64,20 @@ public class SlackApi {
   private final GroupManager groups;
   private final ConversationsManager conversations;
 
+  private final Logger logger;
+
+  public SlackApi(final String token) {
+    this(token, Logger.getAnonymousLogger(SlackApi.class.getName()));
+  }
+
   /**
    * The base Api class from here you can get almost everything..
    *
    * @param token the token from the interface
    */
   @SuppressWarnings("deprecation")
-  public SlackApi(final String token) {
+  public SlackApi(final String token, final Logger log) {
+    logger = log;
     connection = new SlackConnection(token);
     final GsonBuilder builder = new GsonBuilder();
     builder.registerTypeAdapter(NormalChannel.class, NormalChannel.getGsonAdapter());
@@ -86,6 +94,10 @@ public class SlackApi {
     channels = new ChannelManager(this);
     groups = new GroupManager(this);
     conversations = new ConversationsManager(this);
+  }
+
+  protected Logger getLogger() {
+    return logger;
   }
 
   public static boolean isDebug() {

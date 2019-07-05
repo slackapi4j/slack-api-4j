@@ -51,8 +51,7 @@ public abstract class BaseObject {
     @Override
     @SuppressWarnings("deprecation")
     public BaseObject deserialize(final JsonElement element, final Type type,
-                                  final JsonDeserializationContext context)
-        throws JsonParseException {
+                                  final JsonDeserializationContext context) {
       if (!(element instanceof JsonObject)) {
         throw new JsonParseException("Expected JSONObject as channel root");
       }

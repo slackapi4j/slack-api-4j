@@ -34,4 +34,8 @@ public class SlackMessageInvalidException extends SlackException {
   public SlackMessageInvalidException(final String errorCode, final String message) {
     super(errorCode, message);
   }
+
+  public SlackMessageInvalidException(final String errorCode, final String message, Throwable e) {
+    super(errorCode, message, e);
+  }
 }

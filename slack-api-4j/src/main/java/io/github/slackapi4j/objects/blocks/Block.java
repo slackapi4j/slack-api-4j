@@ -112,7 +112,7 @@ public class Block extends BaseObject {
 
     @Override
     public Block deserialize(final JsonElement json, final Type type,
-                             final JsonDeserializationContext context) throws JsonParseException {
+                             final JsonDeserializationContext context) {
       if (!(json instanceof JsonObject)) {
         throw new JsonParseException("Expected JSONObject as channel root");
       }

@@ -58,7 +58,7 @@ public class ChannelManager {
     connection = main.getSlack();
   }
 
-  public NormalChannel create(final String name) throws SlackException, IOException {
+  public NormalChannel create(final String name) {
     throw new UnsupportedOperationException("Not yet implemented");
   }
 
@@ -68,7 +68,7 @@ public class ChannelManager {
    * @param channel the channel
    * @return true on success
    * @throws SlackException If the session generates an error
-   * @throws IOException    if the {@link Gson} object returned cannot be decoded
+   * @throws IOException    if there is an error connecting to the rest endpoint
    */
   public boolean joinChannel(final NormalChannel channel) throws SlackException, IOException {
     final Map<String, Object> params = ImmutableMap.<String, Object>builder()

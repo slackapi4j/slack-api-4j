@@ -66,6 +66,10 @@ public class ObjectID {
     return String.format("%s%s", type.getClassifier(), id);
   }
 
+  public boolean isUnknown() {
+    return type == ObjectType.Unknown;
+  }
+
   @Getter
   @RequiredArgsConstructor
   private enum ObjectType {

@@ -34,6 +34,7 @@ import io.github.slackapi4j.exceptions.SlackException;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
+import java.util.logging.Logger;
 
 /**
  * Created by Narimm on 27/06/2019.
@@ -60,7 +61,7 @@ public class ExampleBot {
             new ExampleListener(s_SESSION);
             new MessageExampleListener(s_SESSION);
           } catch (final SlackException | IOException e) {
-            e.printStackTrace();
+            Logger.getAnonymousLogger().warning(e.getMessage());
           }
         }
     );

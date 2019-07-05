@@ -61,7 +61,6 @@ public class ExampleListener implements RealTimeListener {
   @Override
   public void onError(final SlackRtException cause) {
     log.info(cause.getMessage());
-    cause.printStackTrace();
   }
 
   /**

@@ -36,6 +36,7 @@ import io.github.slackapi4j.exceptions.SlackException;
 import io.github.slackapi4j.exceptions.SlackMessageInvalidException;
 import io.github.slackapi4j.exceptions.SlackRequestLimitException;
 import io.github.slackapi4j.exceptions.SlackRestrictedException;
+import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -84,7 +85,7 @@ public class SlackConnection {
       return data.toString();
     } catch (final UnsupportedEncodingException e) {
       // Should never happen
-      throw new AssertionError();
+      throw new AssertionError(e);
     }
   }
 
@@ -129,7 +130,7 @@ public class SlackConnection {
       return connection;
     } catch (final ProtocolException e) {
       // Should not happen
-      throw new AssertionError();
+      throw new AssertionError(e);
     }
   }
 
@@ -178,7 +179,7 @@ public class SlackConnection {
 
   private JsonElement processConnectionResult(final HttpsURLConnection connection)
       throws IOException {
-    if (connection.getResponseCode() == 429) {  //too many requests
+    if (connection.getResponseCode() == HttpStatus.TOO_MANY_REQUESTS_429) {  //too many requests
       final int delay = connection.getHeaderFieldInt("Retry-After", 2);
       isRateLimited = true;
       retryEnd = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(delay);
@@ -251,13 +252,9 @@ public class SlackConnection {
       final String code = base.get("error").getAsString();
       throw validateErrorCode(code);
     } else if (SlackApi.isDebug() && base.has("warning")) {
-      try {
         final String warning = base.get("warning").getAsString();
-        throw new SlackMessageInvalidException("warning", "DEBUG ENABLED : "
-            + method + " Response contained a warning :" + warning);
-      } catch (final SlackException e) {
-        e.printStackTrace();
-      }
+      new SlackMessageInvalidException("warning", "DEBUG ENABLED : " + method
+          + " Response contained a warning :" + warning).printStackTrace();
       return base;
     }
     return base;
