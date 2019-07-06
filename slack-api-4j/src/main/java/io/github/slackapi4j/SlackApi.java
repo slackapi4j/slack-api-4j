@@ -67,7 +67,7 @@ public class SlackApi {
   private final Logger logger;
 
   public SlackApi(final String token) {
-    this(token, Logger.getAnonymousLogger(SlackApi.class.getName()));
+    this(token, Logger.getAnonymousLogger());
   }
 
   /**

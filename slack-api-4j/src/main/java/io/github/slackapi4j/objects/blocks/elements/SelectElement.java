@@ -38,9 +38,8 @@ import io.github.slackapi4j.objects.blocks.composition.ConfirmObject;
 import io.github.slackapi4j.objects.blocks.composition.Option;
 import io.github.slackapi4j.objects.blocks.composition.OptionGroup;
 import io.github.slackapi4j.objects.blocks.composition.TextObject;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,8 +47,7 @@ import java.util.List;
 /**
  *  Created by Narimm on 21/02/2019.
  */
-@Getter
-@Setter
+@Data
 @EqualsAndHashCode(callSuper = true)
 public class SelectElement extends ConfirmableElement {
 
