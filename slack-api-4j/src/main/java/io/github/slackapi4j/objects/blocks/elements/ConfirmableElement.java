@@ -36,12 +36,12 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-abstract class ConfirmableElement extends Element {
+ abstract class ConfirmableElement extends Element {
 
   @SerializedName("confirm")
-  Object confirm;
+  protected Object confirm;
 
   @SerializedName("action_id")
-  String actionId;
+  protected String actionId;
 
 }

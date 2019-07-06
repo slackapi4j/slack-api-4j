@@ -83,14 +83,16 @@ public class ButtonElement extends ConfirmableElement {
   }
 
   protected enum ButtonStyle{
+
     Default("default"),
     Primary("primary"),
     Danger("danger");
 
+    private String value;
+
     ButtonStyle(String style){
       this.value = style;
     }
-    private String value;
 
     @Override
     public String toString(){
