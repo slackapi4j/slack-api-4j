@@ -49,12 +49,13 @@ public class TextObject extends CompositionObject {
 
   @Builder.Default
   private TextType type = TextType.PLAIN;
-  private Boolean emoji;
-  private Boolean verbatim;
+  private boolean emoji;
+  private boolean verbatim;
   private String text;
 
   public TextObject() {
     super();
+    setType(TextType.PLAIN);
   }
 
   @Override
@@ -68,12 +69,8 @@ public class TextObject extends CompositionObject {
   @Override
   protected JsonElement save(final JsonObject root, final JsonSerializationContext context) {
     root.addProperty("type", type.getValue());
-    if (emoji != null && type == TextType.PLAIN) {
-      root.addProperty("emoji", emoji);
-    }
-    if (verbatim != null) {
-      root.addProperty("verbatim", verbatim);
-    }
+    root.addProperty("emoji", emoji);
+    root.addProperty("verbatim", verbatim);
     root.addProperty("text", text);
     return root;
   }

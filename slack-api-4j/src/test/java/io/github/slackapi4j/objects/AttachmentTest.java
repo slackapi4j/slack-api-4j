@@ -45,8 +45,7 @@ class AttachmentTest {
   protected void testSerialization() {
     final Attachment attachment = new Attachment("test fallback");
     attachment.setColor("red");
-    Attachment.MarkDownFormats formats = new Attachment.MarkDownFormats();
-    formats.setFormatFields(false);
+    MarkDownFormats formats = MarkDownFormats.builder().formatFields(false).build();
     attachment.setFormats(formats);
     attachment.getFields().add(new Attachment.AttachmentField("field test title", "some value", true));
     attachment.setAuthorName("TestAuthor");
