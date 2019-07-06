@@ -32,6 +32,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
+import com.google.gson.annotations.SerializedName;
 import io.github.slackapi4j.internal.SlackUtil;
 import io.github.slackapi4j.objects.blocks.composition.ConfirmObject;
 import io.github.slackapi4j.objects.blocks.composition.Option;
@@ -50,13 +51,16 @@ import java.util.List;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class SelectElement extends Element {
+public class SelectElement extends ConfirmableElement {
+
+  @SerializedName("placeholder")
   private TextObject placeHolder;
-  private String actionId;
+  @SerializedName("options")
   private List<Option> options;
+  @SerializedName("optiongroups")
   private List<OptionGroup> optionGroups;
+  @SerializedName("initial_option")
   private Option initialOption;
-  private ConfirmObject confirm;
 
   public SelectElement() {
     super();

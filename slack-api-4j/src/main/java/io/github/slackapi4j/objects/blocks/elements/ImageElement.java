@@ -30,6 +30,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
+import com.google.gson.annotations.SerializedName;
 import io.github.slackapi4j.internal.SlackUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -45,8 +46,9 @@ import java.net.URL;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 public class ImageElement extends Element {
-
+  @SerializedName("imageURL")
   private URL imageUrl;
+  @SerializedName("alt_text")
   private String altText;
 
   public ImageElement() {
@@ -72,7 +74,7 @@ public class ImageElement extends Element {
       root.addProperty("imageUrl", imageUrl.toString());
     }
     if (altText != null) {
-      root.addProperty("alt_test", altText);
+      root.addProperty("alt_text", altText);
     }
     return root;
   }

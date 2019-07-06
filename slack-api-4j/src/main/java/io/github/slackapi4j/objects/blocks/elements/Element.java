@@ -35,6 +35,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.google.gson.annotations.SerializedName;
 import io.github.slackapi4j.internal.SlackUtil;
 import io.github.slackapi4j.objects.BaseObject;
 import lombok.EqualsAndHashCode;
@@ -56,6 +57,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public abstract class Element extends BaseObject {
 
+  @SerializedName("type")
   private ElementType type;
 
   /**
@@ -124,6 +126,7 @@ public abstract class Element extends BaseObject {
     IMAGE,
     STATIC_SELECT,
     BUTTON,
+    DATEPICKER,
   }
 
   private static class ElementJsonAdapter implements

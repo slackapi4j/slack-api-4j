@@ -30,6 +30,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
+import com.google.gson.annotations.SerializedName;
 import io.github.slackapi4j.internal.SlackUtil;
 import io.github.slackapi4j.objects.blocks.composition.TextObject;
 import lombok.EqualsAndHashCode;
@@ -45,13 +46,16 @@ import java.net.URL;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class ButtonElement extends Element {
+public class ButtonElement extends ConfirmableElement {
 
+@SerializedName("text")
   private TextObject text;
-  private String actionId;
+@SerializedName("url")
   private URL url;
+@SerializedName("value")
   private String value;
-  private Object confirm;
+@SerializedName("style")
+  private ButtonStyle style;
 
   public ButtonElement() {
     super();
@@ -69,10 +73,28 @@ public class ButtonElement extends Element {
     } catch (final MalformedURLException e) {
       throw new JsonParseException("URL could not be decoded", e);
     }
+    style = ButtonStyle.valueOf(root.get("style").getAsString().toUpperCase());
+
   }
 
   @Override
   protected JsonObject save(final JsonObject root, final JsonSerializationContext context) {
     return super.save(root, context);
+  }
+
+  protected enum ButtonStyle{
+    Default("default"),
+    Primary("primary"),
+    Danger("danger");
+
+    ButtonStyle(String style){
+      this.value = style;
+    }
+    private String value;
+
+    @Override
+    public String toString(){
+      return value;
+    }
   }
 }

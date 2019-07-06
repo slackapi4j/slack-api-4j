@@ -54,6 +54,7 @@ public abstract class CompositionObject extends BaseObject {
     builder.registerTypeAdapter(Option.class, getGsonAdapter());
     builder.registerTypeAdapter(ConfirmObject.class, getGsonAdapter());
     builder.registerTypeAdapter(OptionGroup.class, getGsonAdapter());
+    builder.registerTypeAdapter(ConfirmObject.class,getGsonAdapter());
   }
 
   public static CompositionObjectJsonAdapter getGsonAdapter() {
